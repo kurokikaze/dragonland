@@ -1,0 +1,39 @@
+.promptOverlay {
+    width: 900px;
+    height: 100%;
+    background-color: rgba(51, 51, 51, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.promptWindow {
+    width: 80%;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    height: 80%;
+    background-color: #E7DCCA;
+    border-color: #D1A53E;
+    color: #040403;
+}
+
+.promptWindow .cardHolder img {
+    max-width: 128px;
+    max-height: 180px;     
+}
+
+.promptChooseCards .cardsRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.promptChooseCards .cardSelect {
+    opacity: 0.6;
+}
+
+.promptChooseCards .cardSelect.chosen {
+    opacity: 1;
+}

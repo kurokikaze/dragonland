@@ -49,26 +49,6 @@
     width: 900px;
 }
 
-#overlay {
-    display: none;
-    width: 900px;
-    height: 100%;
-    opacity: 0.6;
-    background-color: #333;
-    position: absolute;
-}
-
-#prompt {
-    width: 800;
-    position: absolute;
-    top: 100px;
-    left: 100px;
-    height: 200px;
-    background-color: #E7DCCA;
-    border-color: #D1A53E;
-    color: #040403;
-}
-
 .button {
     padding: 9px 17px;
     font-family: Verdana, sans-serif;

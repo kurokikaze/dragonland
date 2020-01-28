@@ -39,6 +39,7 @@ export default (state = {}, action) => {
                 prompt: true,
                 promptType: action.promptType,
                 promptParams: action.promptParams,
+                promptGeneratedBy: action.generatedBy,
             };
         }
         case ACTION_RESOLVE_PROMPT: {
@@ -47,6 +48,7 @@ export default (state = {}, action) => {
                 prompt: false,
                 promptType: null,
                 promptParams: null,
+                promptGeneratedBy: null,
             };
         }
         case ACTION_EFFECT: {
@@ -66,8 +68,8 @@ export default (state = {}, action) => {
                     break;
                 }                
                 case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {
-                    const playerInPlay = [...state.zones.playerInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
-                    const opponentInPlay = [...state.zones.opponentInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+                    const playerInPlay = [...(state.zones.playerInPlay || [])].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+                    const opponentInPlay = [...(state.zones.opponentInPlay || [])].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 
                     return {
                         ...state,
@@ -80,27 +82,19 @@ export default (state = {}, action) => {
                     break;
                 }                
                 case EFFECT_TYPE_ADD_ENERGY_TO_MAGI: {
-                    const isOwnMagi = state.zones.playerActiveMagi &&
-                        state.zones.playerActiveMagi.length &&
-                        state.zones.playerActiveMagi[0].id === action.target.id;
-                    const ownerName = isOwnMagi ? 'player' : 'opponent';
-                    const zoneId = `${ownerName}ActiveMagi`;
+                    const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+                    const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 
                     return {
                         ...state,
                         zones: {
                             ...state.zones,
-                            [zoneId]: [
-                                {
-                                    ...state.zones[zoneId][0],
-                                    data: {
-                                        ...state.zones[zoneId][0].data,
-                                        energy: (state.zones[zoneId][0].data.energy || 0) + action.amount,
-                                    }
-                                }
-                            ],
+                            playerActiveMagi,
+                            opponentActiveMagi,
                         },
-                    }                    
+                    };
                     break;
                 }
                 case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {

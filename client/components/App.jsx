@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Zone from './Zone';
 import PromptOverlay from './PromptOverlay';
+import {connect} from 'react-redux';
+
+import {isPromptActive} from '../selectors';
 
 function App({prompt}) {
     return (
@@ -19,7 +22,7 @@ function App({prompt}) {
 
 function mapStateToProps(state) {
     return {
-        prompt: state.prompt,
+        prompt: isPromptActive(state),
     };
 }
 
