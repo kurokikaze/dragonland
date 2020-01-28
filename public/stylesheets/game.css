@@ -1,0 +1,80 @@
+#game {
+    width: 900px;
+    position: relative;
+}
+
+#playerHand {
+    height: 100px;
+    width: 900px;
+}
+
+#opponentHand {
+    height: 100px;
+    width: 900px;
+}
+
+.zone {
+    min-height: 100px;
+    max-width: 900px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.cardHolder {
+    position: relative;
+}
+
+.cardHolder .cardEnergy {
+    position: absolute;
+    top: 2px;
+    color: lime;
+    font-size: 4em;
+    width: 100%;
+    text-align: center;    
+}
+
+.zone img {
+    width: 64px;
+    height: 90px; 
+}
+
+#playerActiveMagi {
+    height: 100px;
+    width: 900px;
+}
+
+#opponentMagi {
+    height: 100px;
+    width: 900px;
+}
+
+#overlay {
+    display: none;
+    width: 900px;
+    height: 100%;
+    opacity: 0.6;
+    background-color: #333;
+    position: absolute;
+}
+
+#prompt {
+    width: 800;
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    height: 200px;
+    background-color: #E7DCCA;
+    border-color: #D1A53E;
+    color: #040403;
+}
+
+.button {
+    padding: 9px 17px;
+    font-family: Verdana, sans-serif;
+    background-color: #D1A53E;
+    color: #040403;
+    border: 1px solid #E7DCCA;
+    border-radius: 3px;
+    font-weight: bold;
+}

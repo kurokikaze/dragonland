@@ -1,0 +1,51 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.deckSet {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.deck {
+  display: flex;
+  flex-direction: column;
+}
+
+.deck label {
+  display: block;
+  font-size: 2em;
+}
+
+.startConfig {
+  width: 400px;
+}
+
+.startButton {
+  width: 400px;
+  height: 80px;
+}
+
+.startButton {
+  width: 400px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+
+.startButton button[type=submit] {
+  padding: 9px 17px;
+  font-family: Verdana, sans-serif;
+  background-color: #D1A53E;
+  color: #040403;
+  border: 1px solid #E7DCCA;
+  border-radius: 3px;
+  font-weight: bold;
+}

@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form.startConfig(action='/api/start',method='POST')
+    div.deckSet(data-role='fieldcontain')
+      fieldset.deck(data-role='controlgroup')
+        label(for='deckOne') Deck one
+        textarea#deckOne(name='deckOne',rows=deckHeight).
+         #{deckOne}
+      fieldset.deck(data-role='controlgroup')
+        label(for='deckTwo') Deck two
+        textarea#deckTwo(name='deckTwo',rows=deckHeight).
+          #{deckTwo}
+    .startButton
+      button(type='submit',value='Start!') Start!
