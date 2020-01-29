@@ -5,7 +5,7 @@ export function isOurTurn(state) {
 }
 
 export function isPromptActive(state) {
-    return state.prompt;
+    return state.prompt && state.promptPlayer === window.playerId;
 }
 
 export function zoneContent(zoneId, state) {

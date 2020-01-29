@@ -1,5 +1,6 @@
 import {
     ACTION_EFFECT,
+    ACTION_PASS,
     ACTION_ENTER_PROMPT,
     ACTION_RESOLVE_PROMPT,
 
@@ -7,6 +8,8 @@ import {
     EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
     EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
     EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
+    EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+    EFFECT_TYPE_START_OF_TURN,
 
     ZONE_TYPE_ACTIVE_MAGI,
     ZONE_TYPE_MAGI_PILE,
@@ -33,10 +36,18 @@ const zoneNames = {
 
 export default (state = {}, action) => {
     switch (action.type) {
+        case ACTION_PASS: {
+            return {
+                ...state,
+                step: action.newStep,
+            }
+            break;
+        }
         case ACTION_ENTER_PROMPT: {
             return {
                 ...state,
                 prompt: true,
+                promptPlayer: action.player,
                 promptType: action.promptType,
                 promptParams: action.promptParams,
                 promptGeneratedBy: action.generatedBy,
@@ -46,6 +57,7 @@ export default (state = {}, action) => {
             return {
                 ...state,
                 prompt: false,
+                promptPlayer: null,
                 promptType: null,
                 promptParams: null,
                 promptGeneratedBy: null,
@@ -53,6 +65,29 @@ export default (state = {}, action) => {
         }
         case ACTION_EFFECT: {
             switch(action.effectType) {
+                case EFFECT_TYPE_START_OF_TURN: {
+                    return {
+                        ...state,
+                        activePlayer: action.player,
+                    };
+                }
+                case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
+                    const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
+                        .map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+                    const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
+                        .map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    return {
+                        ...state,
+                        zones: {
+                            ...state.zones,
+                            playerActiveMagi,
+                            opponentActiveMagi,
+                        },
+                    };
+
+                    break;
+                }
                 case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
                     const playerInPlay = [...state.zones.playerInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
                     const opponentInPlay = [...state.zones.opponentInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
@@ -128,22 +163,28 @@ export default (state = {}, action) => {
             switch (action.subtype) {
                 case SUBTYPE_ZONE_UPDATE:
                     console.log(`Zone update`);
-                    const zoneName = zoneNames[action.zoneType];
-                    const ownerName = action.player == window.playerId ? 'player' : 'opponent';
+                    if (action.zoneType == ZONE_TYPE_IN_PLAY) {
+                        return {
+                            ...state,
+                            zones: {
+                                ...state.zones,
+                                playerInPlay: action.content.filter(card => card.data.controller == window.playerId),
+                                opponentInPlay: action.content.filter(card => card.data.controller != window.playerId),
+                            },
+                        };
+                    } else {
+                        const zoneName = zoneNames[action.zoneType];
+                        const ownerName = action.player == window.playerId ? 'player' : 'opponent';
 
-                    const zoneId = `${ownerName}${zoneName}`;
+                        const zoneId = `${ownerName}${zoneName}`;
 
-                    console.log(`Zone id: ${zoneId}`);
-
-                    return {
-                        ...state,
-                        zones: {
-                            ...state.zones,
-                            [zoneId]: action.content,
-                        },
-                        cardNav: {
-                            ...state.cardNav,
-                        }
+                        return {
+                            ...state,
+                            zones: {
+                                ...state.zones,
+                                [zoneId]: action.content,
+                            },
+                        };
                     }
                     break;
             }

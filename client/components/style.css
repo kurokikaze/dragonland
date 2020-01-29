@@ -37,3 +37,15 @@
 .promptChooseCards .cardSelect.chosen {
     opacity: 1;
 }
+
+.stepBoard {
+    position: absolute;
+    right: 0;
+    top: 145px;
+    display: flex;
+    flex-direction: column;
+    width: 50px;
+    border: 0;
+    height: 324px;
+    justify-content: flex-start;
+}

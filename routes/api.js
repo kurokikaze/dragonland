@@ -3,6 +3,7 @@ var nanoid = require('nanoid');
 var moonlands = require('moonlands');
 
 const {
+    ACTION_PASS,
     ACTION_PLAY,
     ACTION_EFFECT,
 
@@ -16,6 +17,8 @@ const {
 
 const ACTION_DISPLAY = 'actions/display';
 const ZONE_UPDATE = 'subtypes/zone_update';
+
+const NUMBER_OF_STEPS = 6;
 
 var router = express.Router();
 
@@ -124,63 +127,80 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
             runningGames[gameId].enableDebug();
             runningGames[gameId].actionStreamOne.on('action', action => 
             {
-                socket.emit('action', action);
-                if (action.type == ACTION_EFFECT) {
-                    switch(action.effectType) {
-                        case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
-                            const player = action.destinationCard.owner;
-                            const sourceZoneContent = runningGames[gameId].getZone(
-                                action.sourceZone, 
-                                (action.sourceZone == ZONE_TYPE_IN_PLAY) ? null : player,
-                            ).serialize();
+                switch(action.type) {
+                    case ACTION_PASS: {
+                        const step = runningGames[gameId].state.step;
 
-                            const destinationZoneContent = runningGames[gameId].getZone(
-                                action.destinationZone,
-                                (action.destinationZone == ZONE_TYPE_IN_PLAY) ? null : player,
-                            ).serialize();
+                        const newStep = (step === null) ? 0 : (step + 1) % NUMBER_OF_STEPS;
 
-                            socket.emit('display', {
-                                subtype: ZONE_UPDATE,
-                                zoneType: action.sourceZone,
-                                player,
-                                content: sourceZoneContent,
-                            });
+                        action = {
+                            ...action,
+                            newStep,
+                        };
+                        break;
+                    }
+                    case ACTION_EFFECT: {
+                        switch(action.effectType) {
+                            case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
+                                const player = action.destinationCard.owner;
+                                const sourceZoneContent = runningGames[gameId].getZone(
+                                    action.sourceZone, 
+                                    (action.sourceZone == ZONE_TYPE_IN_PLAY) ? null : player,
+                                ).serialize();
 
-                            socket.emit('display', {
-                                subtype: ZONE_UPDATE,
-                                zoneType: action.destinationZone,
-                                player,
-                                content: destinationZoneContent,
-                            });
-                            break;
+                                const destinationZoneContent = runningGames[gameId].getZone(
+                                    action.destinationZone,
+                                    (action.destinationZone == ZONE_TYPE_IN_PLAY) ? null : player,
+                                ).serialize();
+
+                                socket.emit('display', {
+                                    subtype: ZONE_UPDATE,
+                                    zoneType: action.sourceZone,
+                                    player,
+                                    content: sourceZoneContent,
+                                });
+
+                                socket.emit('display', {
+                                    subtype: ZONE_UPDATE,
+                                    zoneType: action.destinationZone,
+                                    player,
+                                    content: destinationZoneContent,
+                                });
+                                break;
+                            }
+                            case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
+                                console.dir(action.from);
+                                const fromCard = (typeof action.from == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.from, action.generatedBy) :
+                                    action.from;
+                                const from = (fromCard.length) ? fromCard[0] : fromCard;
+                                from.card = from.card.card;
+
+                                action = {
+                                    ...action,
+                                    from,
+                                };
+                                break;
+                            }
+                            case EFFECT_TYPE_ADD_ENERGY_TO_MAGI: {
+                                const targetCard = (typeof action.target == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
+                                    action.target;
+                                
+                                const target = (targetCard.length) ? targetCard[0] : targetCard;
+                                target.card = target.card.card;
+
+                                action = {
+                                    ...action,
+                                    target,
+                                };
+                                break;
+                            }
                         }
-                        case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
-                            console.dir(action.from);
-                            const from = (typeof action.from == 'string') ?
-                                runningGames[gameId].getMetaValue(action.from, action.generatedBy) :
-                                action.from;
-
-                            socket.emit('display', {
-                                subtype: 'subtypes/pay_energy_for_creature',
-                                amount: action.amount,
-                                from: (from.length) ? from[0].id : from.id,
-                            });
-                            break;
-                        }
-                        case EFFECT_TYPE_ADD_ENERGY_TO_MAGI: {
-                            const target = (typeof action.target == 'string') ?
-                                runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
-                                action.target;
-
-                            socket.emit('display', {
-                                subtype: 'subtypes/add_energy_to_magi',
-                                amount: action.amount,
-                                target: (target.length) ? target[0].id : target.id,
-                            });
-                            break;
-                        }
+                        break;
                     }
                 }
+                socket.emit('action', action);
             });
 
             socket.on('action', action => {

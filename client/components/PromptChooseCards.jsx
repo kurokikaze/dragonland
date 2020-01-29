@@ -17,7 +17,7 @@ function PromptChooseCards({params, triggerElement, selected, onSend}) {
             <div className="cardsRow">
                 {params.map((card, i) => (
                     <div className={`cardSelect ${selected.includes(card) ? 'chosen' : ''}`} key={i}>
-                        <Card id={`test${i}`} card={card} data={{}} onClick={() => triggerElement(card)} />
+                        <Card id={`test${i}`} card={{name: card}} data={{}} onClick={() => triggerElement(card)} />
                     </div>
                 ))}
             </div>
