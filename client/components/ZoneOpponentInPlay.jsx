@@ -9,20 +9,12 @@ import {
 } from 'moonlands/src/const';
 import {byName} from 'moonlands/src/cards';
 import Card from './Card';
-import {zoneContent, getMagiEnergy} from '../selectors';
+import {zoneContent} from '../selectors';
 import {
-    STEP_CREATURES,
-    STEP_PRS_FIRST,
-    STEP_PRS_SECOND,
+    STEP_ATTACK,
 } from '../const';
 
-const canCast = (cardType, cardCost, magiEnergy, currentStep) => 
-    (cardCost <= magiEnergy) && (
-         (cardType == TYPE_CREATURE && currentStep == STEP_CREATURES) ||
-         ([TYPE_RELIC, TYPE_SPELL].includes(cardType) && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(currentStep))
-    );
-
-function ZoneHand({ name, content, onCardClick, active, magiEnergy, currentStep }) {
+function ZoneOpponentInPlay({ name, content, active }) {
     return (
         <div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
             {content.length ? content.map(cardData =>
@@ -31,8 +23,9 @@ function ZoneHand({ name, content, onCardClick, active, magiEnergy, currentStep 
                     id={cardData.id}
                     card={cardData.card}
                     data={cardData.data}
-                    onClick={onCardClick}
-                    available={active && canCast(cardData.card.type, cardData.card.cost, magiEnergy, currentStep)}
+                    onClick={() => {}}
+                    droppable={active && cardData.card.type === TYPE_CREATURE}
+                    target={active && cardData.card.type === TYPE_CREATURE}
                 />,
             ) : null}
         </div>
@@ -50,9 +43,7 @@ const propsTranformer = props => ({
 function mapStateToProps(state, {zoneId, name, activeStep}) {
     return {
         name,
-        currentStep: state.step,
-        magiEnergy: getMagiEnergy(state),
-        active: state.activePlayer == window.playerId,
+        active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
         content: zoneContent(zoneId, state),
     };
 };
@@ -62,4 +53,4 @@ const enhance = compose(
     mapProps(propsTranformer),
 );
 
-export default enhance(ZoneHand);
+export default enhance(ZoneOpponentInPlay);

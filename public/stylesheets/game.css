@@ -23,6 +23,16 @@
 
 .cardHolder {
     position: relative;
+    width: 64px;
+    height: 90px;    
+}
+
+.cardHolder.available {
+    box-shadow: 0px 0 6px 6px green;
+}
+
+.cardHolder.target {
+    box-shadow: 0px 0 6px 6px red;
 }
 
 .cardHolder .cardEnergy {

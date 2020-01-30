@@ -5,6 +5,7 @@ var moonlands = require('moonlands');
 const {
     ACTION_PASS,
     ACTION_PLAY,
+    ACTION_ATTACK,
     ACTION_EFFECT,
 
     EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
@@ -208,17 +209,20 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                 console.dir(action, null, 2);
                 var expandedAction = {...action};
                 switch (action.type) {
+                    case ACTION_ATTACK: {
+                        expandedAction.source = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
+                        expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+                        break;
+                    }
                     case ACTION_PLAY: {
                         const player = action.payload.player;
-                        console.dir(runningGames[gameId].getZone(ZONE_TYPE_HAND, player).serialize());
                         const cardInHand = runningGames[gameId].getZone(ZONE_TYPE_HAND, player).byId(action.payload.card);
-                        console.dir(cardInHand);
                         expandedAction.payload.card = cardInHand;
                         break;
                     }
                 }
                 // runningGames[gameId].commandStream.write(action);
-                runningGames[gameId].update(action);
+                runningGames[gameId].update(expandedAction);
             });
 
             socket.on('disconnect', function(){

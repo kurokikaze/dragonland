@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {compose, withHandlers} from 'recompose';
+import Backend from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 import {
     ACTION_PASS,
     ACTION_PLAY,
@@ -13,6 +15,8 @@ import {
 
 import Zone from './Zone';
 import ZoneHand from './ZoneHand';
+import ZonePlayerInPlay from './ZonePlayerInPlay';
+import ZoneOpponentInPlay from './ZoneOpponentInPlay';
 import PromptOverlay from './PromptOverlay';
 import StepBoard from './StepBoard';
 
@@ -29,15 +33,17 @@ const STEP_DRAW = 5;
 function App({prompt, isOurTurn, onPass, onPlay}) {
     return (
         <div className="game">
-            <Zone zoneId="opponentHand" name='Opponent hand' activeStep={NO_ACTIVE_STEP} />
-            <Zone zoneId="opponentActiveMagi" name='Opponent Active Magi' activeStep={NO_ACTIVE_STEP} />
-            <Zone zoneId="opponentInPlay" name='Opponent in play' activeStep={NO_ACTIVE_STEP} />
-            <Zone zoneId="playerInPlay" name='Player in play' activeStep={STEP_ATTACK} />
-            <Zone zoneId="playerActiveMagi" name='Player Active Magi' />
-            <ZoneHand zoneId="playerHand" name='Player hand' onCardClick={onPlay} />
-            <StepBoard />
-            {isOurTurn && <button onClick={() => onPass()}>Pass</button>}
-            {prompt && <PromptOverlay />}
+            <DndProvider backend={Backend}>
+                <Zone zoneId="opponentHand" name='Opponent hand' />
+                <Zone zoneId="opponentActiveMagi" name='Opponent Active Magi' />
+                <ZoneOpponentInPlay zoneId="opponentInPlay" name='Opponent in play' />
+                <ZonePlayerInPlay zoneId="playerInPlay" name='Player in play' />
+                <Zone zoneId="playerActiveMagi" name='Player Active Magi' />
+                <ZoneHand zoneId="playerHand" name='Player hand' onCardClick={onPlay} />
+                <StepBoard />
+                {isOurTurn && <button onClick={() => onPass()}>Pass</button>}
+                {prompt && <PromptOverlay />}
+            </DndProvider>
         </div>
     );
 }
