@@ -69,3 +69,20 @@
     border-radius: 3px;
     font-weight: bold;
 }
+
+.endgame h1 {
+    text-align: center;
+    padding-top: 20%;
+    font-size: 76px;
+}
+
+.endgame h1.win {
+    color: gold;
+}
+
+.endgame p {
+    text-align: center;
+    padding-top: 2px;
+    font-size: 25px;
+}
+

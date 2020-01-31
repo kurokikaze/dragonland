@@ -3,6 +3,7 @@ import {
     ACTION_PASS,
     ACTION_ENTER_PROMPT,
     ACTION_RESOLVE_PROMPT,
+    ACTION_PLAYER_WINS,
 
     EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
     EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
@@ -38,6 +39,14 @@ const zoneNames = {
 
 export default (state = {}, action) => {
     switch (action.type) {
+        case ACTION_PLAYER_WINS: {
+            return {
+                ...state,
+                gameEnded: true,
+                winner: action.player,
+            };
+            break;
+        }
         case ACTION_PASS: {
             return {
                 ...state,
@@ -73,10 +82,7 @@ export default (state = {}, action) => {
                             ...state,
                             zones: {
                                 ...state.zones,
-                                playerInPlay: state.zones.playerInPlay.map(card => 
-                                    card.type === TYPE_CREATURE ?
-                                    {...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false}} : card,
-                                ),
+                                playerInPlay: state.zones.playerInPlay.map(card => ({...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false}})),
                             },
                             activePlayer: action.player,
                         };

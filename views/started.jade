@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  div
+    ul
+      li
+        a(href!='/api/game/' + gameId + '/' + playerOne target='_blank') Player one
+      li
+        a(href!='/api/game/' + gameId + '/' + playerTwo target='_blank') Player two

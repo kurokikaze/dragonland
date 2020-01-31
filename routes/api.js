@@ -153,9 +153,10 @@ router.post('/start', function(req, res) {
 
     runningGames[gameId].setup();
 
-    res.json({
+    res.render('started', {
         gameId,
-        result: 'OK',
+        playerOne,
+        playerTwo,
     });
 });
 

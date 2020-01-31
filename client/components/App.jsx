@@ -20,6 +20,7 @@ import ZoneOpponentInPlay from './ZoneOpponentInPlay';
 import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi';
 import PromptOverlay from './PromptOverlay';
 import StepBoard from './StepBoard';
+import EndgameOverlay from './EndgameOverlay';
 
 import {isPromptActive, isOurTurn} from '../selectors';
 
@@ -31,7 +32,7 @@ const STEP_CREATURES = 3;
 const STEP_PRS_SECOND = 4;
 const STEP_DRAW = 5;
 
-function App({prompt, isOurTurn, onPass, onPlay}) {
+function App({prompt, isOurTurn, onPass, onPlay, gameEnded}) {
     return (
         <div className="game">
             <DndProvider backend={Backend}>
@@ -44,6 +45,7 @@ function App({prompt, isOurTurn, onPass, onPlay}) {
                 <StepBoard />
                 {isOurTurn && <button onClick={() => onPass()}>Pass</button>}
                 {prompt && <PromptOverlay />}
+                {gameEnded && <EndgameOverlay />}
             </DndProvider>
         </div>
     );
@@ -53,6 +55,7 @@ function mapStateToProps(state) {
     return {
         prompt: isPromptActive(state),
         isOurTurn: isOurTurn(state),
+        gameEnded: state.gameEnded,
     };
 }
 
