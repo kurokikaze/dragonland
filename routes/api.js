@@ -2,6 +2,57 @@ var express = require('express');
 var nanoid = require('nanoid');
 var moonlands = require('moonlands');
 
+function clone(item) {
+    if (!item) { return item; } // null, undefined values check
+
+    var types = [ Number, String, Boolean ], 
+        result;
+
+    // normalizing primitives if someone did new String('aaa'), or new Number('444');
+    types.forEach(function(type) {
+        if (item instanceof type) {
+            result = type( item );
+        }
+    });
+
+    if (typeof result == "undefined") {
+        if (Object.prototype.toString.call( item ) === "[object Array]") {
+            result = [];
+            item.forEach(function(child, index, array) { 
+                result[index] = clone( child );
+            });
+        } else if (typeof item == "object") {
+            // testing that this is DOM
+            if (item.nodeType && typeof item.cloneNode == "function") {
+                result = item.cloneNode( true );    
+            } else if (!item.prototype) { // check that this is a literal
+                if (item instanceof Date) {
+                    result = new Date(item);
+                } else {
+                    // it is an object literal
+                    result = {};
+                    for (var i in item) {
+                        result[i] = clone( item[i] );
+                    }
+                }
+            } else {
+                // depending what you would like here,
+                // just keep the reference, or create new object
+                if (false && item.constructor) {
+                    // would not advice to do that, reason? Read below
+                    result = new item.constructor();
+                } else {
+                    result = item;
+                }
+            }
+        } else {
+            result = item;
+        }
+    }
+
+    return result;
+}
+
 const {
     ACTION_PASS,
     ACTION_PLAY,
@@ -14,6 +65,7 @@ const {
 
     ZONE_TYPE_HAND,
     ZONE_TYPE_IN_PLAY,
+    ZONE_TYPE_ACTIVE_MAGI,
 } = require('moonlands/src/const');
 
 const ACTION_DISPLAY = 'actions/display';
@@ -207,11 +259,15 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
             socket.on('action', action => {
                 console.log('Client:');
                 console.dir(action, null, 2);
-                var expandedAction = {...action};
+                var expandedAction = clone(action);
                 switch (action.type) {
                     case ACTION_ATTACK: {
                         expandedAction.source = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
                         expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+                        if (!expandedAction.target) {
+                            const opponentId = runningGames[gameId].getOpponent(expandedAction.source.data.controller);
+                            expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_ACTIVE_MAGI, opponentId).byId(action.target);
+                        }
                         break;
                     }
                     case ACTION_PLAY: {

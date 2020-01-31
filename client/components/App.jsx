@@ -17,6 +17,7 @@ import Zone from './Zone';
 import ZoneHand from './ZoneHand';
 import ZonePlayerInPlay from './ZonePlayerInPlay';
 import ZoneOpponentInPlay from './ZoneOpponentInPlay';
+import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi';
 import PromptOverlay from './PromptOverlay';
 import StepBoard from './StepBoard';
 
@@ -35,7 +36,7 @@ function App({prompt, isOurTurn, onPass, onPlay}) {
         <div className="game">
             <DndProvider backend={Backend}>
                 <Zone zoneId="opponentHand" name='Opponent hand' />
-                <Zone zoneId="opponentActiveMagi" name='Opponent Active Magi' />
+                <ZoneOpponentActiveMagi zoneId="opponentActiveMagi" name='Opponent Active Magi' />
                 <ZoneOpponentInPlay zoneId="opponentInPlay" name='Opponent in play' />
                 <ZonePlayerInPlay zoneId="playerInPlay" name='Player in play' />
                 <Zone zoneId="playerActiveMagi" name='Player Active Magi' />

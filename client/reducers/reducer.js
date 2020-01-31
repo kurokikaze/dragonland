@@ -11,6 +11,8 @@ import {
     EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
     EFFECT_TYPE_START_OF_TURN,
 
+    TYPE_CREATURE,
+
     ZONE_TYPE_ACTIVE_MAGI,
     ZONE_TYPE_MAGI_PILE,
     ZONE_TYPE_DEFEATED_MAGI,
@@ -66,10 +68,24 @@ export default (state = {}, action) => {
         case ACTION_EFFECT: {
             switch(action.effectType) {
                 case EFFECT_TYPE_START_OF_TURN: {
-                    return {
-                        ...state,
-                        activePlayer: action.player,
-                    };
+                    if (action.player === window.playerId) {
+                        return {
+                            ...state,
+                            zones: {
+                                ...state.zones,
+                                playerInPlay: state.zones.playerInPlay.map(card => 
+                                    card.type === TYPE_CREATURE ?
+                                    {...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false}} : card,
+                                ),
+                            },
+                            activePlayer: action.player,
+                        };
+                    } else {
+                        return {
+                            ...state,
+                            activePlayer: action.player,
+                        };
+                    }
                 }
                 case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
                     const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
