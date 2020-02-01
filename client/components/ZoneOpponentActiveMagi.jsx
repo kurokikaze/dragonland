@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {compose} from 'recompose';
 import {
     TYPE_CREATURE,
     TYPE_RELIC,
     TYPE_SPELL,
 } from 'moonlands/src/const';
-import {byName} from 'moonlands/src/cards';
 import Card from './Card';
 import {zoneContent} from '../selectors';
 import {
     STEP_ATTACK,
 } from '../const';
+import {withCardData} from './common';
 
 function ZoneOpponentActiveMagi({ name, content, active }) {
     return (
@@ -32,14 +32,6 @@ function ZoneOpponentActiveMagi({ name, content, active }) {
     );
 }
 
-const propsTranformer = props => ({
-    ...props,
-    content: props.content.map(cardData => ({
-        ...cardData,
-        card: byName(cardData.card),
-    })),
-});
-
 function mapStateToProps(state, {zoneId, name, activeStep}) {
     return {
         name,
@@ -50,7 +42,7 @@ function mapStateToProps(state, {zoneId, name, activeStep}) {
 
 const enhance = compose(
     connect(mapStateToProps),
-    mapProps(propsTranformer),
+    withCardData,
 );
 
 export default enhance(ZoneOpponentActiveMagi);

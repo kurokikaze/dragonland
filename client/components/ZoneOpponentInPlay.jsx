@@ -6,15 +6,17 @@ import {
     TYPE_CREATURE,
     TYPE_RELIC,
     TYPE_SPELL,
+    ACTION_RESOLVE_PROMPT,
+    PROMPT_TYPE_SINGLE_CREATURE,
 } from 'moonlands/src/const';
-import {byName} from 'moonlands/src/cards';
 import Card from './Card';
 import {zoneContent} from '../selectors';
 import {
     STEP_ATTACK,
 } from '../const';
+import {withCardData} from './common';
 
-function ZoneOpponentInPlay({ name, content, active }) {
+function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt }) {
     return (
         <div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
             {content.length ? content.map(cardData =>
@@ -23,7 +25,8 @@ function ZoneOpponentInPlay({ name, content, active }) {
                     id={cardData.id}
                     card={cardData.card}
                     data={cardData.data}
-                    onClick={() => {}}
+                    onClick={cardClickHandler}
+                    isOnPrompt={isOnCreaturePrompt}
                     droppable={active && cardData.card.type === TYPE_CREATURE}
                     target={active && cardData.card.type === TYPE_CREATURE}
                 />,
@@ -32,12 +35,15 @@ function ZoneOpponentInPlay({ name, content, active }) {
     );
 }
 
-const propsTranformer = props => ({
+const propsTransformer = props => ({
     ...props,
-    content: props.content.map(cardData => ({
-        ...cardData,
-        card: byName(cardData.card),
-    })),
+    cardClickHandler: props.isOnCreaturePrompt ? cardId => {
+        window.socket.emit('action', {
+            type: ACTION_RESOLVE_PROMPT,
+            target: cardId,
+            generatedBy: props.promptGeneratedBy,
+        });
+    } : () => {},
 });
 
 function mapStateToProps(state, {zoneId, name, activeStep}) {
@@ -45,12 +51,15 @@ function mapStateToProps(state, {zoneId, name, activeStep}) {
         name,
         active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
         content: zoneContent(zoneId, state),
+        isOnCreaturePrompt: state.prompt && state.promptType === PROMPT_TYPE_SINGLE_CREATURE,
+        promptGeneratedBy: state.promptGeneratedBy,
     };
 };
 
 const enhance = compose(
     connect(mapStateToProps),
-    mapProps(propsTranformer),
+    mapProps(propsTransformer),
+    withCardData,
 );
 
 export default enhance(ZoneOpponentInPlay);

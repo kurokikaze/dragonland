@@ -58,10 +58,17 @@ const {
     ACTION_PLAY,
     ACTION_ATTACK,
     ACTION_EFFECT,
+    ACTION_RESOLVE_PROMPT,
+
+    PROMPT_TYPE_SINGLE_CREATURE,
+    PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 
     EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
     EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
     EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+    EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
+    EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
+    EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
 
     ZONE_TYPE_HAND,
     ZONE_TYPE_IN_PLAY,
@@ -223,7 +230,6 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                                 break;
                             }
                             case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
-                                console.dir(action.from);
                                 const fromCard = (typeof action.from == 'string') ?
                                     runningGames[gameId].getMetaValue(action.from, action.generatedBy) :
                                     action.from;
@@ -233,6 +239,63 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                                 action = {
                                     ...action,
                                     from,
+                                };
+                                break;
+                            }
+                            case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
+                                const targetCard = (typeof action.target == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
+                                    action.target;
+
+                                const amount = (typeof action.amount == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.amount, action.generatedBy) :
+                                    action.amount;
+                                
+                                const target = (targetCard.length) ? targetCard[0] : targetCard;
+                                target.card = target.card.card;
+
+                                action = {
+                                    ...action,
+                                    target,
+                                    amount,
+                                };
+                                break;
+                            }
+                            case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
+                                const targetCard = (typeof action.target == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
+                                    action.target;
+
+                                const amount = (typeof action.amount == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.amount, action.generatedBy) :
+                                    action.amount;
+                                
+                                const target = (targetCard.length) ? targetCard[0] : targetCard;
+                                target.card = target.card.card;
+
+                                action = {
+                                    ...action,
+                                    target,
+                                    amount,
+                                };
+                                break;
+                            }
+                            case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {
+                                const targetCard = (typeof action.target == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
+                                    action.target;
+                                
+                                const target = (targetCard.length) ? targetCard[0] : targetCard;
+                                target.card = target.card.card;
+
+                                const amount = (typeof action.amount == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.amount, action.generatedBy) :
+                                    action.amount;
+
+                                action = {
+                                    ...action,
+                                    target,
+                                    amount,
                                 };
                                 break;
                             }
@@ -262,6 +325,29 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                 console.dir(action, null, 2);
                 var expandedAction = clone(action);
                 switch (action.type) {
+                    case ACTION_RESOLVE_PROMPT: {
+                        switch (runningGames[gameId].state.promptType) {
+                            case PROMPT_TYPE_SINGLE_CREATURE: {
+                                console.log(`Finding target for id ${action.target}`);
+                                expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+                                console.dir(expandedAction.target);
+                                break;
+                            }
+                            case PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI: {
+                                expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+                                if (!expandedAction.target) {
+                                    expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_ACTIVE_MAGI, expandedAction.source.data.controller).byId(action.target);
+                                }
+                                if (!expandedAction.target) {
+                                    const opponentId = runningGames[gameId].getOpponent(expandedAction.source.data.controller);
+                                    expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_ACTIVE_MAGI, opponentId).byId(action.target);
+                                }
+                                break;
+                            }
+                        }
+                        // change target string to CardInGame
+                        break;
+                    }
                     case ACTION_ATTACK: {
                         expandedAction.source = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
                         expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);

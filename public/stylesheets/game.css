@@ -28,6 +28,10 @@
     height: 90px;    
 }
 
+.cardHolder.onPrompt {
+    z-index: 120;
+}
+
 .cardHolder.available {
     box-shadow: 0px 0 6px 6px green;
 }

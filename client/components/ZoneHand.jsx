@@ -1,13 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {compose} from 'recompose';
 import {
     TYPE_CREATURE,
     TYPE_RELIC,
     TYPE_SPELL,
 } from 'moonlands/src/const';
-import {byName} from 'moonlands/src/cards';
 import Card from './Card';
 import {zoneContent, getMagiEnergy} from '../selectors';
 import {
@@ -15,6 +14,7 @@ import {
     STEP_PRS_FIRST,
     STEP_PRS_SECOND,
 } from '../const';
+import {withCardData} from './common';
 
 const canCast = (cardType, cardCost, magiEnergy, currentStep) => 
     (cardCost <= magiEnergy) && (
@@ -39,14 +39,6 @@ function ZoneHand({ name, content, onCardClick, active, magiEnergy, currentStep 
     );
 }
 
-const propsTranformer = props => ({
-    ...props,
-    content: props.content.map(cardData => ({
-        ...cardData,
-        card: byName(cardData.card),
-    })),
-});
-
 function mapStateToProps(state, {zoneId, name, activeStep}) {
     return {
         name,
@@ -59,7 +51,7 @@ function mapStateToProps(state, {zoneId, name, activeStep}) {
 
 const enhance = compose(
     connect(mapStateToProps),
-    mapProps(propsTranformer),
+    withCardData,
 );
 
 export default enhance(ZoneHand);

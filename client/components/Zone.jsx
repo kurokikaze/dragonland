@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
-import {byName} from 'moonlands/src/cards';
 import Card from './Card';
 import {zoneContent} from '../selectors';
+import {withCardData} from './common';
 
 function Zone({ name, content, onCardClick, active }) {
     return (
@@ -23,14 +23,6 @@ function Zone({ name, content, onCardClick, active }) {
     );
 }
 
-const propsTranformer = props => ({
-    ...props,
-    content: props.content.map(cardData => ({
-        ...cardData,
-        card: byName(cardData.card),
-    })),
-});
-
 function mapStateToProps(state, {zoneId, name, activeStep}) {
     return {
         name,
@@ -41,7 +33,7 @@ function mapStateToProps(state, {zoneId, name, activeStep}) {
 
 const enhance = compose(
     connect(mapStateToProps),
-    mapProps(propsTranformer),
+    withCardData,
 );
 
 export default enhance(Zone);

@@ -10,11 +10,11 @@ const DraggableTypes = {
     CARD: 'card',
 };
 
-function Card({id, card, data, onClick, draggable, isDragging, available, target, connectDragSource, connectDropTarget}) {
+function Card({id, card, data, onClick, draggable, isDragging, available, target, connectDragSource, connectDropTarget, isOnPrompt}) {
     const connector = (draggable && connectDragSource) ? connectDragSource : (target && connectDropTarget ? connectDropTarget : identity);
     return connector(
         <div 
-            className={cn('cardHolder', {'dragging': isDragging, 'available': available, 'target': target})} 
+            className={cn('cardHolder', {'dragging': isDragging, 'available': available, 'target': target, 'onPrompt': isOnPrompt})} 
             data-id={id}
             onClick={() => onClick && onClick(id)}
         >
