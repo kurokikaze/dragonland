@@ -1,5 +1,7 @@
 import {mapProps} from 'recompose';
+import {connect} from 'react-redux';
 import {byName} from 'moonlands/src/cards';
+import {zoneContent} from '../selectors';
 
 const propsTransformer = props => ({
     ...props,
@@ -10,3 +12,11 @@ const propsTransformer = props => ({
 });
 
 export const withCardData = mapProps(propsTransformer);
+
+function mapStateToProps(state, {zoneId}) {
+    return {
+        content: zoneContent(zoneId, state),
+    };
+}
+
+export const withZoneContent = connect(mapStateToProps);

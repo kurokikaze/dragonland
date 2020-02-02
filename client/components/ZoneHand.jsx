@@ -8,13 +8,13 @@ import {
     TYPE_SPELL,
 } from 'moonlands/src/const';
 import Card from './Card';
-import {zoneContent, getMagiEnergy} from '../selectors';
+import {getMagiEnergy} from '../selectors';
 import {
     STEP_CREATURES,
     STEP_PRS_FIRST,
     STEP_PRS_SECOND,
 } from '../const';
-import {withCardData} from './common';
+import {withCardData, withZoneContent} from './common';
 
 const canCast = (cardType, cardCost, magiEnergy, currentStep) => 
     (cardCost <= magiEnergy) && (
@@ -39,17 +39,17 @@ function ZoneHand({ name, content, onCardClick, active, magiEnergy, currentStep 
     );
 }
 
-function mapStateToProps(state, {zoneId, name, activeStep}) {
+function mapStateToProps(state, {name, activeStep}) {
     return {
         name,
         currentStep: state.step,
         magiEnergy: getMagiEnergy(state),
         active: state.activePlayer == window.playerId,
-        content: zoneContent(zoneId, state),
     };
 };
 
 const enhance = compose(
+    withZoneContent,
     connect(mapStateToProps),
     withCardData,
 );

@@ -58,8 +58,10 @@ const {
     ACTION_PLAY,
     ACTION_ATTACK,
     ACTION_EFFECT,
+    ACTION_ENTER_PROMPT,
     ACTION_RESOLVE_PROMPT,
 
+    PROMPT_TYPE_CHOOSE_CARDS,
     PROMPT_TYPE_SINGLE_CREATURE,
     PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 
@@ -69,8 +71,12 @@ const {
     EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
     EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
     EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
+    EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
+    EFFECT_TYPE_MOVE_ENERGY,
 
     ZONE_TYPE_HAND,
+    ZONE_TYPE_DISCARD,
+    ZONE_TYPE_DECK,
     ZONE_TYPE_IN_PLAY,
     ZONE_TYPE_ACTIVE_MAGI,
 } = require('moonlands/src/const');
@@ -133,9 +139,6 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
     return gameId;
 }
 
-console.log('API router');
-console.dir(express.get);
-console.dir(router);
 console.log(`const: ${ACTION_PLAY}`);
 /* GET home page. */
 
@@ -200,6 +203,20 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                         };
                         break;
                     }
+                    case ACTION_ENTER_PROMPT: {
+                        switch(action.promptType) {
+                            case PROMPT_TYPE_CHOOSE_CARDS: {
+                                const discardCards = runningGames[gameId].getZone(ZONE_TYPE_DISCARD, action.player).cards.map(card => card.card.name);
+                                const libraryCards = runningGames[gameId].getZone(ZONE_TYPE_DECK, action.player).cards.map(card => card.card.name);
+                                const searchableCards = [...discardCards, ...libraryCards];
+                                const availableCards = action.promptParams.filter(card => searchableCards.includes(card));
+
+                                action.availableCards = availableCards;                                
+                                break;
+                            }
+                        }
+                        break;
+                    }
                     case ACTION_EFFECT: {
                         switch(action.effectType) {
                             case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
@@ -242,6 +259,19 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                                 };
                                 break;
                             }
+                            case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
+                                const fromCard = (typeof action.from == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.from, action.generatedBy) :
+                                    action.from;
+                                const from = (fromCard.length) ? fromCard[0] : fromCard;
+                                from.card = from.card.card;
+
+                                action = {
+                                    ...action,
+                                    from,
+                                };
+                                break;
+                            }
                             case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
                                 const targetCard = (typeof action.target == 'string') ?
                                     runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
@@ -257,6 +287,33 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                                 action = {
                                     ...action,
                                     target,
+                                    amount,
+                                };
+                                break;
+                            }
+                            case EFFECT_TYPE_MOVE_ENERGY: {
+                                const targetCard = (typeof action.target == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.target, action.generatedBy) :
+                                    action.target;
+
+                                const target = (targetCard.length) ? targetCard[0] : targetCard;
+                                target.card = target.card.card;
+
+                                const sourceCard = (typeof action.source == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.source, action.generatedBy) :
+                                    action.source;
+
+                                const source = (sourceCard.length) ? sourceCard[0] : sourceCard;
+                                source.card = source.card.card;
+
+                                const amount = (typeof action.amount == 'string') ?
+                                    runningGames[gameId].getMetaValue(action.amount, action.generatedBy) :
+                                    action.amount;
+
+                                action = {
+                                    ...action,
+                                    target,
+                                    source,
                                     amount,
                                 };
                                 break;
@@ -328,7 +385,6 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
                     case ACTION_RESOLVE_PROMPT: {
                         switch (runningGames[gameId].state.promptType) {
                             case PROMPT_TYPE_SINGLE_CREATURE: {
-                                console.log(`Finding target for id ${action.target}`);
                                 expandedAction.target = runningGames[gameId].getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
                                 console.dir(expandedAction.target);
                                 break;

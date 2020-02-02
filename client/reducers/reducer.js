@@ -10,7 +10,9 @@ import {
     EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
     EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
     EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+    EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
     EFFECT_TYPE_START_OF_TURN,
+    EFFECT_TYPE_MOVE_ENERGY,
 
     TYPE_CREATURE,
 
@@ -62,6 +64,7 @@ export default (state = {}, action) => {
                 promptType: action.promptType,
                 promptParams: action.promptParams,
                 promptGeneratedBy: action.generatedBy,
+                promptAvailableCards: action.availableCards || null,
             };
         }
         case ACTION_RESOLVE_PROMPT: {
@@ -72,6 +75,7 @@ export default (state = {}, action) => {
                 promptType: null,
                 promptParams: null,
                 promptGeneratedBy: null,
+                promptAvailableCards: null,
             };
         }
         case ACTION_EFFECT: {
@@ -93,6 +97,21 @@ export default (state = {}, action) => {
                         };
                     }
                 }
+                case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
+                    const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
+                        .map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+                    const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
+                        .map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    return {
+                        ...state,
+                        zones: {
+                            ...state.zones,
+                            playerActiveMagi,
+                            opponentActiveMagi,
+                        },
+                    };
+                }
                 case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
                     const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
                         .map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
@@ -107,8 +126,6 @@ export default (state = {}, action) => {
                             opponentActiveMagi,
                         },
                     };
-
-                    break;
                 }
                 case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
                     const playerInPlay = [...state.zones.playerInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
@@ -137,6 +154,36 @@ export default (state = {}, action) => {
                             opponentActiveMagi,
                         },
                     }
+                    break;
+                }
+                case EFFECT_TYPE_MOVE_ENERGY: {
+                    const playerActiveMagi = [...state.zones.playerActiveMagi]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
+                        .map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    const opponentActiveMagi = [...state.zones.opponentActiveMagi]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
+                        .map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    const playerInPlay = [...(state.zones.playerInPlay || [])]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
+                        .map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    const opponentInPlay = [...(state.zones.opponentInPlay || [])]
+                        .map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
+                        .map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+                    return {
+                        ...state,
+                        zones: {
+                            ...state.zones,
+                            playerActiveMagi,
+                            opponentActiveMagi,
+                            playerInPlay,
+                            opponentInPlay,
+                        },
+                    }
+                    break;
                     break;
                 }
                 case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {

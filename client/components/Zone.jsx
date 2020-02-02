@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import Card from './Card';
-import {zoneContent} from '../selectors';
-import {withCardData} from './common';
+import {withCardData, withZoneContent} from './common';
 
 function Zone({ name, content, onCardClick, active }) {
     return (
@@ -23,15 +22,15 @@ function Zone({ name, content, onCardClick, active }) {
     );
 }
 
-function mapStateToProps(state, {zoneId, name, activeStep}) {
+function mapStateToProps(state, {name, activeStep}) {
     return {
         name,
         active: state.step === activeStep && state.activePlayer == window.playerId,
-        content: zoneContent(zoneId, state),
     };
 }
 
 const enhance = compose(
+    withZoneContent,
     connect(mapStateToProps),
     withCardData,
 );

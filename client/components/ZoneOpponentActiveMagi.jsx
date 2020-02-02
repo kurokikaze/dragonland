@@ -8,11 +8,10 @@ import {
     TYPE_SPELL,
 } from 'moonlands/src/const';
 import Card from './Card';
-import {zoneContent} from '../selectors';
 import {
     STEP_ATTACK,
 } from '../const';
-import {withCardData} from './common';
+import {withCardData, withZoneContent} from './common';
 
 function ZoneOpponentActiveMagi({ name, content, active }) {
     return (
@@ -32,15 +31,14 @@ function ZoneOpponentActiveMagi({ name, content, active }) {
     );
 }
 
-function mapStateToProps(state, {zoneId, name, activeStep}) {
+function mapStateToProps(state, {name, activeStep}) {
     return {
-        name,
         active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-        content: zoneContent(zoneId, state),
     };
 };
 
 const enhance = compose(
+    withZoneContent,
     connect(mapStateToProps),
     withCardData,
 );

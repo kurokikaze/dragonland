@@ -10,14 +10,19 @@ import {
     PROMPT_TYPE_CHOOSE_CARDS,
 } from 'moonlands/src/const';
 
-function PromptChooseCards({params, triggerElement, selected, onSend}) {
+function PromptChooseCards({cards, triggerElement, selected, onSend, availableCards}) {
     return (
         <div className="promptWindow promptChooseCards">
             <h1>Choose starting cards</h1>
             <div className="cardsRow">
-                {params.map((card, i) => (
+                {cards.map((card, i) => (
                     <div className={`cardSelect ${selected.includes(card) ? 'chosen' : ''}`} key={i}>
-                        <Card id={`test${i}`} card={{name: card}} data={{}} onClick={() => triggerElement(card)} />
+                        <Card
+                            id={`test${i}`}
+                            card={{name: card}}
+                            data={{}}
+                            onClick={availableCards.includes(card) ? () => triggerElement(card) : () => null}
+                        />
                     </div>
                 ))}
             </div>
@@ -30,12 +35,13 @@ function PromptChooseCards({params, triggerElement, selected, onSend}) {
 
 const mapStateToProps = (state) => ({
     generatedBy: state.promptGeneratedBy,
+    availableCards: state.promptAvailableCards,
 });
 
 const enhance  = compose(
     connect(mapStateToProps),
     withStateHandlers(
-        ({params}) => ({selected: params}),
+        ({value}) => ({selected: value}),
         {
             triggerElement: ({selected}) => (cardName) => ({
                 selected: selected.includes(cardName) ? selected.filter(e => e !== cardName): [...selected, cardName],

@@ -12,11 +12,10 @@ import {
     PROMPT_TYPE_SINGLE_CREATURE,
 } from 'moonlands/src/const';
 import Card from './Card';
-import {zoneContent} from '../selectors';
 import {
     STEP_ATTACK,
 } from '../const';
-import {withCardData} from './common';
+import {withCardData, withZoneContent} from './common';
 
 function ZonePlayerInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt }) {
     return (
@@ -48,17 +47,17 @@ const propsTransformer = props => ({
     } : () => {},
 });
 
-function mapStateToProps(state, {zoneId, name, activeStep}) {
+function mapStateToProps(state, {name, activeStep}) {
     return {
         name,
         active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-        content: zoneContent(zoneId, state),
         isOnCreaturePrompt: state.prompt && state.promptType === PROMPT_TYPE_SINGLE_CREATURE,
         promptGeneratedBy: state.promptGeneratedBy,
     };
 };
 
 const enhance = compose(
+    withZoneContent,
     connect(mapStateToProps),
     mapProps(propsTransformer),
     withCardData,
