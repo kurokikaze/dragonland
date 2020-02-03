@@ -1,6 +1,6 @@
 {
   "name": "dragonland",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "watch": "parcel watch client/game.js --out-dir public/javascripts",
@@ -11,11 +11,13 @@
     "classnames": "^2.2.6",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.18.2",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^0.20.0",
     "jade": "~1.11.0",
-    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.0.9.tar.gz",
+    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.0.10.tar.gz",
     "morgan": "~1.9.1",
     "nanoid": "^2.1.9",
     "parcel-bundler": "^1.12.4",

@@ -38,19 +38,19 @@ Yaki
 2 Sea Barl`;
 
 const deckHeight = 18;
+
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { 
-    title: 'Dragonlands',
-    deckOne: caldDeck,
-    deckTwo: naroomDeck,
-    deckHeight,
-  });
+	res.render('index', { 
+		title: 'Dragonlands',
+		deckOne: caldDeck,
+		deckTwo: naroomDeck,
+		deckHeight,
+	});
 });
 
 router.get('/start', function(req, res) {
-  console.dir(req.body);
-  res.json({result: OK});
+	res.json({result: 'OK'});
 }); 
 
 module.exports = router;
