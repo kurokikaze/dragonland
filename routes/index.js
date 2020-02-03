@@ -15,7 +15,7 @@ Sinder
 3 Drakan
 3 Thermal Blast
 3 Flame Geyser
-3 Cave Hyren
+3 Lava Balamant
 2 Magma Armor
 2 Fire Flow`;
 
@@ -30,7 +30,7 @@ Yaki
 3 Balamant
 3 Grow
 2 Giant Parathin
-3 Syphon Stone
+3 Furok
 3 Carillion
 3 Rudwot
 3 Stagadan
