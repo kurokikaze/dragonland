@@ -16,7 +16,7 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^0.20.0",
-    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.0.11.tar.gz",
+    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.0.12.tar.gz",
     "morgan": "~1.9.1",
     "nanoid": "^2.1.9",
     "parcel-bundler": "^1.12.4",
