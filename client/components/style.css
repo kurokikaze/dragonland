@@ -49,3 +49,27 @@
     height: 324px;
     justify-content: flex-start;
 }
+
+.cardAbilities {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: -50%;
+    min-width: 140px;
+    background-color: #E7DCCA;
+    border-color: #D1A53E;
+    color: #040403;
+    margin-bottom: 99px;
+    padding: 8px;
+    border-radius: 7px;
+    line-height: 1.25em;
+    height: calc(100% + 24px);
+}
+
+.cardAbilityHolder {
+    position: relative;
+}
+
+.cardAbilityHolder:hover .cardAbilities {
+    display: block;
+}

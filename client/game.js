@@ -1,4 +1,4 @@
-/* global $, document, window, io */
+/* global document, window, io */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -8,7 +8,7 @@ import thunk from 'redux-thunk';
 import App from './components/App';
 import rootReducer from './reducers';
 
-$(document).ready(function(){
+function startGame() {
 	console.log('Document ready');
 	console.dir(document.getElementById('game'));
 	const store = createStore(
@@ -33,4 +33,10 @@ $(document).ready(function(){
 			...action,
 		});
 	});
-});
+}
+
+document.onreadystatechange = function() {
+	if (document.readyState == 'complete') {
+		startGame();
+	}
+};

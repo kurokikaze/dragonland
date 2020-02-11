@@ -4,8 +4,7 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/game.css')
     link(rel='stylesheet', href='/javascripts/game.css')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js')
-    script(src='https://code.jquery.com/jquery-3.4.1.min.js')
+    script(src='/javascripts/socket.io.js')
     script(src='/javascripts/game.js')
     script.
         window.initialState = JSON.parse('!{JSON.stringify(status)}');

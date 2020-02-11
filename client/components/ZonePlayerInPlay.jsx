@@ -5,24 +5,26 @@ import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
 import {
 	ACTION_RESOLVE_PROMPT,
-
 	TYPE_CREATURE,
-	// TYPE_RELIC,
-	// TYPE_SPELL,
-
 	PROMPT_TYPE_SINGLE_CREATURE,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
 	STEP_ATTACK,
+	STEP_PRS_FIRST,
+	STEP_PRS_SECOND,
 } from '../const';
 import {withCardData, withZoneContent} from './common';
+import {withAbilities} from './CardAbilities';
 
-function ZonePlayerInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt }) {
+const CardWithAbilities = withAbilities(Card);
+
+function ZonePlayerInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt, prsAvailable }) {
+	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<Card
+				<SelectedCard
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
@@ -50,6 +52,7 @@ const propsTransformer = props => ({
 
 function mapStateToProps(state) {
 	return {
+		prsAvailable: state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step),
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
 		isOnCreaturePrompt: state.prompt && state.promptType === PROMPT_TYPE_SINGLE_CREATURE,
 		promptGeneratedBy: state.promptGeneratedBy,
