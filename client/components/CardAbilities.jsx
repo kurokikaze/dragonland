@@ -21,6 +21,7 @@ export const withAbilities = Component => (props) => {
 						name={name}
 						text={text}
 						cost={cost}
+						onClick={() => props.onAbilityUse(props.id, name)}
 					/>
 				)}
 			</div>

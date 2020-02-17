@@ -16,6 +16,7 @@ function Zone({ name, content, onCardClick, active }) {
 					data={cardData.data}
 					onClick={onCardClick}
 					inActiveZone={active}
+					onAbilityUse={() => null}
 				/>,
 			) : null}
 		</div>

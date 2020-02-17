@@ -5,6 +5,7 @@ import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
 import {
 	ACTION_RESOLVE_PROMPT,
+	ACTION_POWER,
 	TYPE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE,
 } from 'moonlands/src/const';
@@ -19,7 +20,7 @@ import {withAbilities} from './CardAbilities';
 
 const CardWithAbilities = withAbilities(Card);
 
-function ZonePlayerInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt, prsAvailable }) {
+function ZonePlayerInPlay({ name, content, active, cardClickHandler, abilityUseHandler, isOnCreaturePrompt, prsAvailable }) {
 	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
@@ -33,6 +34,7 @@ function ZonePlayerInPlay({ name, content, active, cardClickHandler, isOnCreatur
 					isOnPrompt={isOnCreaturePrompt}
 					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
+					onAbilityUse={abilityUseHandler}
 				/>,
 			) : null}
 		</div>
@@ -48,6 +50,11 @@ const propsTransformer = props => ({
 			generatedBy: props.promptGeneratedBy,
 		});
 	} : () => {},
+	abilityUseHandler: (id, powerName) => window.socket.emit('action', {
+		type: ACTION_POWER,
+		source: id,
+		power: powerName,
+	}),
 });
 
 function mapStateToProps(state) {
