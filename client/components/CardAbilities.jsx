@@ -2,10 +2,10 @@
 import React from 'react';
 import cn from 'classnames';
 
-export const CardAbility = ({name, cost, text, used}) =>
+export const CardAbility = ({name, cost, text, used, onClick}) =>
 	(
 		<div className={cn('ability', {'used': used})}>
-			<b>{name}</b>&mdash;{cost && <b>{cost}:</b>} <span>{text}</span>
+			<b onClick={onClick}>{name}</b>&mdash;{cost && <b>{cost}:</b>} <span>{text}</span>
 		</div>
 	);
 
