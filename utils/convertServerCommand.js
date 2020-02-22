@@ -4,6 +4,7 @@ const {
 	ACTION_EFFECT,
 
 	PROMPT_TYPE_CHOOSE_CARDS,
+	PROMPT_TYPE_NUMBER,
 	// PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
@@ -43,6 +44,10 @@ function convertServerCommand(action, game) {
 
 					action.availableCards = availableCards;                                
 					break;
+				}
+				case PROMPT_TYPE_NUMBER: {
+					action.min = game.getMetaValue(action.min, action.generatedBy);
+					action.max = game.getMetaValue(action.max, action.generatedBy);
 				}
 			}
 			break;

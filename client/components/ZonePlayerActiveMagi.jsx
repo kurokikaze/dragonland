@@ -2,23 +2,21 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
+import cn from 'classnames';
 import {
-	TYPE_CREATURE,
-	// TYPE_RELIC,
-	// TYPE_SPELL,
-	ACTION_RESOLVE_PROMPT,
-	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_SINGLE_MAGI,
+	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
-	STEP_ATTACK,
+	STEP_PRS_FIRST, STEP_PRS_SECOND,
 } from '../const';
 import {withCardData, withZoneContent} from './common';
 
-function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt }) {
+function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
 	return (
-		<div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
+		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<Card
 					key={cardData.id}
@@ -26,9 +24,9 @@ function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreat
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
-					isOnPrompt={isOnCreaturePrompt}
-					droppable={active && cardData.card.type === TYPE_CREATURE}
-					target={active && cardData.card.type === TYPE_CREATURE}
+					isOnPrompt={isOnMagiPrompt}
+					droppable={active}
+					target={active}
 				/>,
 			) : null}
 		</div>
@@ -37,7 +35,7 @@ function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreat
 
 const propsTransformer = props => ({
 	...props,
-	cardClickHandler: props.isOnCreaturePrompt ? cardId => {
+	cardClickHandler: props.isOnMagiPrompt ? cardId => {
 		window.socket.emit('action', {
 			type: ACTION_RESOLVE_PROMPT,
 			target: cardId,
@@ -48,10 +46,8 @@ const propsTransformer = props => ({
 
 function mapStateToProps(state) {
 	return {
-		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt &&
-			[PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
-		promptGeneratedBy: state.promptGeneratedBy,
+		active: state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step),
+		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
 	};
 }
 
@@ -62,4 +58,4 @@ const enhance = compose(
 	withCardData,
 );
 
-export default enhance(ZoneOpponentInPlay);
+export default enhance(ZoneOpponentActiveMagi);

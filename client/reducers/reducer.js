@@ -15,6 +15,8 @@ import {
 	EFFECT_TYPE_START_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
 
+	PROMPT_TYPE_NUMBER,
+
 	// TYPE_CREATURE,
 
 	ZONE_TYPE_ACTIVE_MAGI,
@@ -56,12 +58,20 @@ export default (state = {}, action) => {
 			};
 		}
 		case ACTION_ENTER_PROMPT: {
+			var promptParams = action.promptParams;
+			switch (action.promptType) {
+				case PROMPT_TYPE_NUMBER:
+					promptParams = {
+						min: action.min,
+						max: action.max
+					};
+			}
 			return {
 				...state,
 				prompt: true,
 				promptPlayer: action.player,
 				promptType: action.promptType,
-				promptParams: action.promptParams,
+				promptParams,
 				promptGeneratedBy: action.generatedBy,
 				promptAvailableCards: action.availableCards || null,
 			};

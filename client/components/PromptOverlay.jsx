@@ -2,10 +2,12 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import PromptChooseCards from './PromptChooseCards';
+import PromptChooseNumber from './PromptChooseNumber';
 import './style.css';
 
 import {
 	PROMPT_TYPE_CHOOSE_CARDS,
+	PROMPT_TYPE_NUMBER,
 	// @TODO
 	/* PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
@@ -24,6 +26,7 @@ function PromptOverlay({promptType, promptParams, availableCards}) {
 	return (
 		<div className="promptOverlay">
 			{promptType === PROMPT_TYPE_CHOOSE_CARDS && <PromptChooseCards cards={promptParams} value={availableCards} />}
+			{promptType === PROMPT_TYPE_NUMBER && <PromptChooseNumber value={promptParams.min} />}
 		</div>
 	);
 }
@@ -31,7 +34,7 @@ function PromptOverlay({promptType, promptParams, availableCards}) {
 function mapStateToProps(state) {
 	return {
 		promptType: state.promptType,
-		promptParams: state.promptParams,
+		promptParams: state.promptParams || { min: 0, max: 10},
 		availableCards: state.promptAvailableCards,
 	};
 }

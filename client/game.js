@@ -24,6 +24,7 @@ function startGame() {
 	);
 	window.socket = io(`/?gameId=${window.gameId}&playerId=${window.playerId}`);
 	window.socket.on('action', function(action) {
+		console.dir(action);
 		store.dispatch(action);
 	});
 

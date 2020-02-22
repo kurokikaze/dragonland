@@ -1,20 +1,20 @@
 /* global window */
 import React from 'react';
 import {connect} from 'react-redux';
-import {compose} from 'recompose';
+import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
-// import {
-// 	TYPE_CREATURE,
-// 	TYPE_RELIC,
-// 	TYPE_SPELL,
-// } from 'moonlands/src/const';
+import {
+	PROMPT_TYPE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_SINGLE_MAGI,
+	ACTION_RESOLVE_PROMPT,
+} from 'moonlands/src/const';
 import Card from './Card';
 import {
 	STEP_ATTACK,
 } from '../const';
 import {withCardData, withZoneContent} from './common';
 
-function ZoneOpponentActiveMagi({ name, content, active }) {
+function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
 	return (
 		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
@@ -23,7 +23,8 @@ function ZoneOpponentActiveMagi({ name, content, active }) {
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
-					onClick={() => {}}
+					onClick={cardClickHandler}
+					isOnPrompt={isOnMagiPrompt}
 					droppable={active}
 					target={active}
 				/>,
@@ -32,15 +33,28 @@ function ZoneOpponentActiveMagi({ name, content, active }) {
 	);
 }
 
+const propsTransformer = props => ({
+	...props,
+	cardClickHandler: props.isOnMagiPrompt ? cardId => {
+		window.socket.emit('action', {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: props.promptGeneratedBy,
+		});
+	} : () => {},
+});
+
 function mapStateToProps(state) {
 	return {
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
+		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
 	};
 }
 
 const enhance = compose(
 	withZoneContent,
 	connect(mapStateToProps),
+	mapProps(propsTransformer),
 	withCardData,
 );
 
