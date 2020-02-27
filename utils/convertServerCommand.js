@@ -85,7 +85,7 @@ function convertServerCommand(action, game) {
 						action.target;
 
 					const amount = (typeof action.amount == 'string') ?
-						game.getMetaValue(action.amount, action.generatedBy) :
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
@@ -114,7 +114,7 @@ function convertServerCommand(action, game) {
 					source.card = source.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
-						game.getMetaValue(action.amount, action.generatedBy) :
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
 					action = {
@@ -131,7 +131,7 @@ function convertServerCommand(action, game) {
 						action.target;
 
 					const amount = (typeof action.amount == 'string') ?
-						game.getMetaValue(action.amount, action.generatedBy) :
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
@@ -153,7 +153,7 @@ function convertServerCommand(action, game) {
 					target.card = target.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
-						game.getMetaValue(action.amount, action.generatedBy) :
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
 					action = {
@@ -172,7 +172,7 @@ function convertServerCommand(action, game) {
 					target.card = target.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
-						game.getMetaValue(action.amount, action.generatedBy) :
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
 					action = {
