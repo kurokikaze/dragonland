@@ -1,11 +1,12 @@
 {
   "name": "dragonland",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "watch": "parcel watch client/game.js --out-dir public/javascripts",
     "build": "parcel build client/game.js --out-dir public/javascripts",
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "jest --no-cache"
   },
   "dependencies": {
     "classnames": "^2.2.6",
