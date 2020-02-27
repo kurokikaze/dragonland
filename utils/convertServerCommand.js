@@ -171,9 +171,14 @@ function convertServerCommand(action, game) {
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
 					target.card = target.card.card;
 
+					const amount = (typeof action.amount == 'string') ?
+						game.getMetaValue(action.amount, action.generatedBy) :
+						action.amount;
+
 					action = {
 						...action,
 						target,
+						amount,
 					};
 					break;
 				}
