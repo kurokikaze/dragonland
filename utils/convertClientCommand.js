@@ -5,6 +5,7 @@ const {
 	ACTION_RESOLVE_PROMPT,
 
 	PROMPT_TYPE_SINGLE_CREATURE,
+	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 
@@ -19,6 +20,10 @@ function convertClientCommands(action, game) {
 	switch (action.type) {
 		case ACTION_RESOLVE_PROMPT: {
 			switch (game.state.promptType) {
+				case PROMPT_TYPE_OWN_SINGLE_CREATURE: {
+					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+					break;
+				}
 				case PROMPT_TYPE_SINGLE_CREATURE: {
 					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
 					break;

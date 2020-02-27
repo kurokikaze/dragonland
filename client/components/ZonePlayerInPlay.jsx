@@ -9,6 +9,7 @@ import {
 	TYPE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
@@ -62,7 +63,7 @@ function mapStateToProps(state) {
 	return {
 		prsAvailable: state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step),
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt && [PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
+		isOnCreaturePrompt: state.prompt && [PROMPT_TYPE_OWN_SINGLE_CREATURE, PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
 		promptGeneratedBy: state.promptGeneratedBy,
 	};
 }
