@@ -149,7 +149,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 	res.render('game', {
 		gameId,
 		playerId,
-		status: runningGames[gameId].serializeData(),
+		initialState: runningGames[gameId].serializeData(playerId),
 	});
 });
 
