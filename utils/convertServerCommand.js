@@ -13,9 +13,6 @@ const {
 	EFFECT_TYPE_MOVE_ENERGY,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
-
-	ZONE_TYPE_DECK,
-	ZONE_TYPE_DISCARD,
 } = require('moonlands/src/const');
 
 const NUMBER_OF_STEPS = 6;
@@ -36,12 +33,6 @@ function convertServerCommand(action, game) {
 		case ACTION_ENTER_PROMPT: {
 			switch(action.promptType) {
 				case PROMPT_TYPE_CHOOSE_CARDS: {
-					const discardCards = game.getZone(ZONE_TYPE_DISCARD, action.player).cards.map(card => card.card.name);
-					const libraryCards = game.getZone(ZONE_TYPE_DECK, action.player).cards.map(card => card.card.name);
-					const searchableCards = [...discardCards, ...libraryCards];
-					const availableCards = action.promptParams.filter(card => searchableCards.includes(card));
-
-					action.availableCards = availableCards;                                
 					break;
 				}
 				case PROMPT_TYPE_NUMBER: {

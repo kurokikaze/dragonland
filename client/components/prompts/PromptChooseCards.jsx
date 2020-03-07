@@ -2,8 +2,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers, withStateHandlers} from 'recompose';
+import {getAvailableStartingCards} from '../../selectors';
 import cn from 'classnames';
-import Card from './Card';
+import Card from '../Card';
 
 import {
 	ACTION_RESOLVE_PROMPT,
@@ -33,15 +34,18 @@ function PromptChooseCards({cards, triggerElement, selected, onSend, availableCa
 	);
 }
 
-const mapStateToProps = (state) => ({
-	generatedBy: state.promptGeneratedBy,
-	availableCards: state.promptParams.cards,
-});
+const mapStateToProps = (state) => {
+	return {
+		cards: state.promptParams.cards,
+		generatedBy: state.promptGeneratedBy,
+		availableCards: getAvailableStartingCards(state.promptParams.cards, state),
+	};
+};
 
 const enhance  = compose(
 	connect(mapStateToProps),
 	withStateHandlers(
-		({value}) => ({selected: value}),
+		({availableCards}) => ({selected: availableCards}),
 		{
 			triggerElement: ({selected}) => (cardName) => ({
 				selected: selected.includes(cardName) ? selected.filter(e => e !== cardName): [...selected, cardName],

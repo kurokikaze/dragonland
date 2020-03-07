@@ -16,3 +16,10 @@ export function getMagiEnergy(state) {
 export function zoneContent(zoneId, state) {
 	return pathOr([], ['zones', zoneId], state);
 }
+
+export function getAvailableStartingCards(cards = [], state) {
+	const discardCards = state.zones.playerDiscard.map(card => card.card);
+	const libraryCards = state.zones.playerDeck.map(card => card.card);
+	const searchableCards = [...discardCards, ...libraryCards];
+	return cards.filter(card => searchableCards.includes(card));
+}

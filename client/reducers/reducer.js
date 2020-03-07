@@ -43,7 +43,26 @@ const zoneNames = {
 	[ZONE_TYPE_IN_PLAY]: 'InPlay',
 };
 
-export default (state = {}, action) => {
+const defaultState = {
+	zones: {
+		playerHand: [],
+		playerDeck: [],
+		playerDiscard: [],
+		playerActiveMagi: [],
+		playerMagiPile: [],
+		playerDefeatedMagi: [],
+		playerInPlay: [],
+		opponentHand: [],
+		opponentDeck: [],
+		opponentDiscard: [],
+		opponentActiveMagi: [],
+		opponentMagiPile: [],
+		opponentDefeatedMagi: [],
+		opponentInPlay: [],
+	}
+};
+
+export default (state = defaultState, action) => {
 	switch (action.type) {
 		case ACTION_PLAYER_WINS: {
 			return {
@@ -68,12 +87,6 @@ export default (state = {}, action) => {
 					};
 					break;
 				}
-				case PROMPT_TYPE_CHOOSE_CARDS: {
-					promptParams = {
-						cards: action.promptParams,
-					};
-					break;
-				}
 			}
 			return {
 				...state,
@@ -82,7 +95,7 @@ export default (state = {}, action) => {
 				promptType: action.promptType,
 				promptParams,
 				promptGeneratedBy: action.generatedBy,
-				promptAvailableCards: action.availableCards || null,
+				promptAvailableCards: action.availableCards || [],
 			};
 		}
 		case ACTION_RESOLVE_PROMPT: {

@@ -22,10 +22,10 @@ import {
 	PROMPT_TYPE_NUMBER,*/ 
 } from 'moonlands/src/const';
 
-function PromptOverlay({promptType, promptParams, availableCards}) {
+function PromptOverlay({promptType, promptParams}) {
 	return (
 		<div className="promptOverlay">
-			{promptType === PROMPT_TYPE_CHOOSE_CARDS && <PromptChooseCards cards={promptParams} value={availableCards} />}
+			{promptType === PROMPT_TYPE_CHOOSE_CARDS && <PromptChooseCards cards={promptParams} />}
 			{promptType === PROMPT_TYPE_NUMBER && <PromptChooseNumber value={promptParams.min} />}
 		</div>
 	);
@@ -35,7 +35,6 @@ function mapStateToProps(state) {
 	return {
 		promptType: state.promptType,
 		promptParams: state.promptParams || { min: 0, max: 10},
-		availableCards: state.promptAvailableCards,
 	};
 }
 
