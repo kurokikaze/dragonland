@@ -35,7 +35,7 @@ function PromptChooseCards({cards, triggerElement, selected, onSend, availableCa
 
 const mapStateToProps = (state) => ({
 	generatedBy: state.promptGeneratedBy,
-	availableCards: state.promptAvailableCards,
+	availableCards: state.promptParams.cards,
 });
 
 const enhance  = compose(

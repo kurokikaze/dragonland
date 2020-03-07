@@ -19,7 +19,7 @@ import ZonePlayerInPlay from './ZonePlayerInPlay';
 import ZoneOpponentInPlay from './ZoneOpponentInPlay';
 import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi';
 import ZonePlayerActiveMagi from './ZonePlayerActiveMagi';
-import PromptOverlay from './PromptOverlay';
+import PromptOverlay from './prompts/PromptOverlay';
 import StepBoard from './StepBoard';
 import EndgameOverlay from './EndgameOverlay';
 

@@ -16,6 +16,7 @@ import {
 	EFFECT_TYPE_MOVE_ENERGY,
 
 	PROMPT_TYPE_NUMBER,
+	PROMPT_TYPE_CHOOSE_CARDS,
 
 	// TYPE_CREATURE,
 
@@ -60,11 +61,19 @@ export default (state = {}, action) => {
 		case ACTION_ENTER_PROMPT: {
 			var promptParams = action.promptParams;
 			switch (action.promptType) {
-				case PROMPT_TYPE_NUMBER:
+				case PROMPT_TYPE_NUMBER: {
 					promptParams = {
 						min: action.min,
 						max: action.max
 					};
+					break;
+				}
+				case PROMPT_TYPE_CHOOSE_CARDS: {
+					promptParams = {
+						cards: action.promptParams,
+					};
+					break;
+				}
 			}
 			return {
 				...state,

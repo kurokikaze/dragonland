@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 
 import PromptChooseCards from './PromptChooseCards';
 import PromptChooseNumber from './PromptChooseNumber';
-import './style.css';
+import '../style.css';
 
 import {
 	PROMPT_TYPE_CHOOSE_CARDS,
