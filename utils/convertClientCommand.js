@@ -50,6 +50,12 @@ function convertClientCommands(action, game) {
 		}
 		case ACTION_POWER: {
 			expandedAction.source = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
+			if (!expandedAction.source) {
+				expandedAction.source = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[0]).byId(action.source);
+			}
+			if (!expandedAction.source) {
+				expandedAction.source = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[1]).byId(action.source);
+			}
 			expandedAction.power = expandedAction.source.card.data.powers.find(power => power.name === expandedAction.power);
 			expandedAction.player = expandedAction.source.data.controller;
 			break;

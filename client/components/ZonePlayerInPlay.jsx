@@ -14,9 +14,8 @@ import {
 import Card from './Card';
 import {
 	STEP_ATTACK,
-	STEP_PRS_FIRST,
-	STEP_PRS_SECOND,
 } from '../const';
+import {isPRSAvailable} from '../selectors';
 import {withCardData, withZoneContent} from './common';
 import {withAbilities} from './CardAbilities';
 
@@ -61,7 +60,7 @@ const propsTransformer = props => ({
 
 function mapStateToProps(state) {
 	return {
-		prsAvailable: state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step),
+		prsAvailable: isPRSAvailable(state),
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
 		isOnCreaturePrompt: state.prompt && [PROMPT_TYPE_OWN_SINGLE_CREATURE, PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
 		promptGeneratedBy: state.promptGeneratedBy,

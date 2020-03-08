@@ -6,27 +6,32 @@ import cn from 'classnames';
 import {
 	PROMPT_TYPE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
+
 	ACTION_RESOLVE_PROMPT,
+	ACTION_POWER,
 } from 'moonlands/src/const';
 import Card from './Card';
-import {
-	STEP_PRS_FIRST, STEP_PRS_SECOND,
-} from '../const';
+
+import {isPRSAvailable} from '../selectors';
+import {withAbilities} from './CardAbilities';
 import {withCardData, withZoneContent} from './common';
 
-function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
+const CardWithAbilities = withAbilities(Card);
+
+function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler, abilityUseHandler }) {
+	const SelectedCard = active ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<Card
+				<SelectedCard
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnMagiPrompt}
-					droppable={active}
 					target={active}
+					onAbilityUse={abilityUseHandler}
 				/>,
 			) : null}
 		</div>
@@ -42,11 +47,16 @@ const propsTransformer = props => ({
 			generatedBy: props.promptGeneratedBy,
 		});
 	} : () => {},
+	abilityUseHandler: (id, powerName) => window.socket.emit('action', {
+		type: ACTION_POWER,
+		source: id,
+		power: powerName,
+	}),
 });
 
 function mapStateToProps(state) {
 	return {
-		active: state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step),
+		active: isPRSAvailable(state),
 		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
 	};
 }
@@ -58,4 +68,4 @@ const enhance = compose(
 	withCardData,
 );
 
-export default enhance(ZoneOpponentActiveMagi);
+export default enhance(ZonePlayerActiveMagi);

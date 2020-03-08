@@ -1,5 +1,9 @@
 /* global window */
 import {pathOr} from 'ramda';
+import {
+	STEP_PRS_FIRST,
+	STEP_PRS_SECOND,
+} from '../const';
 
 export function isOurTurn(state) {
 	return state.activePlayer === window.playerId;
@@ -23,3 +27,5 @@ export function getAvailableStartingCards(cards = [], state) {
 	const searchableCards = [...discardCards, ...libraryCards];
 	return cards.filter(card => searchableCards.includes(card));
 }
+
+export const isPRSAvailable = state => state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step);
