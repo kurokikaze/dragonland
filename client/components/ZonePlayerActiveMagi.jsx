@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
 import {
-	PROMPT_TYPE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 
 	ACTION_RESOLVE_PROMPT,
@@ -57,7 +57,7 @@ const propsTransformer = props => ({
 function mapStateToProps(state) {
 	return {
 		active: isPRSAvailable(state),
-		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
+		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
 	};
 }
 

@@ -8,7 +8,7 @@ import {
 	// TYPE_SPELL,
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
@@ -50,7 +50,7 @@ function mapStateToProps(state) {
 	return {
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
 		isOnCreaturePrompt: state.prompt &&
-			[PROMPT_TYPE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
+			[PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
 		promptGeneratedBy: state.promptGeneratedBy,
 	};
 }
