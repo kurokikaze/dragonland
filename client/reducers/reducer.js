@@ -6,17 +6,22 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
 
+	TYPE_CREATURE,
+	TYPE_MAGI,
+	TYPE_RELIC,
+
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
 	EFFECT_TYPE_START_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
 
 	PROMPT_TYPE_NUMBER,
-	PROMPT_TYPE_CHOOSE_CARDS,
+	// PROMPT_TYPE_CHOOSE_CARDS,
 
 	// TYPE_CREATURE,
 
@@ -93,6 +98,7 @@ export default (state = defaultState, action) => {
 				prompt: true,
 				promptPlayer: action.player,
 				promptType: action.promptType,
+				promptMessage: action.message || null,
 				promptParams,
 				promptGeneratedBy: action.generatedBy,
 				promptAvailableCards: action.availableCards || [],
@@ -128,6 +134,64 @@ export default (state = defaultState, action) => {
 						};
 					}
 				}
+				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {
+					switch (action.target._card.type) {
+						case TYPE_CREATURE: {
+							// creature pays for the ability
+							return state;
+						}
+						case TYPE_MAGI:
+						case TYPE_RELIC: {
+							// magi pays for the ability
+							if (action.target.data.controller == window.playerId) {
+								const playerActiveMagi = state.zones.playerActiveMagi
+									.map(card => ({
+										...card,
+										data: {
+											...card.data,
+											energy: card.data.energy - action.amount,
+										},
+									}));
+								return {
+									...state,
+									zones: {
+										...state.zones,
+										playerActiveMagi,
+									},
+								};
+							} else {
+								const opponentActiveMagi = state.zones.playerActiveMagi
+									.map(card => ({
+										...card,
+										data: {
+											...card.data,
+											energy: card.data.energy - action.amount,
+										},
+									}));
+								return {
+									...state,
+									zones: {
+										...state.zones,
+										opponentActiveMagi,
+									},
+								};
+							}
+						}
+					}
+					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
+						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+					const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
+						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+
+					return {
+						...state,
+						zones: {
+							...state.zones,
+							playerActiveMagi,
+							opponentActiveMagi,
+						},
+					};
+				}// @TODO
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
 					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
 						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
