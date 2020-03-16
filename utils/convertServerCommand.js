@@ -4,6 +4,7 @@ const {
 	ACTION_EFFECT,
 
 	PROMPT_TYPE_CHOOSE_CARDS,
+	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
@@ -54,6 +55,11 @@ function convertServerCommand(action, game) {
 				action.message = templateMessage(action.message, metaData);
 			}
 			switch(action.promptType) {
+				case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE: {
+					action.source = game.getMetaValue(action.source, action.generatedBy);
+					action.source.card = action.source.card.card;
+					break;
+				}
 				case PROMPT_TYPE_CHOOSE_CARDS: {
 					break;
 				}

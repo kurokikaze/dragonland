@@ -7,21 +7,34 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 	TYPE_CREATURE,
-	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
-	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
 	STEP_ATTACK,
 } from '../const';
 import {isPRSAvailable} from '../selectors';
-import {withCardData, withZoneContent} from './common';
+import {
+	withCardData, 
+	withZoneContent,
+	UNFILTERED_CREATURE_PROMPTS,
+	FILTERED_CREATURE_PROMPTS,
+	getPromptFilter,
+} from './common';
 import {withAbilities} from './CardAbilities';
 
 const CardWithAbilities = withAbilities(Card);
 
-function ZonePlayerInPlay({ name, content, active, cardClickHandler, abilityUseHandler, isOnCreaturePrompt, prsAvailable }) {
+function ZonePlayerInPlay({
+	name, 
+	content, 
+	active, 
+	cardClickHandler, 
+	abilityUseHandler, 
+	isOnUnfilteredPrompt,
+	isOnFilteredPrompt,
+	promptFilter,
+	prsAvailable 
+}) {
 	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
@@ -32,7 +45,7 @@ function ZonePlayerInPlay({ name, content, active, cardClickHandler, abilityUseH
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
-					isOnPrompt={isOnCreaturePrompt}
+					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 					onAbilityUse={abilityUseHandler}
@@ -56,13 +69,18 @@ const propsTransformer = props => ({
 		source: id,
 		power: powerName,
 	}),
+	isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
+	isOnFilteredPrompt:  props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
+	promptFilter: getPromptFilter(props.promptType, props.promptParams),
 });
 
 function mapStateToProps(state) {
 	return {
 		prsAvailable: isPRSAvailable(state),
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt && [PROMPT_TYPE_OWN_SINGLE_CREATURE, PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
+		isOnCreaturePrompt: state.prompt,
+		promptType: state.promptType,
+		promptParams: state.promptParams,
 		promptGeneratedBy: state.promptGeneratedBy,
 	};
 }

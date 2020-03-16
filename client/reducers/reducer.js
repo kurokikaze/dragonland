@@ -21,6 +21,7 @@ import {
 	EFFECT_TYPE_MOVE_ENERGY,
 
 	PROMPT_TYPE_NUMBER,
+	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	// PROMPT_TYPE_CHOOSE_CARDS,
 
 	// TYPE_CREATURE,
@@ -89,6 +90,12 @@ export default (state = defaultState, action) => {
 					promptParams = {
 						min: action.min,
 						max: action.max
+					};
+					break;
+				}
+				case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE: {
+					promptParams = {
+						source: action.source,
 					};
 					break;
 				}
@@ -191,7 +198,7 @@ export default (state = defaultState, action) => {
 							opponentActiveMagi,
 						},
 					};
-				}// @TODO
+				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
 					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
 						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);

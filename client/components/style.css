@@ -51,6 +51,7 @@
 }
 
 .cardAbilities {
+    font-size: 13px;
     display: none;
     position: absolute;
     bottom: 0;

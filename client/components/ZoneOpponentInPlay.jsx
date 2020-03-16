@@ -4,19 +4,29 @@ import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import {
 	TYPE_CREATURE,
-	// TYPE_RELIC,
-	// TYPE_SPELL,
 	ACTION_RESOLVE_PROMPT,
-	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 } from 'moonlands/src/const';
 import Card from './Card';
 import {
 	STEP_ATTACK,
 } from '../const';
-import {withCardData, withZoneContent} from './common';
+import {
+	withCardData,
+	withZoneContent,
+	UNFILTERED_CREATURE_PROMPTS,
+	FILTERED_CREATURE_PROMPTS,
+	getPromptFilter,
+} from './common';
 
-function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreaturePrompt }) {
+function ZoneOpponentInPlay({
+	name,
+	content,
+	active,
+	cardClickHandler,
+	isOnUnfilteredPrompt,
+	isOnFilteredPrompt,
+	promptFilter,
+}) {
 	return (
 		<div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
@@ -26,7 +36,7 @@ function ZoneOpponentInPlay({ name, content, active, cardClickHandler, isOnCreat
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
-					isOnPrompt={isOnCreaturePrompt}
+					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					droppable={active && cardData.card.type === TYPE_CREATURE}
 					target={active && cardData.card.type === TYPE_CREATURE}
 				/>,
@@ -44,13 +54,17 @@ const propsTransformer = props => ({
 			generatedBy: props.promptGeneratedBy,
 		});
 	} : () => {},
+	isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
+	isOnFilteredPrompt: props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
+	promptFilter: getPromptFilter(props.promptType, props.promptParams),
 });
 
 function mapStateToProps(state) {
 	return {
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt &&
-			[PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_CREATURE].includes(state.promptType),
+		isOnCreaturePrompt: state.prompt,
+		promptType: state.promptType,
+		promptParams: state.promptParams,
 		promptGeneratedBy: state.promptGeneratedBy,
 	};
 }
