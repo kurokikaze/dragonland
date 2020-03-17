@@ -37,6 +37,23 @@ Yaki
 3 Robe of Vines
 2 Sea Barl`;
 
+const arderialDeck = `Lasada
+Jaela
+Ora
+3 Pharan
+3 Alaban
+3 Ayebaw
+3 Cyclone Vashp
+3 Shockwave
+3 Shooting Star
+3 Storm Cloud
+3 Thunder Hyren
+3 Xyx
+3 Xyx Elder
+3 Updraft
+3 Typhoon
+1 Syphon Stone`;
+
 const deckHeight = 18;
 
 /* GET home page. */
@@ -44,7 +61,7 @@ router.get('/', function(req, res) {
 	res.render('index', { 
 		title: 'Dragonlands',
 		deckOne: caldDeck,
-		deckTwo: naroomDeck,
+		deckTwo: arderialDeck,
 		deckHeight,
 	});
 });

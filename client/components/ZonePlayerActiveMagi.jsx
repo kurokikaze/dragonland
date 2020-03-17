@@ -21,7 +21,7 @@ const CardWithAbilities = withAbilities(Card);
 function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler, abilityUseHandler }) {
 	const SelectedCard = active ? CardWithAbilities : Card;
 	return (
-		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
+		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<SelectedCard
 					key={cardData.id}

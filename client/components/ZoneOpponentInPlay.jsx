@@ -2,6 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
+import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	ACTION_RESOLVE_PROMPT,
@@ -28,7 +29,7 @@ function ZoneOpponentInPlay({
 	promptFilter,
 }) {
 	return (
-		<div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
+		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<Card
 					key={cardData.id}

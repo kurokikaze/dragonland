@@ -16,7 +16,7 @@ import {withCardData, withZoneContent} from './common';
 
 function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
 	return (
-		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
+		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<Card
 					key={cardData.id}

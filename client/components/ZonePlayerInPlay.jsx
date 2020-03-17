@@ -37,7 +37,7 @@ function ZonePlayerInPlay({
 }) {
 	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
-		<div className={cn('zone', {'zone-active': active})} data-zone-name={name}>
+		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<SelectedCard
 					key={cardData.id}

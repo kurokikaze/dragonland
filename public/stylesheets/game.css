@@ -28,6 +28,42 @@
     height: 90px;    
 }
 
+.zone-creatures .cardHolder {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.zone-creatures .cardHolder img {
+    width: 104px;
+    height: auto;
+    position: relative;
+    top: -25px;
+    left: -11px;
+}
+
+.zone-creatures .cardHolder .cardEnergy {
+    top: -7px;
+}
+
+.zone-magi .cardHolder {
+    position: relative;
+    width: 82px;
+    height: 82px;
+    border-radius: 41px;
+    overflow: hidden;
+}
+
+.zone-magi .cardHolder img {
+    width: 124px;
+    height: auto;
+    top: -21px;
+    left: -20px;
+    position: relative;
+}
+
 .cardHolder.onPrompt {
     z-index: 120;
 }
