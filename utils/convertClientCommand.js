@@ -8,6 +8,8 @@ const {
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
+	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+	PROMPT_TYPE_SINGLE_RELIC,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
@@ -20,11 +22,19 @@ function convertClientCommands(action, game) {
 	switch (action.type) {
 		case ACTION_RESOLVE_PROMPT: {
 			switch (game.state.promptType) {
+				case PROMPT_TYPE_SINGLE_RELIC: {
+					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+					break;
+				}
 				case PROMPT_TYPE_OWN_SINGLE_CREATURE: {
 					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
 					break;
 				}
 				case PROMPT_TYPE_SINGLE_CREATURE: {
+					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+					break;
+				}
+				case PROMPT_TYPE_SINGLE_CREATURE_FILTERED: {
 					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
 					break;
 				}

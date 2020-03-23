@@ -167,7 +167,7 @@ export default (state = defaultState, action) => {
 									},
 								};
 							} else {
-								const opponentActiveMagi = state.zones.playerActiveMagi
+								const opponentActiveMagi = state.zones.opponentActiveMagi
 									.map(card => ({
 										...card,
 										data: {

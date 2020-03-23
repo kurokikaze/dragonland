@@ -30,7 +30,7 @@ function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClick
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnMagiPrompt}
-					target={active}
+					target={active && cardData.card.data.powers}
 					onAbilityUse={abilityUseHandler}
 				/>,
 			) : null}

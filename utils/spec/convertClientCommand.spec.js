@@ -13,9 +13,11 @@ const {
 	ACTION_POWER,
 	ACTION_RESOLVE_PROMPT,
 
+	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
+	PROMPT_TYPE_SINGLE_RELIC,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_DECK,
@@ -62,6 +64,112 @@ describe('ACTION_RESOLVE_PROMPT', () => {
 			activePlayer: ACTIVE_PLAYER,
 			prompt: true,
 			promptType: PROMPT_TYPE_SINGLE_CREATURE,
+			promptParams: {},			
+		});
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, ACTIVE_PLAYER).add([yaki]);
+		gameState.getZone(ZONE_TYPE_IN_PLAY, null).add([weebo]);
+
+		const clientAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: weebo.id,
+		};
+
+		const expectedAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: weebo,
+		};
+
+		const result = convert(clientAction, gameState);
+
+		expect(result).toEqual(expectedAction);
+	});
+
+	it('PROMPT_TYPE_SINGLE_RELIC', () => {
+		const ACTIVE_PLAYER = 0;
+		const NON_ACTIVE_PLAYER = 1;
+
+		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+		const robesOfTheAges = new CardInGame(byName('Robes of the Ages'), ACTIVE_PLAYER);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER),
+			step: STEP_PRS_SECOND,
+			activePlayer: ACTIVE_PLAYER,
+			prompt: true,
+			promptType: PROMPT_TYPE_SINGLE_RELIC,
+			promptParams: {},			
+		});
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, ACTIVE_PLAYER).add([yaki]);
+		gameState.getZone(ZONE_TYPE_IN_PLAY, null).add([weebo, robesOfTheAges]);
+
+		const clientAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: robesOfTheAges.id,
+		};
+
+		const expectedAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: robesOfTheAges,
+		};
+
+		const result = convert(clientAction, gameState);
+
+		expect(result).toEqual(expectedAction);
+	});
+
+	it('PROMPT_TYPE_SINGLE_CREATURE_FILTERED', () => {
+		const ACTIVE_PLAYER = 0;
+		const NON_ACTIVE_PLAYER = 1;
+
+		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER),
+			step: STEP_PRS_SECOND,
+			activePlayer: ACTIVE_PLAYER,
+			prompt: true,
+			promptType: PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+			promptParams: {},			
+		});
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, ACTIVE_PLAYER).add([yaki]);
+		gameState.getZone(ZONE_TYPE_IN_PLAY, null).add([weebo]);
+
+		const clientAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: weebo.id,
+		};
+
+		const expectedAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			target: weebo,
+		};
+
+		const result = convert(clientAction, gameState);
+
+		expect(result).toEqual(expectedAction);
+	});
+
+	it('PROMPT_TYPE_SINGLE_RELIC', () => {
+		const ACTIVE_PLAYER = 0;
+		const NON_ACTIVE_PLAYER = 1;
+
+		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER),
+			step: STEP_PRS_SECOND,
+			activePlayer: ACTIVE_PLAYER,
+			prompt: true,
+			promptType: PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 			promptParams: {},			
 		});
 		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
