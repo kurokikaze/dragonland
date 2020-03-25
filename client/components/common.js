@@ -15,6 +15,13 @@ import {
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+
+	RESTRICTION_TYPE,
+	RESTRICTION_ENERGY_LESS_THAN_STARTING,
+	RESTRICTION_OWN_CREATURE,
+	RESTRICTION_OPPONENT_CREATURE,
+	RESTRICTION_REGION,
+	RESTRICTION_CREATURE_TYPE,
 } from 'moonlands/src/const';
 
 import {zoneContent} from '../selectors';
@@ -50,6 +57,23 @@ export const FILTERED_CREATURE_PROMPTS = [
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 ];
 
+const getRestrictionFilter = (restriction, value) => {
+	switch(restriction) {
+		case RESTRICTION_TYPE:
+			return card => card.card.type === value;
+		case RESTRICTION_REGION:
+			return card => card.card.region === value;
+		case RESTRICTION_CREATURE_TYPE:
+			return card => (card.card.type === TYPE_CREATURE && card.card.name.split(' ').includes(value));
+		case RESTRICTION_ENERGY_LESS_THAN_STARTING:
+			return card => (card.card.type === TYPE_CREATURE && card.data.energy < card.card.cost);
+		case RESTRICTION_OWN_CREATURE:
+			return card => (card.card.type === TYPE_CREATURE && card.data.controller === window.playerId);
+		case RESTRICTION_OPPONENT_CREATURE:
+			return card => (card.card.type === TYPE_CREATURE && card.data.controller !== window.playerId);
+	}
+};
+
 export const getPromptFilter = (promptType, promptParams) => {
 	switch (promptType) {
 		case PROMPT_TYPE_SINGLE_RELIC:
@@ -62,6 +86,18 @@ export const getPromptFilter = (promptType, promptParams) => {
 			return card => card.data.controller === window.playerId && card.card.type === TYPE_CREATURE;
 		case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE:
 			return card => card.id !== promptParams.source;
+		case PROMPT_TYPE_SINGLE_CREATURE_FILTERED:
+			if (promptParams) {
+				if (promptParams.restrictions && promptParams.restrictions.length) {
+					const checkers = promptParams.restrictions.map(({type, value}) => getRestrictionFilter(type, value));
+					return card =>
+						checkers.map(checker => checker(card)).every(a => a === true); // combine checkers
+				} else {
+					return getRestrictionFilter(promptParams.restriction, promptParams.restrictionValue);
+				}
+			} else {
+				return () => true;
+			}
 		default:
 			return () => true;
 	}

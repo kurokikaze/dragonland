@@ -22,6 +22,7 @@ import {
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
+	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	// PROMPT_TYPE_CHOOSE_CARDS,
 
 	// TYPE_CREATURE,
@@ -98,6 +99,14 @@ export default (state = defaultState, action) => {
 				case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE: {
 					promptParams = {
 						source: action.source,
+					};
+					break;
+				}
+				case PROMPT_TYPE_SINGLE_CREATURE_FILTERED: {
+					promptParams = {
+						restrictions: action.restrictions,
+						restriction: action.restriction,
+						restrictionValue: action.restrictionValue,
 					};
 					break;
 				}
