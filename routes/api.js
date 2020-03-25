@@ -138,7 +138,8 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 					runningGames[gameId].update(expandedAction);
 				} catch(e) {
 					console.log('Engine error!');
-					console.log();
+					console.log('On action:');
+					console.dir(expandedAction);
 					console.log();
 					console.dir(runningGames[gameId].state);
 				}

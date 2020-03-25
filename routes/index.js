@@ -19,6 +19,7 @@ Sinder
 2 Magma Armor
 2 Fire Flow`;
 
+/* eslint-disable-next-line no-unused-vars */
 const naroomDeck = `Pruitt
 Poad
 Yaki

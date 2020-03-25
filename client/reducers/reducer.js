@@ -65,7 +65,9 @@ const defaultState = {
 		opponentMagiPile: [],
 		opponentDefeatedMagi: [],
 		opponentInPlay: [],
-	}
+	},
+	gameEnded: false,
+	winner: null,
 };
 
 export default (state = defaultState, action) => {
