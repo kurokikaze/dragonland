@@ -49,7 +49,7 @@ function ZoneOpponentInPlay({
 const propsTransformer = props => ({
 	...props,
 	cardClickHandler: props.isOnCreaturePrompt ? cardId => {
-		window.socket.emit('action', {
+		window.socket.emit('clientAction', {
 			type: ACTION_RESOLVE_PROMPT,
 			target: cardId,
 			generatedBy: props.promptGeneratedBy,

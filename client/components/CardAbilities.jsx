@@ -21,7 +21,8 @@ export const withAbilities = Component => (props) => {
 						name={name}
 						text={text}
 						cost={cost}
-						onClick={() => props.onAbilityUse(props.id, name)}
+						used={props.data.actionsUsed && props.data.actionsUsed.includes(name)}
+						onClick={() => {console.log(`id:${props.id} , power ${name}`); props.onAbilityUse(props.id, name);}}
 					/>
 				)}
 			</div>

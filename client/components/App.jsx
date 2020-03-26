@@ -66,12 +66,12 @@ const enhance = compose(
 	connect(mapStateToProps),
 	withHandlers({
 		onPass: () => () => {
-			window.socket.emit('action', {
+			window.socket.emit('clientAction', {
 				type: ACTION_PASS,
 			});
 		},
 		onPlay: () => cardId => {
-			window.socket.emit('action', {
+			window.socket.emit('clientAction', {
 				type: ACTION_PLAY,
 				payload: {
 					card: cardId,

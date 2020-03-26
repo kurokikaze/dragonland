@@ -36,7 +36,7 @@ function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardCli
 const propsTransformer = props => ({
 	...props,
 	cardClickHandler: props.isOnMagiPrompt ? cardId => {
-		window.socket.emit('action', {
+		window.socket.emit('clientAction', {
 			type: ACTION_RESOLVE_PROMPT,
 			target: cardId,
 			generatedBy: props.promptGeneratedBy,

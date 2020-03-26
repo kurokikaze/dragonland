@@ -41,13 +41,13 @@ function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClick
 const propsTransformer = props => ({
 	...props,
 	cardClickHandler: props.isOnMagiPrompt ? cardId => {
-		window.socket.emit('action', {
+		window.socket.emit('clientAction', {
 			type: ACTION_RESOLVE_PROMPT,
 			target: cardId,
 			generatedBy: props.promptGeneratedBy,
 		});
 	} : () => {},
-	abilityUseHandler: (id, powerName) => window.socket.emit('action', {
+	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
 		type: ACTION_POWER,
 		source: id,
 		power: powerName,

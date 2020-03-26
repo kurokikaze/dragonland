@@ -132,9 +132,12 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 			});
 
 			// Converting client actions for game engine			
-			socket.on('action', action => {
+			socket.on('clientAction', action => {
 				const expandedAction = convertClientCommand(action, runningGames[gameId]);
+				
 				try {
+					console.log('Expanded Action:');
+					console.dir(expandedAction);
 					runningGames[gameId].update(expandedAction);
 				} catch(e) {
 					console.log('Engine error!');
@@ -142,6 +145,10 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 					console.dir(expandedAction);
 					console.log();
 					console.dir(runningGames[gameId].state);
+					console.log();
+					console.log(e.name);
+					console.log(e.message);
+					console.log(e.stack);
 				}
 			});
 

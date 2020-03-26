@@ -40,7 +40,7 @@ const cardSource = {
 		// When dropped on a compatible target, do something
 		const item = monitor.getItem();
 		const dropResult = monitor.getDropResult();
-		window.socket.emit('action', {
+		window.socket.emit('clientAction', {
 			type: 'actions/attack',
 			source: item.id,
 			target: dropResult.id,

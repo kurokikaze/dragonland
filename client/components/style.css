@@ -71,6 +71,10 @@
     position: relative;
 }
 
+.cardAbilityHolder .ability.used b {
+    color: #aaa;
+}
+
 .cardAbilityHolder:hover .cardAbilities {
     display: block;
 }

@@ -2,9 +2,8 @@ const {
 	ACTION_PASS,
 	ACTION_ENTER_PROMPT,
 	ACTION_EFFECT,
+	ACTION_POWER,
 
-	PROMPT_TYPE_CHOOSE_CARDS,
-	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
@@ -17,6 +16,7 @@ const {
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 } = require('moonlands/src/const');
+const {clone} = require('./index');
 
 const NUMBER_OF_STEPS = 6;
 
@@ -35,40 +35,52 @@ const templateMessage = (message, metadata) => {
 	return message.replace(/\$\{(.+?)\}/g, (match, p1) => index(metadata, p1));
 };
 
+const convertCard = cardInGame => ({
+	id: cardInGame.id,
+	owner: cardInGame.owner,
+	card: cardInGame._card.name,
+	data: cardInGame.data,
+});
 
-function convertServerCommand(action, game) {
+function convertServerCommand(initialAction, game) {
+	var action = clone(initialAction);
 	switch(action.type) {
 		case ACTION_PASS: {
 			const step = game.state.step;
 
 			const newStep = (step === null) ? 0 : (step + 1) % NUMBER_OF_STEPS;
 
-			action = {
+			return {
 				...action,
 				newStep,
 			};
-			break;
 		}
 		case ACTION_ENTER_PROMPT: {
+			const actionSource = game.getMetaValue(action.source, action.generatedBy);
+			if (action.source) {
+				action.source = convertCard(actionSource);
+			}
+
 			if (action.message && action.generatedBy) {
 				const metaData = game.getSpellMetadata(action.generatedBy);
 				action.message = templateMessage(action.message, metaData);
 			}
+
 			switch(action.promptType) {
-				case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE: {
-					action.source = game.getMetaValue(action.source, action.generatedBy);
-					action.source.card = action.source.card.card;
-					break;
-				}
-				case PROMPT_TYPE_CHOOSE_CARDS: {
-					break;
-				}
 				case PROMPT_TYPE_NUMBER: {
 					action.min = game.getMetaValue(action.min, action.generatedBy);
 					action.max = game.getMetaValue(action.max, action.generatedBy);
 				}
 			}
 			break;
+		}
+		case ACTION_POWER: {
+			const actionSource = game.getMetaValue(action.source, action.generatedBy);
+			return {
+				...action,
+				source: convertCard(actionSource),
+				power: action.power.name,
+			};
 		}
 		case ACTION_EFFECT: {
 			switch(action.effectType) {
@@ -82,41 +94,35 @@ function convertServerCommand(action, game) {
 						action.amount;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
-					action = {
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 						amount,
 					};
-
-					break;
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
+					console.dir(action);
 					const fromCard = (typeof action.from == 'string') ?
 						game.getMetaValue(action.from, action.generatedBy) :
 						action.from;
 					const from = (fromCard.length) ? fromCard[0] : fromCard;
-					from.card = from.card.card;
 
-					action = {
+					return {
 						...action,
-						from,
+						from: convertCard(from),
 					};
-					break;
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
 					const fromCard = (typeof action.from == 'string') ?
 						game.getMetaValue(action.from, action.generatedBy) :
 						action.from;
 					const from = (fromCard.length) ? fromCard[0] : fromCard;
-					from.card = from.card.card;
 
-					action = {
+					return {
 						...action,
-						from,
+						from: convertCard(from),
 					};
-					break;
 				}
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
 					const targetCard = (typeof action.target == 'string') ?
@@ -128,14 +134,12 @@ function convertServerCommand(action, game) {
 						action.amount;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
-					action = {
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 						amount,
 					};
-					break;
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {
 					const targetCard = (typeof action.target == 'string') ?
@@ -143,38 +147,34 @@ function convertServerCommand(action, game) {
 						action.target;
 
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
 					const sourceCard = (typeof action.source == 'string') ?
 						game.getMetaValue(action.source, action.generatedBy) :
 						action.source;
 
 					const source = (sourceCard.length) ? sourceCard[0] : sourceCard;
-					source.card = source.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
-					action = {
+					return {
 						...action,
-						target,
-						source,
+						target: convertCard(target),
+						source: convertCard(source),
 						amount,
 					};
-					break;
 				}
 				case EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY: {
 					const targetCard = (typeof action.target == 'string') ?
 						game.getMetaValue(action.target, action.generatedBy) :
 						action.target;
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
-					action = {
+
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 					};
-					break;
 				}
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
 					const targetCard = (typeof action.target == 'string') ?
@@ -186,14 +186,12 @@ function convertServerCommand(action, game) {
 						action.amount;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
-					action = {
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 						amount,
 					};
-					break;
 				}
 				case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {
 					const targetCard = (typeof action.target == 'string') ?
@@ -201,18 +199,16 @@ function convertServerCommand(action, game) {
 						action.target;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
-					action = {
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 						amount,
 					};
-					break;
 				}
 				case EFFECT_TYPE_ADD_ENERGY_TO_MAGI: {
 					const targetCard = (typeof action.target == 'string') ?
@@ -220,18 +216,16 @@ function convertServerCommand(action, game) {
 						action.target;
                     
 					const target = (targetCard.length) ? targetCard[0] : targetCard;
-					target.card = target.card.card;
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
 
-					action = {
+					return {
 						...action,
-						target,
+						target: convertCard(target),
 						amount,
 					};
-					break;
 				}
 			}
 			break;

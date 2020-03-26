@@ -45,7 +45,7 @@ const enhance  = compose(
 	),
 	withHandlers({
 		onSend: props => () => {
-			window.socket.emit('action', {
+			window.socket.emit('clientAction', {
 				type: ACTION_RESOLVE_PROMPT,
 				promptType: PROMPT_TYPE_NUMBER,
 				number: props.selected,

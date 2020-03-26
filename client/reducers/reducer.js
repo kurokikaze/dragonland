@@ -5,6 +5,7 @@ import {
 	ACTION_ENTER_PROMPT,
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
+	ACTION_POWER,
 
 	TYPE_CREATURE,
 	TYPE_MAGI,
@@ -23,9 +24,6 @@ import {
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
-	// PROMPT_TYPE_CHOOSE_CARDS,
-
-	// TYPE_CREATURE,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -35,6 +33,8 @@ import {
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
 } from 'moonlands/src/const';
+
+import {byName} from 'moonlands/src/cards';
 
 const TYPE_DISPLAY = 'actions/display';
 
@@ -84,6 +84,36 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				step: action.newStep,
+			};
+		}
+		case ACTION_POWER: {
+			const sourceId = action.source.id;
+			const sourceName = action.power;
+			return {
+				...state,
+				zones: {
+					...state.zones,
+					playerInPlay: state.zones.playerInPlay.map(
+						card => card.id === sourceId
+							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
+							: card
+					),
+					opponentInPlay: state.zones.opponentInPlay.map(
+						card => card.id === sourceId
+							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
+							: card
+					),
+					playerActiveMagi: state.zones.playerActiveMagi.map(
+						card => card.id === sourceId
+							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
+							: card
+					),
+					opponentActiveMagi: state.zones.opponentActiveMagi.map(
+						card => card.id === sourceId
+							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
+							: card
+					),
+				},
 			};
 		}
 		case ACTION_ENTER_PROMPT: {
@@ -141,7 +171,8 @@ export default (state = defaultState, action) => {
 							...state,
 							zones: {
 								...state.zones,
-								playerInPlay: state.zones.playerInPlay.map(card => ({...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false}})),
+								playerInPlay: state.zones.playerInPlay.map(card => ({...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false, actionsUsed: []}})),
+								playerActiveMagi: state.zones.playerActiveMagi.map(card => ({...card, data: {...card.data, wasAttacked: false, actionsUsed: []}})),
 							},
 							activePlayer: action.player,
 						};
@@ -153,12 +184,27 @@ export default (state = defaultState, action) => {
 					}
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {
-					switch (action.target._card.type) {
+					const targetBaseCard = byName(action.target.card);
+					switch (targetBaseCard.type) {
 						case TYPE_CREATURE: {
 							// creature pays for the ability
 							return state;
 						}
-						case TYPE_MAGI:
+						case TYPE_MAGI: {
+							const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
+								.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+							const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
+								.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+							
+							return {
+								...state,
+								zones: {
+									...state.zones,
+									playerActiveMagi,
+									opponentActiveMagi,
+								},
+							};
+						}
 						case TYPE_RELIC: {
 							// magi pays for the ability
 							if (action.target.data.controller == window.playerId) {
@@ -196,19 +242,8 @@ export default (state = defaultState, action) => {
 							}
 						}
 					}
-					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
-						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-					const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
-						.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-
-					return {
-						...state,
-						zones: {
-							...state.zones,
-							playerActiveMagi,
-							opponentActiveMagi,
-						},
-					};
+					// No idea what that was
+					return state; 
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
 					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
