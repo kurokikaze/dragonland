@@ -102,7 +102,6 @@ function convertServerCommand(initialAction, game) {
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
-					console.dir(action);
 					const fromCard = (typeof action.from == 'string') ?
 						game.getMetaValue(action.from, action.generatedBy) :
 						action.from;

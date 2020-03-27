@@ -11,6 +11,9 @@ const {
 	ACTION_EFFECT,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
 
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
@@ -324,8 +327,6 @@ describe('ACTION_EFFECT', () => {
 		const ACTIVE_PLAYER = 42;
 		const NON_ACTIVE_PLAYER = 44;
 
-		const TEST_MAX_VALUE = 12;
-
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
@@ -333,11 +334,6 @@ describe('ACTION_EFFECT', () => {
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
-			spellMetaData: {
-				[weebo.id]: {
-					rollResult: TEST_MAX_VALUE,
-				},
-			},		
 		});
 
 		const serverAction = {
@@ -360,5 +356,145 @@ describe('ACTION_EFFECT', () => {
 		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_ADD_ENERGY_TO_MAGI, 'Effect type is correct');
 		expect(convertedAction.target).toEqual(convertedTarget, 'Target is converted correctly');
 		expect(convertedAction.amount).toEqual(4, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_PAYING_ENERGY_FOR_POWER (creature)', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
+			target: weebo,
+			amount: 1,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		const convertedTarget = {
+			id: weebo.id,
+			owner: weebo.owner,
+			card: 'Weebo',
+			data: weebo.data,
+		};
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_PAYING_ENERGY_FOR_POWER, 'Effect type is correct');
+		expect(convertedAction.target).toEqual(convertedTarget, 'Target is converted correctly');
+		expect(convertedAction.amount).toEqual(1, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_PAYING_ENERGY_FOR_POWER (magi)', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
+			target: grega,
+			amount: 3,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		const convertedTarget = {
+			id: grega.id,
+			owner: grega.owner,
+			card: 'Grega',
+			data: grega.data,
+		};
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_PAYING_ENERGY_FOR_POWER, 'Effect type is correct');
+		expect(convertedAction.target).toEqual(convertedTarget, 'Target is converted correctly');
+		expect(convertedAction.amount).toEqual(3, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+			from: grega,
+			amount: 5,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		const convertedFrom = {
+			id: grega.id,
+			owner: grega.owner,
+			card: 'Grega',
+			data: grega.data,
+		};
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE, 'Effect type is correct');
+		expect(convertedAction.from).toEqual(convertedFrom, 'Payment source is converted correctly');
+		expect(convertedAction.amount).toEqual(5, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
+			from: grega,
+			amount: 6,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		const convertedFrom = {
+			id: grega.id,
+			owner: grega.owner,
+			card: 'Grega',
+			data: grega.data,
+		};
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL, 'Effect type is correct');
+		expect(convertedAction.from).toEqual(convertedFrom, 'Payment source is converted correctly');
+		expect(convertedAction.amount).toEqual(6, 'Amount is passed correctly');
 	});
 });
