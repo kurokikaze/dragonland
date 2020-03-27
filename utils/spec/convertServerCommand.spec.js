@@ -17,6 +17,14 @@ const {
 
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
+	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+
+	RESTRICTION_TYPE,
+	RESTRICTION_REGION,
+
+	TYPE_CREATURE,
+
+	REGION_CALD,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_DECK,
@@ -228,6 +236,58 @@ describe('ACTION_ENTER_PROMPT', () => {
 		expect(convertedAction.source).toEqual(convertedSource, 'Source card is converted correctly');
 		expect(convertedAction.min).toEqual(1, 'Min value is passed correctly');
 		expect(convertedAction.max).toEqual(TEST_MAX_VALUE, 'Max value is passed correctly');
+	});
+
+	it('PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+
+		const kelthet = new CardInGame(byName('Kelthet'), ACTIVE_PLAYER);
+		const thermalBlast = new CardInGame(byName('Thermal Blast'), ACTIVE_PLAYER);
+		const waterOfLife = new CardInGame(byName('Water of Life'), ACTIVE_PLAYER);
+		const quorPup = new CardInGame(byName('Quor Pup'), ACTIVE_PLAYER);
+		const seaBarl = new CardInGame(byName('Sea Barl'), ACTIVE_PLAYER);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+		gameState.getZone(ZONE_TYPE_DECK, ACTIVE_PLAYER).add([kelthet, thermalBlast, waterOfLife, quorPup, seaBarl]);
+
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		const serverAction = {
+			type: ACTION_ENTER_PROMPT,
+			promptType: PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+			zone: ZONE_TYPE_DECK,
+			zoneOwner: ACTIVE_PLAYER,
+			player: ACTIVE_PLAYER,
+			restrictions: [
+				{
+					type: RESTRICTION_TYPE,
+					value: TYPE_CREATURE,
+				},
+				{
+					type: RESTRICTION_REGION,
+					value: REGION_CALD,
+				}				
+			],
+			generatedBy: grega.id,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		expect(convertedAction.cards.length).toEqual(2, 'Only 2 cards fit the restriction');
+		expect(convertedAction.cards[0].card).toEqual('Kelthet', 'First is Kelthet');
+		expect(convertedAction.cards[0].id).toEqual(kelthet.id, 'Kelthet id is preserved');
+		expect(convertedAction.cards[0].data).toEqual(kelthet.data, 'Kelthet data is preserved');
+
+		expect(convertedAction.cards[1].card).toEqual('Quor Pup', 'Second is Quor Pup');
+		expect(convertedAction.cards[1].id).toEqual(quorPup.id, 'Quor Pup id is preserved');
+		expect(convertedAction.cards[1].data).toEqual(quorPup.data, 'Quor Pup data is preserved');
 	});
 });
 

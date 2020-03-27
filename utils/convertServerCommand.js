@@ -5,6 +5,7 @@ const {
 	ACTION_POWER,
 
 	PROMPT_TYPE_NUMBER,
+	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
@@ -16,6 +17,9 @@ const {
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 } = require('moonlands/src/const');
+
+const getRestrictionFilter = require('./restrictionFilter');
+
 const {clone} = require('./index');
 
 const NUMBER_OF_STEPS = 6;
@@ -41,6 +45,12 @@ const convertCard = cardInGame => ({
 	card: cardInGame._card.name,
 	data: cardInGame.data,
 });
+
+const makeCardFilter = restrictions => {
+	const checkers = restrictions.map(({type, value}) => getRestrictionFilter(type, value));
+	return card =>
+		checkers.map(checker => checker(card)).every(a => a === true); // combine checkers
+};
 
 function convertServerCommand(initialAction, game) {
 	var action = clone(initialAction);
@@ -70,6 +80,27 @@ function convertServerCommand(initialAction, game) {
 				case PROMPT_TYPE_NUMBER: {
 					action.min = game.getMetaValue(action.min, action.generatedBy);
 					action.max = game.getMetaValue(action.max, action.generatedBy);
+
+					break;
+				}
+				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
+					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
+					const numberOfCards = game.getMetaValue(action.numberOfCards, action.generatedBy);
+					const zoneContent = game.getZone(action.zone, zoneOwner).cards;
+					const cardFilter = makeCardFilter(action.restrictions);
+
+					const cards = action.restrictions ? zoneContent.filter(cardFilter) : zoneContent;
+
+					return {
+						type: ACTION_ENTER_PROMPT,
+						promptType: PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+						player: action.player,
+						zone: action.zone,
+						restrictions: action.restrictions,
+						cards: cards.map(convertCard),
+						zoneOwner,
+						numberOfCards,
+					};
 				}
 			}
 			break;
