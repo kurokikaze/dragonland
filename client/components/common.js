@@ -30,7 +30,7 @@ const propsTransformer = props => ({
 	...props,
 	content: props.content.map(cardData => ({
 		...cardData,
-		card: byName(cardData.card),
+		card: cardData.card ? byName(cardData.card) : null,
 	})),
 });
 

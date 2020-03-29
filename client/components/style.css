@@ -105,11 +105,12 @@
     padding: 8px;
     border-radius: 7px;
     line-height: 1.25em;
-    height: calc(100% + 24px);
+    min-height: 100%;
 }
 
 .cardAbilityHolder {
     position: relative;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }
 
 .cardAbilityHolder .ability.used b {
@@ -118,4 +119,67 @@
 
 .cardAbilityHolder:hover .cardAbilities {
     display: block;
+}
+
+.cardView {
+    font-size: 13px;
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: -50%;
+    min-width: 140px;
+    background-color: #E7DCCA;
+    margin-bottom: 100px;
+    border-radius: 7px;
+    line-height: 1.25em;
+    height: 293px;
+    overflow: hidden;
+    animation: fadeInDown .3s;
+    z-index: 2;
+}
+
+.cardView img {
+    width: 200px;
+}
+
+.cardViewHolder {
+    position: relative;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+}
+
+.cardViewHolder:hover .cardView {
+    display: block;
+}
+
+@-webkit-keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0,-50px,0);
+        transform: translate3d(0,-50px,0)
+    }
+
+    to {
+        opacity: 1;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0)
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0,-50px,0);
+        transform: translate3d(0,-50px,0)
+    }
+
+    to {
+        opacity: 1;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0)
+    }
+}
+
+.fadeInDown {
+    -webkit-animation-name: fadeInDown;
+    animation-name: fadeInDown;
 }

@@ -2,7 +2,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers, withStateHandlers} from 'recompose';
-import {getAvailableStartingCards} from '../../selectors';
 import cn from 'classnames';
 import Card from '../Card';
 
@@ -38,7 +37,7 @@ const mapStateToProps = (state) => {
 	return {
 		cards: state.promptParams.cards,
 		generatedBy: state.promptGeneratedBy,
-		availableCards: getAvailableStartingCards(state.promptParams.cards, state),
+		availableCards: state.promptParams.availableCards,//getAvailableStartingCards(state.promptParams.cards, state),
 	};
 };
 

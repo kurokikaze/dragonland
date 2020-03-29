@@ -28,39 +28,63 @@
     height: 90px;    
 }
 
+.cardHolder .cardEnergy {
+    position: absolute;
+    top: 13px;
+    color: #f7e73a;
+    font-size: 4em;
+    width: 100%;
+    text-align: center;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
 .zone-creatures .cardHolder {
     position: relative;
     width: 80px;
-    height: 60px;
+    height: 62px;
     overflow: hidden;
     border-radius: 6px;
 }
 
+.zone-creatures .cardHolder.relic {
+    overflow: hidden;
+    height: 100px;
+    border-radius: 3px;
+}
+
 .zone-creatures .cardHolder img {
-    width: 104px;
+    width: 98px;
     height: auto;
     position: relative;
-    top: -25px;
-    left: -11px;
+    top: -22px;
+    left: -9px;
+}
+.zone-creatures .cardHolder.relic img {
+    width: auto;
+    height: 100px;
+    top: 0;
+    left: 0;
 }
 
 .zone-creatures .cardHolder .cardEnergy {
-    top: -7px;
+    top: 0px;
+    line-height: 68px;
 }
 
 .zone-magi .cardHolder {
     position: relative;
-    width: 82px;
-    height: 82px;
-    border-radius: 41px;
+    width: 94px;
+    height: 94px;
+    border-radius: 47px;
     overflow: hidden;
 }
 
 .zone-magi .cardHolder img {
     width: 124px;
     height: auto;
-    top: -21px;
-    left: -20px;
+    top: -17px;
+    left: -15px;
     position: relative;
 }
 
@@ -76,18 +100,13 @@
     box-shadow: 0px 0 6px 6px red;
 }
 
-.cardHolder .cardEnergy {
-    position: absolute;
-    top: 2px;
-    color: lime;
-    font-size: 4em;
-    width: 100%;
-    text-align: center;    
-}
-
 .zone img {
     width: 64px;
-    height: 90px; 
+    /* height: 90px;  */
+}
+
+.zone.zone-magi {
+    height: 110px;
 }
 
 #playerActiveMagi {
@@ -108,6 +127,10 @@
     border: 1px solid #E7DCCA;
     border-radius: 3px;
     font-weight: bold;
+}
+
+.endgame {
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }
 
 .endgame h1 {

@@ -4,21 +4,35 @@ import { DragSource, DropTarget } from 'react-dnd';
 import {identity} from 'ramda';
 import {branch, compose} from 'recompose';
 import cn from 'classnames';
+import {
+	TYPE_CREATURE,
+	TYPE_RELIC,
+	TYPE_SPELL,
+	TYPE_MAGI,
+} from 'moonlands/src/const';
+
 import {camelCase} from '../utils';
 
 const DraggableTypes = {
 	CARD: 'card',
 };
 
+const typeClass = {
+	[TYPE_CREATURE]: 'creature',
+	[TYPE_RELIC]: 'relic',
+	[TYPE_SPELL]: 'spell',
+	[TYPE_MAGI]: 'magi',
+};
+
 function Card({id, card, data, onClick, draggable, isDragging, available, target, connectDragSource, connectDropTarget, isOnPrompt}) {
 	const connector = (draggable && connectDragSource) ? connectDragSource : (target && connectDropTarget ? connectDropTarget : identity);
 	return connector(
 		<div
-			className={cn('cardHolder', {'dragging': isDragging, 'available': available, 'target': target, 'onPrompt': isOnPrompt})} 
+			className={cn('cardHolder', card ? typeClass[card.type] : null, {'dragging': isDragging, 'available': available, 'target': target, 'onPrompt': isOnPrompt})} 
 			data-id={id}
 			onClick={() => onClick && onClick(id)}
 		>
-			<img src={`/images/cards/${camelCase(card.name)}.jpg`} alt={card.name} data-card-data={JSON.stringify(card)} />
+			<img src={`/images/cards/${card ? camelCase(card.name) : 'cardBack'}.jpg`} alt={card ? card.name : null} />
 			<div className="cardEnergy">
 				{data.energy || ''}
 			</div>

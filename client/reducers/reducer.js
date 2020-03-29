@@ -287,8 +287,10 @@ export default (state = defaultState, action) => {
 					};
 				}
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
-					const playerInPlay = [...state.zones.playerInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-					const opponentInPlay = [...state.zones.opponentInPlay].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+					const idsToFind = action.target.length ? action.target.map(({id}) => id) : [action.target.id];
+
+					const playerInPlay = [...state.zones.playerInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+					const opponentInPlay = [...state.zones.opponentInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
 
 					return {
 						...state,
@@ -342,8 +344,9 @@ export default (state = defaultState, action) => {
 					};
 				}
 				case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {
-					const playerInPlay = [...(state.zones.playerInPlay || [])].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
-					const opponentInPlay = [...(state.zones.opponentInPlay || [])].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+					const idsToFind = action.target.length ? action.target.map(({id}) => id) : [action.target.id];
+					const playerInPlay = [...(state.zones.playerInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+					const opponentInPlay = [...(state.zones.opponentInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 
 					return {
 						...state,

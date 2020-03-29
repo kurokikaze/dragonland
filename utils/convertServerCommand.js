@@ -208,11 +208,11 @@ function convertServerCommand(initialAction, game) {
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
                     
-					const target = (targetCard.length) ? targetCard[0] : targetCard;
+					const target = (targetCard.length) ? targetCard.map(convertCard) : convertCard(targetCard);
 
 					return {
 						...action,
-						target: convertCard(target),
+						target,
 						amount,
 					};
 				}
@@ -221,7 +221,7 @@ function convertServerCommand(initialAction, game) {
 						game.getMetaValue(action.target, action.generatedBy) :
 						action.target;
                     
-					const target = (targetCard.length) ? targetCard[0] : targetCard;
+					const target = (targetCard.length) ? targetCard.map(convertCard) : convertCard(targetCard);
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
@@ -229,7 +229,7 @@ function convertServerCommand(initialAction, game) {
 
 					return {
 						...action,
-						target: convertCard(target),
+						target,
 						amount,
 					};
 				}
