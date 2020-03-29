@@ -13,14 +13,40 @@
     top: 10%;
     left: 10%;
     height: 80%;
+    padding: 10px 30px;
     background-color: #E7DCCA;
     border-color: #D1A53E;
+    border-radius: 10px;
+    border-width: 1px;
     color: #040403;
+}
+
+.promptWindow .cardHolder {
+    height: 180px;
+    width: 123px;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .promptWindow .cardHolder img {
     max-width: 128px;
-    max-height: 180px;     
+    max-height: 180px;
+}
+
+.promptWindow .cardsRow.smallCards .zoneCardSelect .cardHolder img {
+    max-width: 64px;
+}
+
+.promptWindow .buttonHolder {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.promptWindow .buttonHolder button {
+    padding: 10px 15px;
+    font-size: 20px;
+    border-radius: 4px;
+    border-width: 1px;
 }
 
 .promptChooseCards .cardsRow {
@@ -38,8 +64,6 @@
 }
 
 .promptChooseCards .cardsRow .zoneCardSelect {
-    width: 50%;
-    height: 50%;
     opacity: 0.6;
 }
 

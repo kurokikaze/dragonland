@@ -15,7 +15,7 @@ function PromptChooseCards({cards, triggerElement, selected, onSend, numberOfCar
 	return (
 		<div className="promptWindow promptChooseCards">
 			<h1>Choose {numberOfCards} card(s)</h1>
-			<div className="cardsRow">
+			<div className={cn('cardsRow', {'smallCards': cards.length > 4})}>
 				{cards.map(({card, id}, i) => (
 					<div className={cn('zoneCardSelect', {'chosen': selected.includes(id)})} key={i}>
 						<Card
