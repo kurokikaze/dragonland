@@ -18,8 +18,7 @@ const {
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 } = require('moonlands/src/const');
 
-const getRestrictionFilter = require('./restrictionFilter');
-
+const {makeCardFilter} = require('moonlands/src/utils/restrictions');
 const {clone} = require('./index');
 
 const NUMBER_OF_STEPS = 6;
@@ -45,12 +44,6 @@ const convertCard = cardInGame => ({
 	card: cardInGame._card.name,
 	data: cardInGame.data,
 });
-
-const makeCardFilter = restrictions => {
-	const checkers = restrictions.map(({type, value}) => getRestrictionFilter(type, value));
-	return card =>
-		checkers.map(checker => checker(card)).every(a => a === true); // combine checkers
-};
 
 function convertServerCommand(initialAction, game) {
 	var action = clone(initialAction);

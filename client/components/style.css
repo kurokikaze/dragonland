@@ -30,6 +30,23 @@
     align-items: center;
 }
 
+.promptChooseCards .cardsRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.promptChooseCards .cardsRow .zoneCardSelect {
+    width: 50%;
+    height: 50%;
+    opacity: 0.6;
+}
+
+.promptChooseCards .zoneCardSelect.chosen {
+    opacity: 1;
+}
+
 .promptChooseCards .cardSelect {
     opacity: 0.6;
 }

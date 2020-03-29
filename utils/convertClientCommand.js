@@ -10,6 +10,7 @@ const {
 	PROMPT_TYPE_SINGLE_MAGI,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_SINGLE_RELIC,
+	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
@@ -53,6 +54,13 @@ function convertClientCommands(action, game) {
 					if (!expandedAction.target) {
 						expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[1]).byId(action.target);
 					}
+					break;
+				}
+				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
+					const zone = action.zone === ZONE_TYPE_IN_PLAY ? game.getZone(ZONE_TYPE_IN_PLAY) : game.getZone(action.zone, action.zoneOwner);
+					const zoneContent = zone.cards;
+					expandedAction.cards = zoneContent.filter(card => action.cards.includes(card.id));
+					break;
 				}
 			}
 			// change target string to CardInGame

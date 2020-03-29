@@ -24,6 +24,7 @@ import {
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -137,6 +138,16 @@ export default (state = defaultState, action) => {
 						restrictions: action.restrictions,
 						restriction: action.restriction,
 						restrictionValue: action.restrictionValue,
+					};
+					break;
+				}
+				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
+					promptParams = {
+						zone: action.zone,
+						restrictions: action.restrictions,
+						cards: action.cards,
+						zoneOwner: action.zoneOwner,
+						numberOfCards: action.numberOfCards,
 					};
 					break;
 				}
