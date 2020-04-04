@@ -2,6 +2,7 @@
 import {
 	ACTION_EFFECT,
 	ACTION_PASS,
+	ACTION_ATTACK,
 	ACTION_ENTER_PROMPT,
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
@@ -172,6 +173,37 @@ export default (state = defaultState, action) => {
 				promptParams: null,
 				promptGeneratedBy: null,
 				promptAvailableCards: null,
+			};
+		}
+		case ACTION_ATTACK: {
+			const attackerId = action.source.id;
+
+			return {
+				...state,
+				zones: {
+					...state.zones,
+					playerInPlay: state.zones.playerInPlay.map(card =>
+						card.data.id === attackerId ? ({
+							...card,
+							data: {
+								...card.data,
+								attacked: card.data.attacked + 1,
+								hasAttacked: true,
+							},
+						}) : card,
+					),
+					playerActiveMagi: state.zones.opponentInPlay.map(card =>
+						card.data.id === attackerId ? ({
+							...card,
+							data: {
+								...card.data,
+								attacked: card.data.attacked + 1,
+								hasAttacked: true,
+							},
+						}) : card,
+					),
+				},
+				activePlayer: action.player,
 			};
 		}
 		case ACTION_EFFECT: {

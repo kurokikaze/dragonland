@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-const caldDeck = `Grega
-Magam
+const caldDeck = `Magam
 Sinder
+Grega
 3 Fire Chogo
 3 Fire Grag
 3 Arbolit
@@ -14,10 +14,10 @@ Sinder
 3 Diobor
 3 Drakan
 3 Thermal Blast
-3 Flame Geyser
+3 Water of Life
 3 Lava Balamant
 2 Magma Armor
-2 Fire Flow`;
+2 Scroll of Fire`;
 
 /* eslint-disable-next-line no-unused-vars */
 const naroomDeck = `Pruitt
@@ -35,7 +35,8 @@ Yaki
 3 Carillion
 3 Rudwot
 3 Stagadan
-3 Robe of Vines
+2 Robe of Vines
+1 Syphon Stone
 2 Sea Barl`;
 
 const arderialDeck = `Lasada

@@ -3,24 +3,28 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
+import { createEpicMiddleware } from 'redux-observable';
 import thunk from 'redux-thunk';
 
 import App from './components/App';
 import rootReducer from './reducers';
+import rootEpic from './epics';
 
 function startGame() {
-	console.log('Document ready');
-	console.dir(document.getElementById('game'));
-
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+	const epicMiddleware = createEpicMiddleware();
 
 	const store = createStore(
 		rootReducer,
 		window.initialState,
 		composeEnhancers(
 			applyMiddleware(thunk),
+			applyMiddleware(epicMiddleware),
 		),
 	);
+
+	epicMiddleware.run(rootEpic);
+
 	ReactDOM.render(
 		<Provider store={store}>
 			<App/>
