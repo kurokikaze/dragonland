@@ -11,9 +11,7 @@ import thunk from 'redux-thunk';
 import {ACTION_POWER} from 'moonlands/src/const';
 
 import App from './components/App';
-import {showPowerName, hidePowerName, HIDE_POWER_NAME} from './actions'; 
 import rootReducer from './reducers';
-import rootEpic from './epics';
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -63,10 +61,21 @@ function startGame() {
 
 	const delayedActions = actionsObservable
 		.pipe(
-			concatMap(x =>
-				from(actionTypesToAnimate.includes(x.type) ?
-					[{type: `start_animation:${x.type}`}, {type: `end_animation:${x.type}`, endAnimation: true}, x] :
-					[x]
+			concatMap(action =>
+				from(actionTypesToAnimate.includes(action.type) ?
+					[
+						{
+							type: 'start_power_animation',
+							source: action.source.id,
+							power: action.power,
+							player: action.player,
+						}, {
+							type: 'end_power_animation',
+							endAnimation: true,
+						},
+						action,
+					] :
+					[action]
 				).pipe(
 					delayWhen(({endAnimation = false}) =>
 						endAnimation == true ? timer(1000): timer(0),

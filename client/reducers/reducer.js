@@ -203,7 +203,6 @@ export default (state = defaultState, action) => {
 						}) : card,
 					),
 				},
-				activePlayer: action.player,
 			};
 		}
 		case ACTION_EFFECT: {
