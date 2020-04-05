@@ -192,7 +192,7 @@ export default (state = defaultState, action) => {
 							},
 						}) : card,
 					),
-					playerActiveMagi: state.zones.opponentInPlay.map(card =>
+					opponentInPlay: state.zones.opponentInPlay.map(card =>
 						card.data.id === attackerId ? ({
 							...card,
 							data: {

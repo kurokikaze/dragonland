@@ -1,8 +1,8 @@
 import {of, timer} from 'rxjs';
 import {concatMap, delayWhen} from 'rxjs/operators';
-import {
-	TYPE_POWER,
-} from 'moonlands/src/const';
+// import {
+// 	TYPE_POWER,
+// } from 'moonlands/src/const';
 
 import {
 	showPowerName,
@@ -10,8 +10,7 @@ import {
 	HIDE_POWER_NAME,
 } from '../actions';
 
-const actionMessagesEpic = action$ => action$
-	.filter(({type}) => type === TYPE_POWER)
+/* const actionMessagesEpic = action$ => action$
 	.pipe(
 		concatMap(x =>
 			of(
@@ -23,7 +22,7 @@ const actionMessagesEpic = action$ => action$
 				),		
 			),
 		),
-	);
+	); */
 
-export default actionMessagesEpic;
+export default () => null;
 
