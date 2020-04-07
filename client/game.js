@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import {Observable, from, timer} from 'rxjs';
-import {delayWhen, concatMap, filter} from 'rxjs/operators';
+import {delayWhen, concatMap} from 'rxjs/operators';
 import thunk from 'redux-thunk';
 
 import {ACTION_POWER} from 'moonlands/src/const';
@@ -83,8 +83,6 @@ function startGame() {
 				),
 			),
 		);
-
-	// actionsObservable.subscribe(action => store.dispatch(action));
 
 	delayedActions.subscribe(transformedAction => {
 		console.dir(transformedAction);

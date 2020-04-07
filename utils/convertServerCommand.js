@@ -14,6 +14,7 @@ const {
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
 	EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY,
 	EFFECT_TYPE_MOVE_ENERGY,
+	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 } = require('moonlands/src/const');
@@ -107,7 +108,17 @@ function convertServerCommand(initialAction, game) {
 			};
 		}
 		case ACTION_EFFECT: {
-			switch(action.effectType) {
+			switch (action.effectType) {
+				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						sourceCard: convertCard(action.sourceCard),
+						sourceZone: action.sourceZone,
+						destinationCard: convertCard(action.destinationCard),
+						destinationZone: action.destinationZone,
+					};
+				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {
 					const targetCard = (typeof action.target == 'string') ?
 						game.getMetaValue(action.target, action.generatedBy) :

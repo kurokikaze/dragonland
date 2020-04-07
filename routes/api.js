@@ -6,17 +6,6 @@ const {constructDeck} = require('../utils');
 const convertClientCommand = require('../utils/convertClientCommand');
 const convertServerCommand = require('../utils/convertServerCommand');
 
-const {
-	ACTION_EFFECT,
-
-	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
-
-	ZONE_TYPE_IN_PLAY,
-} = require('moonlands/src/const');
-
-const ACTION_DISPLAY = 'display';
-const ZONE_UPDATE = 'subtypes/zone_update';
-
 var router = express.Router();
 
 var runningGames = {};
@@ -97,38 +86,9 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 			console.dir(Object.keys(runningGames));
 			runningGames[gameId].enableDebug();
 			// Converting game actions for sending
-			runningGames[gameId].actionStreamOne.on('action', action => 
-			{
-				if (action.type === ACTION_EFFECT && action.effectType === EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES) {
-					const player = action.destinationCard.owner;
-					const sourceZoneContent = runningGames[gameId].getZone(
-						action.sourceZone, 
-						(action.sourceZone == ZONE_TYPE_IN_PLAY) ? null : player,
-					).serialize();
-
-					const destinationZoneContent = runningGames[gameId].getZone(
-						action.destinationZone,
-						(action.destinationZone == ZONE_TYPE_IN_PLAY) ? null : player,
-					).serialize();
-
-					socket.emit(ACTION_DISPLAY, {
-						subtype: ZONE_UPDATE,
-						zoneType: action.sourceZone,
-						player,
-						content: sourceZoneContent,
-					});
-
-					socket.emit(ACTION_DISPLAY, {
-						subtype: ZONE_UPDATE,
-						zoneType: action.destinationZone,
-						player,
-						content: destinationZoneContent,
-					});
-					socket.emit('action', action);
-				} else {
-					const convertedAction = convertServerCommand(action, runningGames[gameId]);
-					socket.emit('action', convertedAction);
-				}
+			runningGames[gameId].actionStreamOne.on('action', action => {
+				const convertedAction = convertServerCommand(action, runningGames[gameId]);
+				socket.emit('action', convertedAction);
 			});
 
 			// Converting client actions for game engine			

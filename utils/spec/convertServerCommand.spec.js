@@ -14,6 +14,7 @@ const {
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
+	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
@@ -416,6 +417,56 @@ describe('ACTION_EFFECT', () => {
 		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_ADD_ENERGY_TO_MAGI, 'Effect type is correct');
 		expect(convertedAction.target).toEqual(convertedTarget, 'Target is converted correctly');
 		expect(convertedAction.amount).toEqual(4, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const previousWeebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER);
+
+		const gameState = new moonlands.State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		gameState.getZone(ZONE_TYPE_HAND, ACTIVE_PLAYER).add([weebo]);
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
+			sourceCard: previousWeebo,
+			sourceZone: ZONE_TYPE_IN_PLAY,
+			destinationCard: weebo,
+			destinationZone: ZONE_TYPE_HAND,
+			generatedBy: grega.id,
+		};
+
+		const convertedAction = convert(serverAction, gameState);
+
+		const convertedSourceCard = {
+			id: previousWeebo.id,
+			owner: grega.owner,
+			card: 'Weebo',
+			data: previousWeebo.data,
+		};
+
+		const convertedDestinationCard = {
+			id: weebo.id,
+			owner: grega.owner,
+			card: 'Weebo',
+			data: weebo.data,
+		};
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES, 'Effect type is correct');
+		expect(convertedAction.sourceCard).toEqual(convertedSourceCard, 'Source card is converted correctly');
+		expect(convertedAction.sourceZone).toEqual(ZONE_TYPE_IN_PLAY, 'Source zonee is passed');
+		expect(convertedAction.destinationCard).toEqual(convertedDestinationCard, 'Destination card is converted correctly');
+		expect(convertedAction.destinationZone).toEqual(ZONE_TYPE_HAND, 'Destination zonee is passed');
 	});
 
 	it('EFFECT_TYPE_PAYING_ENERGY_FOR_POWER (creature)', () => {

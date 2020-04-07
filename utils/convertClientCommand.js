@@ -9,6 +9,7 @@ const {
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_RELIC,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 
@@ -36,6 +37,10 @@ function convertClientCommands(action, game) {
 					break;
 				}
 				case PROMPT_TYPE_SINGLE_CREATURE_FILTERED: {
+					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+					break;
+				}
+				case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE: {
 					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
 					break;
 				}

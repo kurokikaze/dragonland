@@ -21,6 +21,7 @@ import {
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
 	EFFECT_TYPE_START_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
+	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
@@ -37,20 +38,6 @@ import {
 } from 'moonlands/src/const';
 
 import {byName} from 'moonlands/src/cards';
-
-const TYPE_DISPLAY = 'actions/display';
-
-const SUBTYPE_ZONE_UPDATE = 'subtypes/zone_update';
-
-const zoneNames = {
-	[ZONE_TYPE_ACTIVE_MAGI]: 'ActiveMagi',
-	[ZONE_TYPE_MAGI_PILE]: 'MagiPile',
-	[ZONE_TYPE_DEFEATED_MAGI]: 'DefeatedMagi',
-	[ZONE_TYPE_DECK]: 'Deck',
-	[ZONE_TYPE_DISCARD]: 'Discard',
-	[ZONE_TYPE_HAND]: 'Hand',
-	[ZONE_TYPE_IN_PLAY]: 'InPlay',
-};
 
 const defaultState = {
 	zones: {
@@ -71,6 +58,26 @@ const defaultState = {
 	},
 	gameEnded: false,
 	winner: null,
+};
+
+const clientZoneNames = {
+	[ZONE_TYPE_DECK]: 'Deck',
+	[ZONE_TYPE_HAND]: 'Hand',
+	[ZONE_TYPE_DISCARD]: 'Discard',
+	[ZONE_TYPE_ACTIVE_MAGI]: 'ActiveMagi',
+	[ZONE_TYPE_MAGI_PILE]: 'MagiPile',
+	[ZONE_TYPE_DEFEATED_MAGI]: 'DefeatedMagi',
+	[ZONE_TYPE_IN_PLAY]: 'InPlay',
+};
+
+const getZoneName = (serverZoneType, source) => {
+	if (!clientZoneNames[serverZoneType]) {
+		throw new Error(`Unknown zone: ${serverZoneType}`);
+	}
+
+	const zonePrefix = source.data.controller === window.playerId ? 'player' : 'opponent';
+	const zoneName = clientZoneNames[serverZoneType];
+	return `${zonePrefix}${zoneName}`;
 };
 
 export default (state = defaultState, action) => {
@@ -207,6 +214,19 @@ export default (state = defaultState, action) => {
 		}
 		case ACTION_EFFECT: {
 			switch(action.effectType) {
+				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
+					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
+					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
+
+					return {
+						...state,
+						zones: {
+							...state.zones,
+							[sourceZone]: state.zones[sourceZone].filter(card => card.id !== action.sourceCard.id),
+							[destinationZone]: [...state.zones[destinationZone], action.destinationCard],
+						},
+					};
+				}
 				case EFFECT_TYPE_START_OF_TURN: {
 					if (action.player === window.playerId) {
 						return {
@@ -406,40 +426,8 @@ export default (state = defaultState, action) => {
 			}
 			return state;
 		}
-		case TYPE_DISPLAY: {
-			switch (action.subtype) {
-				case SUBTYPE_ZONE_UPDATE: {
-					console.log('Zone update');
-					if (action.zoneType == ZONE_TYPE_IN_PLAY) {
-						return {
-							...state,
-							zones: {
-								...state.zones,
-								playerInPlay: action.content.filter(card => card.data.controller == window.playerId),
-								opponentInPlay: action.content.filter(card => card.data.controller != window.playerId),
-							},
-						};
-					} else {
-						const zoneName = zoneNames[action.zoneType];
-						const ownerName = action.player == window.playerId ? 'player' : 'opponent';
-
-						const zoneId = `${ownerName}${zoneName}`;
-
-						return {
-							...state,
-							zones: {
-								...state.zones,
-								[zoneId]: action.content,
-							},
-						};
-					}
-				}
-			}
-			break;
-		}
 		default: {
 			return state;
 		}
 	}
-	return state;
 };
