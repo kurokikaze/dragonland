@@ -190,7 +190,7 @@ export default (state = defaultState, action) => {
 				zones: {
 					...state.zones,
 					playerInPlay: state.zones.playerInPlay.map(card =>
-						card.data.id === attackerId ? ({
+						card.id === attackerId ? ({
 							...card,
 							data: {
 								...card.data,
@@ -200,7 +200,7 @@ export default (state = defaultState, action) => {
 						}) : card,
 					),
 					opponentInPlay: state.zones.opponentInPlay.map(card =>
-						card.data.id === attackerId ? ({
+						card.id === attackerId ? ({
 							...card,
 							data: {
 								...card.data,
