@@ -1,5 +1,8 @@
-var express = require('express');
-var router = express.Router();
+import express from 'express';
+import {cards} from 'moonlands/src/cards.js';
+import {camelCase} from '../client/utils.js';
+
+const router = express.Router();
 
 const caldDeck = `Magam
 Sinder
@@ -72,4 +75,11 @@ router.get('/start', function(req, res) {
 	res.json({result: 'OK'});
 }); 
 
-module.exports = router;
+router.get('/coverage', function(req, res) {
+	res.render('implementation', { 
+		title: 'Implemented cards',
+		cards: cards.map(card => ({ name: camelCase(card.name), implemented: true })),
+	});
+});
+
+export default router;

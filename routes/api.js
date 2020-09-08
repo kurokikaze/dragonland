@@ -1,10 +1,10 @@
-const express = require('express');
-const nanoid = require('nanoid');
-const moonlands = require('moonlands');
-const {constructDeck} = require('../utils');
+import express from 'express';
+import nanoid from 'nanoid';
+import {State} from 'moonlands';
+import {constructDeck} from '../utils/index.js';
 
-const convertClientCommand = require('../utils/convertClientCommand');
-const convertServerCommand = require('../utils/convertServerCommand');
+import convertClientCommand from '../utils/convertClientCommand.js';
+import convertServerCommand from '../utils/convertServerCommand.js';
 
 var router = express.Router();
 
@@ -15,7 +15,7 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 
 	const zones = [];
 
-	const gameState = new moonlands.State({
+	const gameState = new State({
 		zones,
 		step: null,
 		activePlayer: playerOne,
@@ -127,4 +127,4 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 	});
 });
 
-module.exports = router;
+export default router;

@@ -11,18 +11,21 @@ import {
 	// ZONE_TYPE_ACTIVE_MAGI,
 	// ZONE_TYPE_HAND,
 	// ZONE_TYPE_IN_PLAY,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
-import Zone from './Zone';
-import ZoneHand from './ZoneHand';
-import ZonePlayerInPlay from './ZonePlayerInPlay';
-import ZoneOpponentInPlay from './ZoneOpponentInPlay';
-import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi';
-import ZonePlayerActiveMagi from './ZonePlayerActiveMagi';
-import PromptOverlay from './prompts/PromptOverlay';
-import StepBoard from './StepBoard';
-import EndgameOverlay from './EndgameOverlay';
+import Zone from './Zone.jsx';
+import ZoneHand from './ZoneHand.jsx';
+import ZonePlayerInPlay from './ZonePlayerInPlay.jsx';
+import ZonePlayerRelics from './ZonePlayerRelics.jsx';
+import ZoneOpponentInPlay from './ZoneOpponentInPlay.jsx';
+import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi.jsx';
+import ZonePlayerActiveMagi from './ZonePlayerActiveMagi.jsx';
+import PromptOverlay from './prompts/PromptOverlay.jsx';
+import PowerMessage from './messages/PowerMessage.jsx';
+import StepBoard from './StepBoard.jsx';
+import EndgameOverlay from './EndgameOverlay.jsx';
 
+import {withSingleCardData} from './common';
 import {isPromptActive, isOurTurn} from '../selectors';
 
 /*
@@ -35,15 +38,26 @@ const STEP_PRS_SECOND = 4;
 const STEP_DRAW = 5;
 */
 
-function App({prompt, isOurTurn, onPass, onPlay, gameEnded}) {
+const EnhancedMessage = withSingleCardData(PowerMessage);
+
+function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
 	return (
 		<div className="game">
 			<DndProvider backend={Backend}>
+				{message && message.type == 'power' && <EnhancedMessage id={message.source} power={message.power} />}
 				<Zone zoneId="opponentHand" name='Opponent hand' />
-				<ZoneOpponentActiveMagi zoneId="opponentActiveMagi" name='Opponent Active Magi' />
+				<div className='middleZones'>
+					<div className='zone-placeholder' />
+					<ZoneOpponentActiveMagi zoneId="opponentActiveMagi" name='Opponent Active Magi' />
+					<ZonePlayerRelics  zoneId="opponentRelics" name='Opponent Relics' />
+				</div>
 				<ZoneOpponentInPlay zoneId="opponentInPlay" name='Opponent in play' />
 				<ZonePlayerInPlay zoneId="playerInPlay" name='Player in play' />
-				<ZonePlayerActiveMagi zoneId="playerActiveMagi" name='Player Active Magi' />
+				<div className='middleZones'>
+					<ZonePlayerRelics  zoneId="playerRelics" name='Player Relics' />
+					<ZonePlayerActiveMagi zoneId="playerActiveMagi" name='Player Active Magi' />
+					<div className='zone-placeholder' />
+				</div>
 				<ZoneHand zoneId="playerHand" name='Player hand' onCardClick={onPlay} />
 				<StepBoard />
 				{isOurTurn && <button onClick={() => onPass()}>Pass</button>}
@@ -58,6 +72,7 @@ function mapStateToProps(state) {
 	return {
 		prompt: isPromptActive(state),
 		isOurTurn: isOurTurn(state),
+		message: state.message,
 		gameEnded: state.gameEnded,
 	};
 }

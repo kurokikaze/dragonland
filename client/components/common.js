@@ -1,7 +1,7 @@
 /* global window */
 import {mapProps} from 'recompose';
 import {connect} from 'react-redux';
-import {byName} from 'moonlands/src/cards';
+import {byName} from 'moonlands/src/cards.js';
 
 import {
 	TYPE_CREATURE,
@@ -9,7 +9,7 @@ import {
 	TYPE_MAGI,
 
 	PROMPT_TYPE_SINGLE_MAGI,
-	PROMPT_TYPE_SINGLE_RELIC,
+	// PROMPT_TYPE_SINGLE_RELIC,
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
@@ -22,9 +22,12 @@ import {
 	RESTRICTION_OPPONENT_CREATURE,
 	RESTRICTION_REGION,
 	RESTRICTION_CREATURE_TYPE,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 import {zoneContent} from '../selectors';
+
+// @todo move to moonlands
+const PROMPT_TYPE_SINGLE_RELIC = 'prompt/single_relic';
 
 const propsTransformer = props => ({
 	...props,
@@ -35,6 +38,16 @@ const propsTransformer = props => ({
 });
 
 export const withCardData = mapProps(propsTransformer);
+
+export function mapCardDataFromProps(state, {id}) {
+	const filter = card => card.id === id;
+	const foundZone = Object.values(state.zones).find(zone => zone.find(filter));
+	return {
+		card: foundZone ? foundZone.find(filter) : null,
+	};
+}
+
+export const withSingleCardData = connect(mapCardDataFromProps);
 
 function mapStateToProps(state, {zoneId}) {
 	return {

@@ -6,7 +6,7 @@ import {compose, withHandlers, withStateHandlers} from 'recompose';
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_NUMBER
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 const makeArray = (min, max) => Array.apply(null, {length: max + 1}).map(Number.call, Number).slice(min);
 

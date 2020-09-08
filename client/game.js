@@ -2,16 +2,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { 
+	startPowerAnimation,
+	endPowerAnimation,
+	startAttackAnimation,
+	endAttackAnimation,
+} from './actions';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import {Observable, from, timer} from 'rxjs';
 import {delayWhen, concatMap} from 'rxjs/operators';
 import thunk from 'redux-thunk';
 
-import {ACTION_POWER} from 'moonlands/src/const';
+import {
+	ACTION_POWER,
+	ACTION_ATTACK,
+} from 'moonlands/src/const.js';
 
-import App from './components/App';
+import App from './components/App.jsx';
 import rootReducer from './reducers';
+
+const POWER_MESSAGE_TIMEOUT = 4000;
+const ATTACK_MESSAGE_TIMEOUT = 600;
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -25,8 +37,6 @@ function startGame() {
 			applyMiddleware(epicMiddleware),
 		),
 	);
-
-	// epicMiddleware.run(rootEpic);
 
 	ReactDOM.render(
 		<Provider store={store}>
@@ -42,8 +52,6 @@ function startGame() {
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io(`/?gameId=${window.gameId}&playerId=${window.playerId}`);
 		window.socket.on('action', function(action) {
-			// store.dispatch(action);
-
 			observer.next(action);
 		});
 
@@ -62,29 +70,37 @@ function startGame() {
 	const delayedActions = actionsObservable
 		.pipe(
 			concatMap(action =>
-				from(actionTypesToAnimate.includes(action.type) ?
+				from(actionTypesToAnimate.includes(action.type) && (action.player !== window.playerId) ?
 					[
-						{
-							type: 'start_power_animation',
-							source: action.source.id,
-							power: action.power,
-							player: action.player,
-						}, {
-							type: 'end_power_animation',
-							endAnimation: true,
-						},
+						startPowerAnimation(action.source.id, action.power, action.player), 
+						endPowerAnimation(action.power),
 						action,
 					] :
 					[action]
 				).pipe(
 					delayWhen(({endAnimation = false}) =>
-						endAnimation == true ? timer(1000): timer(0),
+						endAnimation == true ? timer(POWER_MESSAGE_TIMEOUT): timer(0),
+					),		
+				),
+			),
+			concatMap(action =>
+				from(action.type === ACTION_ATTACK && (action.source.owner !== window.playerId) ?
+					[
+						startAttackAnimation(action.source.id, action.target.id, action.player), 
+						endAttackAnimation(action.source.id),
+						action,
+					] :
+					[action]
+				).pipe(
+					delayWhen(({endAnimation = false}) =>
+						endAnimation == true ? timer(ATTACK_MESSAGE_TIMEOUT): timer(0),
 					),		
 				),
 			),
 		);
 
 	delayedActions.subscribe(transformedAction => {
+		console.log('Transformed');
 		console.dir(transformedAction);
 		store.dispatch(transformedAction);
 	});

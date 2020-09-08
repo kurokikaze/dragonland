@@ -1,10 +1,10 @@
 /* global expect, describe, it */
 
-const moonlands = require('moonlands');
-const CardInGame = require('moonlands/src/classes/CardInGame');
-const Zone = require('moonlands/src/classes/Zone');
+import {State} from 'moonlands';
+import CardInGame from 'moonlands/src/classes/CardInGame.js';
+import Zone from 'moonlands/src/classes/Zone.js';
 
-const {
+import {
 	ACTION_PASS,
 	ACTION_ENTER_PROMPT,
 	ACTION_POWER,
@@ -34,7 +34,7 @@ const {
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_IN_PLAY,
-} = require('moonlands/src/const');
+} from 'moonlands/src/const.js';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;
@@ -45,8 +45,8 @@ const STEP_PRS_SECOND = 4;
 const STEP_DRAW = 5;
 /* eslint-enable no-unused-vars */
 
-const {byName} = require('moonlands/src/cards');
-const convert = require('../convertServerCommand');
+import {byName} from 'moonlands/src/cards.js';
+import convert from '../convertServerCommand';
 
 const createZones = (player1, player2, creatures = [], activeMagi = []) => [
 	new Zone('Player 1 hand', ZONE_TYPE_HAND, player1),
@@ -72,7 +72,7 @@ describe('ACTION_PASS', () => {
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
 			step: STEP_PRS_SECOND,
 			activePlayer: ACTIVE_PLAYER,
@@ -99,7 +99,7 @@ describe('ACTION_PASS', () => {
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -128,7 +128,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -161,7 +161,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -200,7 +200,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -251,7 +251,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 		const quorPup = new CardInGame(byName('Quor Pup'), ACTIVE_PLAYER);
 		const seaBarl = new CardInGame(byName('Sea Barl'), ACTIVE_PLAYER);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -302,7 +302,7 @@ describe('ACTION_POWER', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -346,7 +346,7 @@ describe('ACTION_POWER', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -391,7 +391,7 @@ describe('ACTION_EFFECT', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -427,7 +427,7 @@ describe('ACTION_EFFECT', () => {
 		const previousWeebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -476,7 +476,7 @@ describe('ACTION_EFFECT', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -511,7 +511,7 @@ describe('ACTION_EFFECT', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -546,7 +546,7 @@ describe('ACTION_EFFECT', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,
@@ -581,7 +581,7 @@ describe('ACTION_EFFECT', () => {
 		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
 
-		const gameState = new moonlands.State({
+		const gameState = new State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
 			step: STEP_DRAW,
 			activePlayer: ACTIVE_PLAYER,

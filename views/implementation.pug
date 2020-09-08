@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    div.cards
+        each card in cards
+            if card.implemented
+                div.card--implemented
+                img(src='/images/cards/' + card.name + '.png')
+            else
+                div.card--notImplemented
+                img(src='/images/cards/' + card.name + '.png')

@@ -7,8 +7,8 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 	TYPE_CREATURE,
-} from 'moonlands/src/const';
-import Card from './Card';
+} from 'moonlands/src/const.js';
+import Card from './Card.jsx';
 import {
 	STEP_ATTACK,
 } from '../const';
@@ -19,8 +19,8 @@ import {
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
-} from './common';
-import {withAbilities} from './CardAbilities';
+} from './common.js';
+import {withAbilities} from './CardAbilities.jsx';
 
 const CardWithAbilities = withAbilities(Card);
 
@@ -33,7 +33,8 @@ function ZonePlayerInPlay({
 	isOnUnfilteredPrompt,
 	isOnFilteredPrompt,
 	promptFilter,
-	prsAvailable 
+	prsAvailable,
+	animation,
 }) {
 	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
@@ -49,6 +50,7 @@ function ZonePlayerInPlay({
 					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 					onAbilityUse={abilityUseHandler}
+					className={cn({'attackTarget': animation && animation.target === cardData.id})}
 				/>,
 			) : null}
 		</div>
@@ -82,6 +84,7 @@ function mapStateToProps(state) {
 		promptType: state.promptType,
 		promptParams: state.promptParams,
 		promptGeneratedBy: state.promptGeneratedBy,
+		animation: state.animation,
 	};
 }
 

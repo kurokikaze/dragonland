@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose} from 'recompose';
-import Card from './Card';
+import Card from './Card.jsx';
 import {withCardData, withZoneContent} from './common';
 
 function Zone({ name, content, onCardClick, active }) {

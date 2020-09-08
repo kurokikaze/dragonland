@@ -1,4 +1,4 @@
-const {
+import {
 	ACTION_PLAY,
 	ACTION_ATTACK,
 	ACTION_POWER,
@@ -10,24 +10,25 @@ const {
 	PROMPT_TYPE_SINGLE_MAGI,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
-	PROMPT_TYPE_SINGLE_RELIC,
+	// Not implemented yet
+	// PROMPT_TYPE_SINGLE_RELIC,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
-} = require('moonlands/src/const');
-const {clone} = require('./index');
+} from 'moonlands/src/const.js';
+import {clone} from './index.js';
 
 function convertClientCommands(action, game) {
 	var expandedAction = clone(action);
 	switch (action.type) {
 		case ACTION_RESOLVE_PROMPT: {
 			switch (game.state.promptType) {
-				case PROMPT_TYPE_SINGLE_RELIC: {
-					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
-					break;
-				}
+				// case PROMPT_TYPE_SINGLE_RELIC: {
+				// 	expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+				// 	break;
+				// }
 				case PROMPT_TYPE_OWN_SINGLE_CREATURE: {
 					expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
 					break;
@@ -103,4 +104,4 @@ function convertClientCommands(action, game) {
 	return expandedAction;
 }
 
-module.exports = convertClientCommands;
+export default convertClientCommands;

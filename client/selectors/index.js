@@ -3,7 +3,21 @@ import {pathOr} from 'ramda';
 import {
 	STEP_PRS_FIRST,
 	STEP_PRS_SECOND,
-} from '../const';
+} from '../const.js';
+
+import {cards} from 'moonlands/src/cards';
+
+import {
+	TYPE_RELIC,
+} from 'moonlands/src/const.js';
+
+const relicsHash = {};
+
+cards.forEach(card => {
+	if (card.type === TYPE_RELIC) {
+		relicsHash[card.name] = true;
+	}
+});
 
 export function isOurTurn(state) {
 	return state.activePlayer === window.playerId;
@@ -17,8 +31,27 @@ export function getMagiEnergy(state) {
 	return zoneContent('playerActiveMagi', state).length ? zoneContent('playerActiveMagi', state)[0].data.energy : 0;
 }
 
+const isRelic = card => relicsHash[card.card];
+const isNotRelic = card => !relicsHash[card.card];
+
 export function zoneContent(zoneId, state) {
-	return pathOr([], ['zones', zoneId], state);
+	switch (zoneId) {
+		case 'playerRelics': {
+			return pathOr([], ['zones', 'playerInPlay'], state).filter(isRelic);
+		}
+		case 'playerInPlay': {
+			return pathOr([], ['zones', 'playerInPlay'], state).filter(isNotRelic);
+		}
+		case 'opponentRelics': {
+			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isRelic);
+		}
+		case 'opponentInPlay': {
+			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isNotRelic);
+		}
+		default: {
+			return pathOr([], ['zones', zoneId], state);
+		}
+	}
 }
 
 export function getAvailableStartingCards(cards = [], state) {

@@ -4,12 +4,12 @@ import {connect} from 'react-redux';
 import {compose, withHandlers, withStateHandlers} from 'recompose';
 import {getAvailableStartingCards} from '../../selectors';
 import cn from 'classnames';
-import Card from '../Card';
+import Card from '../Card.jsx';
 
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 function PromptChooseCards({cards, triggerElement, selected, onSend, numberOfCards}) {
 	return (

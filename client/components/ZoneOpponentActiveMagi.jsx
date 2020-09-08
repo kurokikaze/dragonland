@@ -7,8 +7,8 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const';
-import Card from './Card';
+} from 'moonlands/src/const.js';
+import Card from './Card.jsx';
 import {
 	STEP_ATTACK,
 } from '../const';

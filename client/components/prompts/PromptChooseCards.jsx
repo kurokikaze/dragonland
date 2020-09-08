@@ -8,7 +8,7 @@ import Card from '../Card';
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_CHOOSE_CARDS,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 function PromptChooseCards({cards, triggerElement, selected, onSend, availableCards}) {
 	return (

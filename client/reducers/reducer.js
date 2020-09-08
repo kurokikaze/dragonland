@@ -35,7 +35,14 @@ import {
 	ZONE_TYPE_DISCARD,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
+
+import {
+	START_POWER_ANIMATION,
+	END_POWER_ANIMATION,
+	START_ATTACK_ANIMATION,
+	END_ATTACK_ANIMATION,
+} from '../actions';
 
 import {byName} from 'moonlands/src/cards';
 
@@ -55,6 +62,14 @@ const defaultState = {
 		opponentMagiPile: [],
 		opponentDefeatedMagi: [],
 		opponentInPlay: [],
+	},
+	animation: null,
+	message: {
+		type: 'power',
+		source: 'TestSource',
+		power: {
+			name: 'Power Name',
+		},
 	},
 	gameEnded: false,
 	winner: null,
@@ -93,6 +108,38 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				step: action.newStep,
+			};
+		}
+		case START_POWER_ANIMATION: {
+			return {
+				...state,
+				message: {
+					type: 'power',
+					source: action.source,
+					power: action.power,
+				},
+			};
+		}
+		case END_POWER_ANIMATION: {
+			return {
+				...state,
+				message: null,
+			};
+		}
+		case START_ATTACK_ANIMATION: {
+			return {
+				...state,
+				animation: {
+					type: 'attack',
+					source: action.source,
+					target: action.target,
+				},
+			};
+		}
+		case END_ATTACK_ANIMATION: {
+			return {
+				...state,
+				animation: null,
 			};
 		}
 		case ACTION_POWER: {

@@ -6,8 +6,8 @@ import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const';
-import Card from './Card';
+} from 'moonlands/src/const.js';
+import Card from './Card.jsx';
 import {
 	STEP_ATTACK,
 } from '../const';
@@ -27,6 +27,7 @@ function ZoneOpponentInPlay({
 	isOnUnfilteredPrompt,
 	isOnFilteredPrompt,
 	promptFilter,
+	animation,
 }) {
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
@@ -40,6 +41,8 @@ function ZoneOpponentInPlay({
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					droppable={active && cardData.card.type === TYPE_CREATURE}
 					target={active && cardData.card.type === TYPE_CREATURE}
+					className={cn({'attackSource': animation && animation.source === cardData.id})}
+					attacker={animation && animation.source === cardData.id}
 				/>,
 			) : null}
 		</div>
@@ -67,6 +70,7 @@ function mapStateToProps(state) {
 		promptType: state.promptType,
 		promptParams: state.promptParams,
 		promptGeneratedBy: state.promptGeneratedBy,
+		animation: state.animation,
 	};
 }
 

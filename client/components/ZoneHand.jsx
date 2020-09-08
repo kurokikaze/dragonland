@@ -6,8 +6,8 @@ import {
 	TYPE_CREATURE,
 	TYPE_RELIC,
 	TYPE_SPELL,
-} from 'moonlands/src/const';
-import Card from './Card';
+} from 'moonlands/src/const.js';
+import Card from './Card.jsx';
 import {getMagiEnergy} from '../selectors';
 import {
 	STEP_CREATURES,
@@ -15,7 +15,7 @@ import {
 	STEP_PRS_SECOND,
 } from '../const';
 import {withCardData, withZoneContent} from './common';
-import {withView} from './CardView';
+import {withView} from './CardView.jsx';
 
 const canCast = (cardType, cardCost, magiEnergy, currentStep) => 
 	(cardCost <= magiEnergy) && (

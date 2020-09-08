@@ -1,5 +1,5 @@
-/* global window */
-import React from 'react';
+/* global window, document */
+import React, {useEffect} from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import {identity} from 'ramda';
 import {branch, compose} from 'recompose';
@@ -9,7 +9,7 @@ import {
 	TYPE_RELIC,
 	TYPE_SPELL,
 	TYPE_MAGI,
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 import {camelCase} from '../utils';
 
@@ -24,15 +24,112 @@ const typeClass = {
 	[TYPE_MAGI]: 'magi',
 };
 
-function Card({id, card, data, onClick, draggable, isDragging, available, target, connectDragSource, connectDropTarget, isOnPrompt}) {
+/*
+const field = document.getElementById('field');
+
+const $ = sel => document.querySelector(sel);
+
+$('.theirs').addEventListener('mouseover', (event) => {
+  if (event.target.classList.contains('card')) {
+  const attacker = $('.attacking');
+  const targetBox = event.target.getBoundingClientRect();
+  const attackerBox = attacker.getBoundingClientRect();
+    console.log('Target', event.target);
+    console.log('Attacker', attacker);
+    const offsetX = targetBox.left - attackerBox.left;
+  const offsetY = targetBox.top - attackerBox.top;
+    attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
+    attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
+    
+    const newAttacker = attacker.cloneNode(true);
+    attacker.parentNode.replaceChild(newAttacker, attacker);
+    
+   attacker.parentNode.classList.add('animated');
+   setTimeout(() => attacker.parentNode.classList.remove('animated'), 600);
+ }
+}, {passive: true});
+ 
+$('.ours').addEventListener('click', () => {
+ if (event.target.classList.contains('card')) {
+   $('.attacking').classList.remove('attacking');
+   event.target.classList.add('attacking');
+ }
+});
+*/
+function Card({
+	id,
+	card,
+	data,
+	onClick,
+	draggable,
+	isDragging,
+	available,
+	target,
+	connectDragSource,
+	connectDropTarget,
+	isOnPrompt,
+	className,
+	attacker,
+	useLocket = false,
+}) {
+	useEffect(() => {
+		const attacker = document.querySelector('.attackSource');
+		const target = document.querySelector('.attackTarget');
+		if (attacker && target) {
+			const targetBox = target.getBoundingClientRect();
+			const attackerBox = attacker.getBoundingClientRect();
+			console.log('Target', target);
+			console.log('Attacker', attacker);
+			const offsetX = targetBox.left - attackerBox.left;
+			const offsetY = targetBox.top - attackerBox.top;
+			attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
+			attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
+
+			const newAttacker = attacker.cloneNode(true);
+			const parentNode = attacker.parentNode;
+
+			console.log('ParentNode', parentNode);
+			if (parentNode && parentNode.classList) {
+				// if (parentNode.contains(attacker)) {
+				// 	parentNode.replaceChild(newAttacker, attacker);
+				// }
+				parentNode.classList.add('animated');
+				setTimeout(() => {
+					parentNode.classList.remove('animated');
+					newAttacker.classList.remove('attackSource');
+				}, 600);
+			}
+		}
+	}, [attacker]);
+
 	const connector = (draggable && connectDragSource) ? connectDragSource : (target && connectDropTarget ? connectDropTarget : identity);
+	const classes = cn(
+		'cardHolder',
+		card ? typeClass[card.type] : null,
+		{
+			'dragging': isDragging,
+			'available': available,
+			'target': target,
+			'onPrompt': isOnPrompt,
+		},
+		className
+	);
+	const getCardUrl = (card, useLocket) => {
+		if (!card) {
+			return '/images/cards/cardBack.jpg';
+		} else if (useLocket) {
+			return `/images/masked/${camelCase(card.name)}.jpg`;
+		} else {
+			return `/images/cards/${camelCase(card.name)}.jpg`;
+		}
+	};
 	return connector(
 		<div
-			className={cn('cardHolder', card ? typeClass[card.type] : null, {'dragging': isDragging, 'available': available, 'target': target, 'onPrompt': isOnPrompt})} 
+			className={classes}
 			data-id={id}
 			onClick={() => onClick && onClick(id)}
 		>
-			<img src={`/images/cards/${card ? camelCase(card.name) : 'cardBack'}.jpg`} alt={card ? card.name : null} />
+			<img src={getCardUrl(card, useLocket)} alt={card ? card.name : null} />
 			<div className="cardEnergy">
 				{data.energy || ''}
 			</div>

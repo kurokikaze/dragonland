@@ -1,13 +1,13 @@
 /* global expect, describe, it */
 
-const moonlands = require('moonlands');
-const CardInGame = require('moonlands/src/classes/CardInGame');
-const Zone = require('moonlands/src/classes/Zone');
+import * as moonlands from 'moonlands';
+import CardInGame from 'moonlands/src/classes/CardInGame.js';
+import Zone from 'moonlands/src/classes/Zone.js';
 
-const {byName} = require('moonlands/src/cards');
-const convert = require('../convertClientCommand');
+import {byName} from 'moonlands/src/cards.js';
+import convert from '../convertClientCommand.js';
 
-const {
+import {
 	ACTION_PLAY,
 	ACTION_ATTACK,
 	ACTION_POWER,
@@ -17,7 +17,7 @@ const {
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
-	PROMPT_TYPE_SINGLE_RELIC,
+	// PROMPT_TYPE_SINGLE_RELIC,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_DECK,
@@ -25,7 +25,10 @@ const {
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
-} = require('moonlands/src/const');
+} from 'moonlands/src/const.js';
+
+// @todo move to moonlands
+const PROMPT_TYPE_SINGLE_RELIC = 'prompt/single_relic';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;
@@ -86,7 +89,7 @@ describe('ACTION_RESOLVE_PROMPT', () => {
 		expect(result).toEqual(expectedAction);
 	});
 
-	it('PROMPT_TYPE_SINGLE_RELIC', () => {
+	it.skip('PROMPT_TYPE_SINGLE_RELIC', () => {
 		const ACTIVE_PLAYER = 0;
 		const NON_ACTIVE_PLAYER = 1;
 

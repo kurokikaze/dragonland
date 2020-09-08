@@ -1,4 +1,4 @@
-function clone(item) {
+export function clone(item) {
 	if (!item) { return item; } // null, undefined values check
 
 	var types = [ Number, String, Boolean ], 
@@ -51,7 +51,7 @@ function expandDuplicates(str) {
 	return [str];
 }
 
-function constructDeck(strings) {
+export function constructDeck(strings) {
 	let deck = [];
 	strings.forEach(str => {
 		deck = [
@@ -62,8 +62,3 @@ function constructDeck(strings) {
 
 	return deck;
 }
-
-module.exports = {
-	clone,
-	constructDeck,
-};

@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import './style.css';
 
 import {
-} from 'moonlands/src/const';
+} from 'moonlands/src/const.js';
 
 function Step({icon, active}) {
 	return (

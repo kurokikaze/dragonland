@@ -80,6 +80,20 @@
     overflow: hidden;
 }
 
+.PowerMessage {
+    position: absolute;
+    top: 41px;
+    margin: 0 300px;
+    padding: 27px;
+    background-color: rgba(0, 0, 0, .75);
+    color: #fff;
+    z-index: 2;
+    max-width: 100%;
+    border-radius: 5px;
+    font-size: 1.5em;
+    white-space: nowrap;
+}
+
 .zone-magi .cardHolder img {
     width: 124px;
     height: auto;
@@ -100,6 +114,14 @@
     box-shadow: 0px 0 6px 6px red;
 }
 
+.cardHolder.attackTarget {
+    box-shadow: 0px 0 6px 6px gold;
+}
+
+.cardHolder.attackSource {
+    box-shadow: 0px 0 6px 6px lightblue;
+}
+
 .zone img {
     width: 64px;
     /* height: 90px;  */
@@ -107,6 +129,7 @@
 
 .zone.zone-magi {
     height: 110px;
+    width: 110px;
 }
 
 #playerActiveMagi {
@@ -117,6 +140,43 @@
 #opponentMagi {
     height: 100px;
     width: 900px;
+}
+
+.middleZones {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.zone-relics {
+    max-width: 400px;
+    min-width: 400px;
+    justify-content: center;
+    align-items: center;
+}
+
+.zone-relics .cardHolder {
+    height: 64px;
+}
+
+.zone-relics .cardAbilities {
+    margin-bottom: 80px;
+}
+
+.zone-relics.opponentRelics .cardView {
+    top: 80px;
+    bottom: initial;
+}
+
+.zone-relics .cardAbilityHolder {
+    display: flex;
+    align-items: flex-end;
+    height: 85px;
+}
+
+.zone-placeholder {
+    max-width: 400px;
+    min-width: 400px;
 }
 
 .button {
@@ -149,3 +209,24 @@
     font-size: 25px;
 }
 
+/** Animations **/
+.zone.animated .cardHolder.attackSource {
+    --targetOffsetX: 100px;
+    --targetOffsetY: -120px;
+    animation-duration: 0.6s;
+    animation-name: attack;
+}
+
+@keyframes attack {
+    0% {
+        transform: translateX(0px) translateY(0px);
+    }
+
+    50% {
+        transform: translateX(var(--targetOffsetX)) translateY(var(--targetOffsetY));
+    }
+
+    100% {
+        transform: translateX(0px) translateY(0px);
+    }
+}

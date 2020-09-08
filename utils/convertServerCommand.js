@@ -1,4 +1,4 @@
-const {
+import {
 	ACTION_PASS,
 	ACTION_ENTER_PROMPT,
 	ACTION_EFFECT,
@@ -17,10 +17,10 @@ const {
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
-} = require('moonlands/src/const');
+} from 'moonlands/src/const.js';
 
-const {makeCardFilter} = require('moonlands/src/utils/restrictions');
-const {clone} = require('./index');
+import {makeCardFilter} from 'moonlands/src/utils/restrictions.js';
+import {clone} from './index.js';
 
 const NUMBER_OF_STEPS = 6;
 
@@ -268,4 +268,4 @@ function convertServerCommand(initialAction, game) {
 	return action;
 }
 
-module.exports = convertServerCommand;
+export default convertServerCommand;

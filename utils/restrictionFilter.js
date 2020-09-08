@@ -1,11 +1,11 @@
-const {
+import {
 	TYPE_CREATURE,
 
 	RESTRICTION_TYPE,
 	RESTRICTION_ENERGY_LESS_THAN_STARTING,
 	RESTRICTION_REGION,
 	RESTRICTION_CREATURE_TYPE,
-} = require('moonlands/src/const');
+} from 'moonlands/src/const.js';
 
 const getRestrictionFilter = (restriction, value) => {
 	switch(restriction) {
@@ -20,4 +20,4 @@ const getRestrictionFilter = (restriction, value) => {
 	}
 };
 
-module.exports = getRestrictionFilter;
+export default getRestrictionFilter;

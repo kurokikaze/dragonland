@@ -1,24 +1,26 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var apiRouter = require('./routes/api');
-var usersRouter = require('./routes/users');
+import createError from 'http-errors';
+import express from 'express';
+// import path from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import path from 'path';
+import indexRouter from './routes/index.js';
+import apiRouter from './routes/api.js';
+import usersRouter from './routes/users.js';
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+// eslint-disable-next-line
+const dirname__ = path.dirname(import.meta.url.substring(8));
+app.set('views', path.join(dirname__, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(dirname__, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
@@ -40,4 +42,4 @@ app.use(function(err, req, res) {
 	res.render('error');
 });
 
-module.exports = app;
+export default app;
