@@ -10,7 +10,7 @@ export const CardAbility = ({name, cost, text, used, onClick}) =>
 	);
 
 export const withAbilities = Component => (props) => {
-	const ourCard = props.data.controller === window.playerId;
+	const ourCard = (props.data.controller || props.owner) === window.playerId;
 	const hasAbilities = (props.card.data && props.card.data.powers);
 	return (ourCard && hasAbilities && !props.isOnPrompt) ? (
 		<div className='cardAbilityHolder'>

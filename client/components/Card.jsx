@@ -24,38 +24,6 @@ const typeClass = {
 	[TYPE_MAGI]: 'magi',
 };
 
-/*
-const field = document.getElementById('field');
-
-const $ = sel => document.querySelector(sel);
-
-$('.theirs').addEventListener('mouseover', (event) => {
-  if (event.target.classList.contains('card')) {
-  const attacker = $('.attacking');
-  const targetBox = event.target.getBoundingClientRect();
-  const attackerBox = attacker.getBoundingClientRect();
-    console.log('Target', event.target);
-    console.log('Attacker', attacker);
-    const offsetX = targetBox.left - attackerBox.left;
-  const offsetY = targetBox.top - attackerBox.top;
-    attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
-    attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
-    
-    const newAttacker = attacker.cloneNode(true);
-    attacker.parentNode.replaceChild(newAttacker, attacker);
-    
-   attacker.parentNode.classList.add('animated');
-   setTimeout(() => attacker.parentNode.classList.remove('animated'), 600);
- }
-}, {passive: true});
- 
-$('.ours').addEventListener('click', () => {
- if (event.target.classList.contains('card')) {
-   $('.attacking').classList.remove('attacking');
-   event.target.classList.add('attacking');
- }
-});
-*/
 function Card({
 	id,
 	card,
@@ -78,8 +46,6 @@ function Card({
 		if (attacker && target) {
 			const targetBox = target.getBoundingClientRect();
 			const attackerBox = attacker.getBoundingClientRect();
-			console.log('Target', target);
-			console.log('Attacker', attacker);
 			const offsetX = targetBox.left - attackerBox.left;
 			const offsetY = targetBox.top - attackerBox.top;
 			attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
@@ -88,7 +54,6 @@ function Card({
 			const newAttacker = attacker.cloneNode(true);
 			const parentNode = attacker.parentNode;
 
-			console.log('ParentNode', parentNode);
 			if (parentNode && parentNode.classList) {
 				// if (parentNode.contains(attacker)) {
 				// 	parentNode.replaceChild(newAttacker, attacker);
@@ -130,9 +95,9 @@ function Card({
 			onClick={() => onClick && onClick(id)}
 		>
 			<img src={getCardUrl(card, useLocket)} alt={card ? card.name : null} />
-			<div className="cardEnergy">
+			{data && <div className="cardEnergy">
 				{data.energy || ''}
-			</div>
+			</div>}
 		</div>
 	);
 }

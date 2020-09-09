@@ -85,7 +85,7 @@ describe('ACTION_PASS', () => {
 			player: ACTIVE_PLAYER,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		expect(convertedAction.type).toEqual(ACTION_PASS, 'Type is passed as is');
 		expect(convertedAction.player).toEqual(ACTIVE_PLAYER, 'Type is passed as is');
@@ -112,7 +112,7 @@ describe('ACTION_PASS', () => {
 			player: ACTIVE_PLAYER,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		expect(convertedAction.type).toEqual(ACTION_PASS, 'Type is passed as is');
 		expect(convertedAction.player).toEqual(ACTIVE_PLAYER, 'Type is passed as is');
@@ -149,7 +149,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 			generatedBy: weebo.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		expect(convertedAction.message).toEqual('Roll result is 12', 'Message is templated correctly');
 	});
@@ -176,7 +176,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 			generatedBy: weebo.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedSource = {
 			id: weebo.id,
@@ -222,7 +222,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 			generatedBy: weebo.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedSource = {
 			id: weebo.id,
@@ -279,7 +279,7 @@ describe('ACTION_ENTER_PROMPT', () => {
 			generatedBy: grega.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		expect(convertedAction.cards.length).toEqual(2, 'Only 2 cards fit the restriction');
 		expect(convertedAction.cards[0].card).toEqual('Kelthet', 'First is Kelthet');
@@ -320,7 +320,7 @@ describe('ACTION_POWER', () => {
 			generatedBy: weebo.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedSource = {
 			id: weebo.id,
@@ -365,7 +365,7 @@ describe('ACTION_POWER', () => {
 			generatedBy: grega.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedSource = {
 			id: grega.id,
@@ -404,7 +404,7 @@ describe('ACTION_EFFECT', () => {
 			amount: 4,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedTarget = {
 			id: grega.id,
@@ -445,7 +445,7 @@ describe('ACTION_EFFECT', () => {
 			generatedBy: grega.id,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedSourceCard = {
 			id: previousWeebo.id,
@@ -469,6 +469,79 @@ describe('ACTION_EFFECT', () => {
 		expect(convertedAction.destinationZone).toEqual(ZONE_TYPE_HAND, 'Destination zonee is passed');
 	});
 
+	it('EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES (masking cards in hidden zones)', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weeboInDeck = new CardInGame(byName('Weebo'), ACTIVE_PLAYER);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER);
+
+		const gameState = new State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		gameState.getZone(ZONE_TYPE_HAND, ACTIVE_PLAYER).add([weebo]);
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
+			sourceCard: weeboInDeck,
+			sourceZone: ZONE_TYPE_DECK,
+			destinationCard: weebo,
+			destinationZone: ZONE_TYPE_HAND,
+			generatedBy: grega.id,
+		};
+
+		const convertedActionForActivePlayer = convert(serverAction, gameState, ACTIVE_PLAYER);
+
+		const convertedSourceCard = {
+			id: weeboInDeck.id,
+			owner: grega.owner,
+			card: 'Weebo',
+			data: weeboInDeck.data,
+		};
+
+		const convertedDestinationCard = {
+			id: weebo.id,
+			owner: grega.owner,
+			card: 'Weebo',
+			data: weebo.data,
+		};
+
+		expect(convertedActionForActivePlayer.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedActionForActivePlayer.effectType).toEqual(EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES, 'Effect type is correct');
+		expect(convertedActionForActivePlayer.sourceCard).toEqual(convertedSourceCard, 'Source card is converted correctly');
+		expect(convertedActionForActivePlayer.sourceZone).toEqual(ZONE_TYPE_DECK, 'Source zonee is passed');
+		expect(convertedActionForActivePlayer.destinationCard).toEqual(convertedDestinationCard, 'Destination card is converted correctly');
+		expect(convertedActionForActivePlayer.destinationZone).toEqual(ZONE_TYPE_HAND, 'Destination zonee is passed');
+
+		const convertedActionForNonActivePlayer = convert(serverAction, gameState, NON_ACTIVE_PLAYER);
+
+		const maskedSourceCard = {
+			id: weeboInDeck.id,
+			owner: grega.owner,
+			card: null,
+			data: null,
+		};
+
+		const maskedDestinationCard = {
+			id: weebo.id,
+			owner: grega.owner,
+			card: null,
+			data: null,
+		};
+
+		expect(convertedActionForNonActivePlayer.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedActionForNonActivePlayer.effectType).toEqual(EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES, 'Effect type is correct');
+		expect(convertedActionForNonActivePlayer.sourceCard).toEqual(maskedSourceCard, 'Source card is converted and masked correctly');
+		expect(convertedActionForNonActivePlayer.sourceZone).toEqual(ZONE_TYPE_DECK, 'Source zonee is passed');
+		expect(convertedActionForNonActivePlayer.destinationCard).toEqual(maskedDestinationCard, 'Destination card is converted and masked correctly');
+		expect(convertedActionForNonActivePlayer.destinationZone).toEqual(ZONE_TYPE_HAND, 'Destination zonee is passed');
+	});
+
 	it('EFFECT_TYPE_PAYING_ENERGY_FOR_POWER (creature)', () => {
 		const ACTIVE_PLAYER = 42;
 		const NON_ACTIVE_PLAYER = 44;
@@ -489,7 +562,7 @@ describe('ACTION_EFFECT', () => {
 			amount: 1,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedTarget = {
 			id: weebo.id,
@@ -524,7 +597,7 @@ describe('ACTION_EFFECT', () => {
 			amount: 3,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedTarget = {
 			id: grega.id,
@@ -559,7 +632,7 @@ describe('ACTION_EFFECT', () => {
 			amount: 5,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedFrom = {
 			id: grega.id,
@@ -594,7 +667,7 @@ describe('ACTION_EFFECT', () => {
 			amount: 6,
 		};
 
-		const convertedAction = convert(serverAction, gameState);
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
 
 		const convertedFrom = {
 			id: grega.id,

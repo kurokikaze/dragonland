@@ -90,7 +90,7 @@ const getZoneName = (serverZoneType, source) => {
 		throw new Error(`Unknown zone: ${serverZoneType}`);
 	}
 
-	const zonePrefix = source.data.controller === window.playerId ? 'player' : 'opponent';
+	const zonePrefix = source.owner === window.playerId ? 'player' : 'opponent';
 	const zoneName = clientZoneNames[serverZoneType];
 	return `${zonePrefix}${zoneName}`;
 };
@@ -316,7 +316,7 @@ export default (state = defaultState, action) => {
 						}
 						case TYPE_RELIC: {
 							// magi pays for the ability
-							if (action.target.data.controller == window.playerId) {
+							if (action.target.owner == window.playerId) {
 								const playerActiveMagi = state.zones.playerActiveMagi
 									.map(card => ({
 										...card,

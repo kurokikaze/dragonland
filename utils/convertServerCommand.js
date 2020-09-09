@@ -17,10 +17,20 @@ import {
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
+
+	ZONE_TYPE_DECK,
+	ZONE_TYPE_MAGI_PILE,
+	ZONE_TYPE_HAND,
 } from 'moonlands/src/const.js';
 
 import {makeCardFilter} from 'moonlands/src/utils/restrictions.js';
 import {clone} from './index.js';
+
+const hiddenZonesHash = {
+	[ZONE_TYPE_DECK]: true,
+	[ZONE_TYPE_MAGI_PILE]: true,
+	[ZONE_TYPE_HAND]: true,
+};
 
 const NUMBER_OF_STEPS = 6;
 
@@ -46,7 +56,19 @@ const convertCard = cardInGame => ({
 	data: cardInGame.data,
 });
 
-function convertServerCommand(initialAction, game) {
+export const hideIfNecessary = (card, targetZone, isOpponent) => {
+	if (hiddenZonesHash[targetZone] && isOpponent) {
+		return {
+			...card,
+			card: null,
+			data: null,
+		};
+	} else {
+		return card;
+	}
+};
+
+function convertServerCommand(initialAction, game, playerId) {
 	var action = clone(initialAction);
 	switch(action.type) {
 		case ACTION_PASS: {
@@ -110,13 +132,27 @@ function convertServerCommand(initialAction, game) {
 		case ACTION_EFFECT: {
 			switch (action.effectType) {
 				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
+					const sourceCardOwner = action.sourceCard.owner;
+					const destinationCardOwner = action.destinationCard.owner;
+					// we hide the card if the source or destination zone is
+					// marked as hidden and zone owner is different from player we're doing conversion for 
 					return {
 						type: action.type,
 						effectType: action.effectType,
-						sourceCard: convertCard(action.sourceCard),
+						sourceCard: hideIfNecessary(
+							convertCard(action.sourceCard),
+							action.sourceZone,
+							sourceCardOwner !== playerId
+						),
 						sourceZone: action.sourceZone,
-						destinationCard: convertCard(action.destinationCard),
+						destinationCard: hideIfNecessary(
+							convertCard(action.destinationCard),
+							action.destinationZone,
+							destinationCardOwner !== playerId
+						),
 						destinationZone: action.destinationZone,
+						convertedFor: playerId,
+						destOwner: destinationCardOwner,
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {

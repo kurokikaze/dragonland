@@ -80,14 +80,14 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 
 		io.on('connection', function(socket){
 			const gameId = socket.handshake.query.gameId;
-			const playerId = socket.handshake.query.playerId;
+			const playerId = parseInt(socket.handshake.query.playerId, 10);
 			console.log(`Sent game id ${gameId}, player id ${playerId}`);
 			console.log('Running games:');
 			console.dir(Object.keys(runningGames));
 			runningGames[gameId].enableDebug();
 			// Converting game actions for sending
 			runningGames[gameId].actionStreamOne.on('action', action => {
-				const convertedAction = convertServerCommand(action, runningGames[gameId]);
+				const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
 				socket.emit('action', convertedAction);
 			});
 

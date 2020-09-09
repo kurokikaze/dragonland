@@ -81,9 +81,9 @@ const getRestrictionFilter = (restriction, value) => {
 		case RESTRICTION_ENERGY_LESS_THAN_STARTING:
 			return card => (card.card.type === TYPE_CREATURE && card.data.energy < card.card.cost);
 		case RESTRICTION_OWN_CREATURE:
-			return card => (card.card.type === TYPE_CREATURE && card.data.controller === window.playerId);
+			return card => (card.card.type === TYPE_CREATURE && (card.data.controller || card.owner) === window.playerId);
 		case RESTRICTION_OPPONENT_CREATURE:
-			return card => (card.card.type === TYPE_CREATURE && card.data.controller !== window.playerId);
+			return card => (card.card.type === TYPE_CREATURE && (card.data.controller || card.owner) !== window.playerId);
 	}
 };
 
@@ -96,7 +96,7 @@ export const getPromptFilter = (promptType, promptParams) => {
 		case PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI:
 			return card => (card.card.type === TYPE_MAGI || card.card.type === TYPE_CREATURE);
 		case PROMPT_TYPE_OWN_SINGLE_CREATURE:
-			return card => card.data.controller === window.playerId && card.card.type === TYPE_CREATURE;
+			return card => (card.data.controller || card.owner) === window.playerId && card.card.type === TYPE_CREATURE;
 		case PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE:
 			return card => card.id !== promptParams.source;
 		case PROMPT_TYPE_SINGLE_CREATURE_FILTERED:

@@ -35,7 +35,7 @@ function ZoneHand({ name, content, onCardClick, active, magiEnergy, currentStep 
 					card={cardData.card}
 					data={cardData.data}
 					onClick={onCardClick}
-					available={active && canCast(cardData.card.type, cardData.card.cost, magiEnergy, currentStep)}
+					available={active && cardData.card && canCast(cardData.card.type, cardData.card.cost, magiEnergy, currentStep)}
 				/>,
 			) : null}
 		</div>
