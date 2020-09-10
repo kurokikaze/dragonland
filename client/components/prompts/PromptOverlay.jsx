@@ -1,9 +1,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import PromptChooseCards from './PromptChooseCards';
-import PromptChooseCardsInZone from './PromptChooseCardsInZone';
-import PromptChooseNumber from './PromptChooseNumber';
+import PromptChooseCards from './PromptChooseCards.jsx';
+import PromptChooseCardsInZone from './PromptChooseCardsInZone.jsx';
+import PromptChooseNumber from './PromptChooseNumber.jsx';
 import '../style.css';
 
 import {

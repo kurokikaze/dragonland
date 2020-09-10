@@ -1,0 +1,80 @@
+.promptOverlay {
+    width: 900px;
+    height: 100%;
+    background-color: rgba(51, 51, 51, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.promptWindow {
+    width: 80%;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    height: 80%;
+    padding: 10px 30px;
+    background-color: #E7DCCA;
+    border-color: #D1A53E;
+    border-radius: 10px;
+    border-width: 1px;
+    color: #040403;
+}
+
+.promptWindow .cardHolder {
+    height: 180px;
+    width: 123px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.promptWindow .cardHolder img {
+    max-width: 128px;
+    max-height: 180px;
+}
+
+.promptWindow .cardsRow.smallCards .zoneCardSelect .cardHolder img {
+    max-width: 64px;
+}
+
+.promptWindow .buttonHolder {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.promptWindow .buttonHolder button {
+    padding: 10px 15px;
+    font-size: 20px;
+    border-radius: 4px;
+    border-width: 1px;
+}
+
+.promptChooseCards .cardsRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.promptChooseCards .cardsRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.promptChooseCards .cardsRow .zoneCardSelect {
+    opacity: 0.6;
+}
+
+.promptChooseCards .zoneCardSelect.chosen {
+    opacity: 1;
+}
+
+.promptChooseCards .cardSelect {
+    opacity: 0.6;
+}
+
+.promptChooseCards .cardSelect.chosen {
+    opacity: 1;
+}

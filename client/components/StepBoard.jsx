@@ -14,7 +14,7 @@ import {
 
 function StepBoard({currentStep}) {
 	return (
-		<div className="stepBoard">
+		<div className="StepBoard">
 			<StepIcon icon={<Energize />} active={currentStep === 0} />
 			<StepIcon icon={<Power />} active={currentStep === 1} />
 			<StepIcon icon={<Attack />} active={currentStep === 2} />
@@ -33,5 +33,7 @@ function mapStateToProps(state) {
 }
 
 const enhance = connect(mapStateToProps);
+
+export {StepBoard as Base};
 
 export default enhance(StepBoard);

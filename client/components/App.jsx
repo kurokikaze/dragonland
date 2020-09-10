@@ -44,7 +44,7 @@ function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
 	return (
 		<div className="game">
 			<DndProvider backend={Backend}>
-				{message && message.type == 'power' && <EnhancedMessage id={message.source} power={message.power} />}
+				{message && message.type == 'power' && <EnhancedMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
 				<Zone zoneId="opponentHand" name='Opponent hand' />
 				<div className='middleZones'>
 					<div className='zone-placeholder' />
