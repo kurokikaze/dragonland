@@ -1,6 +1,7 @@
 import React from 'react';
 import {camelCase} from '../utils';
 
+// eslint-disable-next-line react/display-name
 export const withView = Component => (props) => {
 	return (
 		<div className='cardViewHolder fadeInDown'>

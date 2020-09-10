@@ -72,6 +72,10 @@
     line-height: 68px;
 }
 
+.zone-creatures .cardAbilities {
+    margin-bottom: 60px;
+}
+
 .zone-magi .cardHolder {
     position: relative;
     width: 94px;
@@ -142,15 +146,21 @@
     width: 900px;
 }
 
+.zone-creatures {
+    margin-right: 50px;
+    align-items: center;
+}
+
 .middleZones {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-right: 50px;
 }
 
 .zone-relics {
-    max-width: 400px;
-    min-width: 400px;
+    max-width: 380px;
+    min-width: 380px;
     justify-content: center;
     align-items: center;
 }
@@ -175,8 +185,8 @@
 }
 
 .zone-placeholder {
-    max-width: 400px;
-    min-width: 400px;
+    max-width: 380px;
+    min-width: 380px;
 }
 
 .button {
@@ -207,6 +217,53 @@
     text-align: center;
     padding-top: 2px;
     font-size: 25px;
+}
+
+.creaturePowerIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0px 0 1px 1px rgba(0, 0, 0, .4);
+}
+
+.magiPowerIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0 2px 2px rgba(0, 0, 0, .2);
+}
+
+.stepIcon {
+    background-color: #000;
+}
+
+.magiPowerIcon svg,
+.creaturePowerIcon svg,
+.stepIcon svg {
+    transition: fill .2s ease;
+}
+
+.abilityIconHolder {
+    position: relative;
+}
+
+.abilityIconHolder .creaturePowerIcon {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+}
+
+.zone-relics .abilityIconHolder .creaturePowerIcon {
+    bottom: 12px;
+    right: -5px;
+}
+
+.abilityIconHolder .magiPowerIcon {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
 }
 
 /** Animations **/

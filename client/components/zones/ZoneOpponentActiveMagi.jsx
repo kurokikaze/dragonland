@@ -8,11 +8,11 @@ import {
 	PROMPT_TYPE_SINGLE_MAGI,
 	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const.js';
-import Card from './Card.jsx';
+import Card from '../Card.jsx';
 import {
 	STEP_ATTACK,
-} from '../const';
-import {withCardData, withZoneContent} from './common';
+} from '../../const';
+import {withCardData, withZoneContent} from '../common';
 
 function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
 	return (

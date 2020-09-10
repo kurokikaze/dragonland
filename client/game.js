@@ -7,6 +7,7 @@ import {
 	endPowerAnimation,
 	startAttackAnimation,
 	endAttackAnimation,
+	endAnimation,
 } from './actions';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
@@ -17,6 +18,8 @@ import thunk from 'redux-thunk';
 import {
 	ACTION_POWER,
 	ACTION_ATTACK,
+	ACTION_EFFECT,
+	EFFECT_TYPE_START_STEP,
 } from 'moonlands/src/const.js';
 
 import App from './components/App.jsx';
@@ -24,6 +27,7 @@ import rootReducer from './reducers';
 
 const POWER_MESSAGE_TIMEOUT = 4000;
 const ATTACK_MESSAGE_TIMEOUT = 600;
+const STEP_TIMEOUT = 500;
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -94,6 +98,19 @@ function startGame() {
 				).pipe(
 					delayWhen(({endAnimation = false}) =>
 						endAnimation == true ? timer(ATTACK_MESSAGE_TIMEOUT): timer(0),
+					),		
+				),
+			),
+			concatMap(action =>
+				from(action.type === ACTION_EFFECT && action.effectType === EFFECT_TYPE_START_STEP && (action.step === 0 || action.step === 5) ?
+					[
+						endAnimation(),
+						action,
+					] :
+					[action]
+				).pipe(
+					delayWhen(({endAnimation = false}) =>
+						endAnimation == true ? timer(STEP_TIMEOUT): timer(0),
 					),		
 				),
 			),

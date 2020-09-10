@@ -4,6 +4,7 @@ export const START_POWER_ANIMATION = 'actions/start_power_animation';
 export const END_POWER_ANIMATION = 'actions/end_power_animation';
 export const START_ATTACK_ANIMATION = 'actions/start_attack_animation';
 export const END_ATTACK_ANIMATION = 'actions/end_attack_animation';
+export const END_ANIMATION = 'actions/end_animation';
 
 export const showPowerName = (id, powerName) => ({type: SHOW_POWER_NAME, id, powerName});
 export const hidePowerName = (id, powerName) => ({type: HIDE_POWER_NAME, id, powerName});
@@ -11,3 +12,4 @@ export const startPowerAnimation = (source, power, player) => ({type: START_POWE
 export const endPowerAnimation = (source) => ({type: END_POWER_ANIMATION, source, endAnimation: true});
 export const startAttackAnimation = (source, target, player) => ({type: START_ATTACK_ANIMATION, source, target, player});
 export const endAttackAnimation = (source) => ({type: END_ATTACK_ANIMATION, source, endAnimation: true});
+export const endAnimation = () => ({type: END_ANIMATION, endAnimation: true});

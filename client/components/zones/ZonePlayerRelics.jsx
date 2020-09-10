@@ -4,21 +4,18 @@ import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
 import {
-	// ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
-	TYPE_CREATURE,
+	TYPE_RELIC,
 } from 'moonlands/src/const.js';
-import Card from './Card.jsx';
-// import {
-// 	STEP_ATTACK,
-// } from '../const';
-import {isPRSAvailable} from '../selectors';
+import Card from '../Card.jsx';
+
+import {isPRSAvailable} from '../../selectors';
 import {
 	withCardData, 
 	withZoneContent,
-} from './common.js';
-import {withAbilities} from './CardAbilities.jsx';
-import {withView} from './CardView.jsx';
+} from '../common.js';
+import {withAbilities} from '../CardAbilities.jsx';
+import {withView} from '../CardView.jsx';
 
 const CardWithAbilities = withAbilities(Card);
 const CardWithView = withView(Card);
@@ -32,22 +29,23 @@ function ZonePlayerRelics({
 	abilityUseHandler, 
 	prsAvailable,
 }) {
-	const SelectedCard = prsAvailable ? CardWithAbilities : CardWithView;
 	return (
-		<div className={cn('zone', 'zone-relics', zoneId, {'zone-active' : active})} data-zone-name={name}>
-			{content.length ? content.map(cardData =>
-				<SelectedCard
+		<div className={cn('zone', 'zone-relics', zoneId)} data-zone-name={name}>
+			{content.length ? content.map(cardData => {
+				const SelectedCard = (prsAvailable && cardData.card.data.powers) ? CardWithAbilities : CardWithView;
+				return <SelectedCard
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={false}
-					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
+					actionsAvailable={prsAvailable}
+					available={active && cardData.card.type === TYPE_RELIC && prsAvailable}
 					onAbilityUse={abilityUseHandler}
 					useLocket={true}
-				/>,
-			) : null}
+				/>;
+			}) : null}
 		</div>
 	);
 }

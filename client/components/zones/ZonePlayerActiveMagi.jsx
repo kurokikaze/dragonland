@@ -10,20 +10,19 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 } from 'moonlands/src/const.js';
-import Card from './Card.jsx';
+import Card from '../Card.jsx';
 
-import {isPRSAvailable} from '../selectors';
-import {withAbilities} from './CardAbilities.jsx';
-import {withCardData, withZoneContent} from './common';
+import {isPRSAvailable} from '../../selectors';
+import {withAbilities} from '../CardAbilities.jsx';
+import {withCardData, withZoneContent} from '../common';
 
 const CardWithAbilities = withAbilities(Card);
 
 function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler, abilityUseHandler, animation }) {
-	const SelectedCard = active ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<SelectedCard
+				<CardWithAbilities
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
@@ -32,6 +31,7 @@ function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClick
 					isOnPrompt={isOnMagiPrompt}
 					target={active && cardData.card.data.powers && cardData.card.data.powers.length > cardData.data.actionsUsed.length}
 					onAbilityUse={abilityUseHandler}
+					actionsAvailable={active}
 					className={cn({'attackTarget': animation && animation.target === cardData.id})}
 				/>,
 			) : null}

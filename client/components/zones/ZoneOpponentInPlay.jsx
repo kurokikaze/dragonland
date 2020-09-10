@@ -4,53 +4,45 @@ import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
 import {
-	ACTION_RESOLVE_PROMPT,
-	ACTION_POWER,
 	TYPE_CREATURE,
+	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const.js';
-import Card from './Card.jsx';
+import Card from '../Card.jsx';
 import {
 	STEP_ATTACK,
-} from '../const';
-import {isPRSAvailable} from '../selectors';
+} from '../../const';
 import {
-	withCardData, 
+	withCardData,
 	withZoneContent,
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
-} from './common.js';
-import {withAbilities} from './CardAbilities.jsx';
+} from '../common';
 
-const CardWithAbilities = withAbilities(Card);
-
-function ZonePlayerInPlay({
-	name, 
-	content, 
-	active, 
-	cardClickHandler, 
-	abilityUseHandler, 
+function ZoneOpponentInPlay({
+	name,
+	content,
+	active,
+	cardClickHandler,
 	isOnUnfilteredPrompt,
 	isOnFilteredPrompt,
 	promptFilter,
-	prsAvailable,
 	animation,
 }) {
-	const SelectedCard = prsAvailable ? CardWithAbilities : Card;
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<SelectedCard
+				<Card
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
-					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
-					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
-					onAbilityUse={abilityUseHandler}
-					className={cn({'attackTarget': animation && animation.target === cardData.id})}
+					droppable={active && cardData.card.type === TYPE_CREATURE}
+					target={active && cardData.card.type === TYPE_CREATURE}
+					className={cn({'attackSource': animation && animation.source === cardData.id})}
+					attacker={animation && animation.source === cardData.id}
 				/>,
 			) : null}
 		</div>
@@ -66,19 +58,13 @@ const propsTransformer = props => ({
 			generatedBy: props.promptGeneratedBy,
 		});
 	} : () => {},
-	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
-		type: ACTION_POWER,
-		source: id,
-		power: powerName,
-	}),
 	isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	isOnFilteredPrompt:  props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
+	isOnFilteredPrompt: props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
 	promptFilter: getPromptFilter(props.promptType, props.promptParams),
 });
 
 function mapStateToProps(state) {
 	return {
-		prsAvailable: isPRSAvailable(state),
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
 		isOnCreaturePrompt: state.prompt,
 		promptType: state.promptType,
@@ -95,4 +81,4 @@ const enhance = compose(
 	withCardData,
 );
 
-export default enhance(ZonePlayerInPlay);
+export default enhance(ZoneOpponentInPlay);

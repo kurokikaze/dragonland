@@ -13,13 +13,13 @@ import {
 	// ZONE_TYPE_IN_PLAY,
 } from 'moonlands/src/const.js';
 
-import Zone from './Zone.jsx';
-import ZoneHand from './ZoneHand.jsx';
-import ZonePlayerInPlay from './ZonePlayerInPlay.jsx';
-import ZonePlayerRelics from './ZonePlayerRelics.jsx';
-import ZoneOpponentInPlay from './ZoneOpponentInPlay.jsx';
-import ZoneOpponentActiveMagi from './ZoneOpponentActiveMagi.jsx';
-import ZonePlayerActiveMagi from './ZonePlayerActiveMagi.jsx';
+import Zone from './zones/Zone.jsx';
+import ZoneHand from './zones/ZoneHand.jsx';
+import ZonePlayerInPlay from './zones/ZonePlayerInPlay.jsx';
+import ZonePlayerRelics from './zones/ZonePlayerRelics.jsx';
+import ZoneOpponentInPlay from './zones/ZoneOpponentInPlay.jsx';
+import ZoneOpponentActiveMagi from './zones/ZoneOpponentActiveMagi.jsx';
+import ZonePlayerActiveMagi from './zones/ZonePlayerActiveMagi.jsx';
 import PromptOverlay from './prompts/PromptOverlay.jsx';
 import PowerMessage from './messages/PowerMessage.jsx';
 import StepBoard from './StepBoard.jsx';

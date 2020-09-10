@@ -1,6 +1,9 @@
 /* global window */
 import React from 'react';
+import CreaturePowerIcon from './CreaturePowerIcon.jsx';
+import MagiPowerIcon from './MagiPowerIcon.jsx';
 import cn from 'classnames';
+import { TYPE_MAGI } from 'moonlands/src/const.js';
 
 export const CardAbility = ({name, cost, text, used, onClick}) =>
 	(
@@ -9,9 +12,13 @@ export const CardAbility = ({name, cost, text, used, onClick}) =>
 		</div>
 	);
 
+// eslint-disable-next-line react/display-name
 export const withAbilities = Component => (props) => {
 	const ourCard = (props.data.controller || props.owner) === window.playerId;
 	const hasAbilities = (props.card.data && props.card.data.powers);
+	const hasUnusedAbilities = hasAbilities && props.card.data.powers.some(power => !(props.data.actionsUsed || []).includes(power.name));
+	const PowerIcon = (props.card.type === TYPE_MAGI) ? MagiPowerIcon : CreaturePowerIcon;
+
 	return (ourCard && hasAbilities && !props.isOnPrompt) ? (
 		<div className='cardAbilityHolder'>
 			<div className='cardAbilities'>
@@ -26,9 +33,12 @@ export const withAbilities = Component => (props) => {
 					/>
 				)}
 			</div>
-			<Component 
-				{...props} 
-			/>
+			<div className='abilityIconHolder'>
+				<Component 
+					{...props}
+				/>
+				<PowerIcon active={hasUnusedAbilities && props.actionsAvailable} />
+			</div>
 		</div>
 	) : (
 		<Component {...props}/>
