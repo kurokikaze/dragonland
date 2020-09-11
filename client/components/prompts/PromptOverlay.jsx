@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import PromptChooseCards from './PromptChooseCards.jsx';
 import PromptChooseCardsInZone from './PromptChooseCardsInZone.jsx';
 import PromptChooseNumber from './PromptChooseNumber.jsx';
-import '../style.css';
+
+import './style.css';
 
 import {
 	PROMPT_TYPE_CHOOSE_CARDS,

@@ -27,6 +27,9 @@ import {
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_SINGLE_CREATURE,
+	PROMPT_TYPE_OWN_SINGLE_CREATURE,
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -42,7 +45,18 @@ import {
 	END_POWER_ANIMATION,
 	START_ATTACK_ANIMATION,
 	END_ATTACK_ANIMATION,
+	START_RELIC_ANIMATION,
+	END_RELIC_ANIMATION,
+	START_SPELL_ANIMATION,
+	END_SPELL_ANIMATION,
 } from '../actions';
+
+import {
+	MESSAGE_TYPE_POWER,
+	MESSAGE_TYPE_RELIC,
+	MESSAGE_TYPE_SPELL,
+	MESSAGE_TYPE_PROMPT_RESOLUTION,
+} from '../const.js';
 
 import {byName} from 'moonlands/src/cards';
 
@@ -110,11 +124,12 @@ export default (state = defaultState, action) => {
 				step: action.newStep,
 			};
 		}
+		/* Animations */
 		case START_POWER_ANIMATION: {
 			return {
 				...state,
 				message: {
-					type: 'power',
+					type: MESSAGE_TYPE_POWER,
 					source: action.source,
 					power: action.power,
 				},
@@ -142,6 +157,38 @@ export default (state = defaultState, action) => {
 				animation: null,
 			};
 		}
+		case START_RELIC_ANIMATION: {
+			return {
+				...state,
+				message: {
+					type: MESSAGE_TYPE_RELIC,
+					source: action.source,
+					card: action.card,
+				},
+			};
+		}
+		case END_RELIC_ANIMATION: {
+			return {
+				...state,
+				message: null,
+			};
+		}
+		case START_SPELL_ANIMATION: {
+			return {
+				...state,
+				message: {
+					type: MESSAGE_TYPE_SPELL,
+					card: action.card,
+				},
+			};
+		}
+		case END_SPELL_ANIMATION: {
+			return {
+				...state,
+				message: null,
+			};
+		}
+		/* End Animations */
 		case ACTION_POWER: {
 			const sourceId = action.source.id;
 			const sourceName = action.power;
@@ -219,8 +266,41 @@ export default (state = defaultState, action) => {
 			};
 		}
 		case ACTION_RESOLVE_PROMPT: {
+			// If we're showing Power / Spell message, that might be the target chosen for it
+			// If so, append the message
+			var messageData = {...state.message};
+
+			if (action.player !== window.playerId) {
+				// Powers have source, spells have card
+
+				switch (state.promptType) {
+					case [PROMPT_TYPE_SINGLE_CREATURE_FILTERED]:
+					case [PROMPT_TYPE_OWN_SINGLE_CREATURE]:
+					case [PROMPT_TYPE_SINGLE_CREATURE]:
+					case [PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI]:
+					case [PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE]: {
+						if (action.target && action.target.card) {
+							messageData = {
+								type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+								chosenTarget: action.target,
+							}; 
+						}
+						break;
+					}
+					case [PROMPT_TYPE_NUMBER]: {
+						if (messageData.card.id === action.generatedBy && action.number) {
+							messageData = {
+								type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+								chosenNumber: action.number,
+							};
+						}
+						break;
+					}
+				}
+			}
 			return {
 				...state,
+				message: messageData,
 				prompt: false,
 				promptPlayer: null,
 				promptType: null,

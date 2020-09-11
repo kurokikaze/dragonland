@@ -22,29 +22,36 @@ import ZoneOpponentActiveMagi from './zones/ZoneOpponentActiveMagi.jsx';
 import ZonePlayerActiveMagi from './zones/ZonePlayerActiveMagi.jsx';
 import PromptOverlay from './prompts/PromptOverlay.jsx';
 import PowerMessage from './messages/PowerMessage.jsx';
+import RelicMessage from './messages/RelicMessage.jsx';
+import SpellMessage from './messages/SpellMessage.jsx';
+import PromptResolutionMessage from './messages/PromptResolutionMessage.jsx';
+
 import StepBoard from './StepBoard.jsx';
 import EndgameOverlay from './EndgameOverlay.jsx';
 
 import {withSingleCardData} from './common';
 import {isPromptActive, isOurTurn} from '../selectors';
 
-/*
-const NO_ACTIVE_STEP = 10;
-const STEP_ENERGIZE = 0;
-const STEP_PRS_FIRST = 1;
-const STEP_ATTACK = 2;
-const STEP_CREATURES = 3;
-const STEP_PRS_SECOND = 4;
-const STEP_DRAW = 5;
-*/
+import {
+	MESSAGE_TYPE_POWER,
+	MESSAGE_TYPE_RELIC,
+	MESSAGE_TYPE_SPELL,
+	MESSAGE_TYPE_PROMPT_RESOLUTION,
+} from '../const.js';
 
-const EnhancedMessage = withSingleCardData(PowerMessage);
+const EnhancedPowerMessage = withSingleCardData(PowerMessage);
+const EnhancedRelicMessage = withSingleCardData(RelicMessage);
+const EnhancedSpellMessage = withSingleCardData(SpellMessage);
+const EnhancedPromptResolutionMessage = withSingleCardData(PromptResolutionMessage);
 
 function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
 	return (
 		<div className="game">
 			<DndProvider backend={Backend}>
-				{message && message.type == 'power' && <EnhancedMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_RELIC && <EnhancedRelicMessage id={message.card.id} display={message.source && message.source.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_SPELL && <EnhancedSpellMessage id={message.card.id} display={message.source && message.source.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_PROMPT_RESOLUTION && <EnhancedPromptResolutionMessage id={message.source} card={message.chosenTarget} number={message.chosenNumber} />}
 				<Zone zoneId="opponentHand" name='Opponent hand' />
 				<div className='middleZones'>
 					<div className='zone-placeholder' />

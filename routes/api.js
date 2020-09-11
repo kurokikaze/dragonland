@@ -78,7 +78,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
 		console.log('Running games:');
 		console.dir(Object.keys(runningGames));
 
-		io.on('connection', function(socket){
+		io.on('connection', function(socket) {
 			const gameId = socket.handshake.query.gameId;
 			const playerId = parseInt(socket.handshake.query.playerId, 10);
 			console.log(`Sent game id ${gameId}, player id ${playerId}`);

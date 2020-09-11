@@ -14,18 +14,32 @@ export default {
 		powerName: {
 			control: 'text',
 		},
+		targetName: {
+			control: 'text',
+		},
+		number: {
+			control: 'number',
+		},
 		display: {
 			control: 'boolean',
 		}
 	},
 };
 
-const Template = ({cardName, powerName, display}) => <PowerMessage card={{owner: undefined, card: cardName}} power={powerName} display={display} />;
+const Template = ({cardName, powerName, targetName, number = null, display}) => 
+	<PowerMessage 
+		card={{card: cardName}} 
+		power={powerName}
+		display={display}
+		chosenNumber={number}
+		chosenTarget={targetName ? {card: targetName} : null} 
+	/>;
 
 export const Simple = Template.bind({});
 Simple.args = {
 	cardName: 'Cinder',
 	powerName: 'Revitalize',
+	targetName: '',
 	display: true,
 };
 

@@ -7,6 +7,7 @@ import Zone from 'moonlands/src/classes/Zone.js';
 import {
 	ACTION_PASS,
 	ACTION_ENTER_PROMPT,
+	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 	ACTION_EFFECT,
 
@@ -117,6 +118,31 @@ describe('ACTION_PASS', () => {
 		expect(convertedAction.type).toEqual(ACTION_PASS, 'Type is passed as is');
 		expect(convertedAction.player).toEqual(ACTIVE_PLAYER, 'Type is passed as is');
 		expect(convertedAction.newStep).toEqual(STEP_ENERGIZE, 'Next step is STEP_ENERGIZE');
+	});
+});
+
+describe('ACTION_RESOLVE_PROMPT', () => {
+	it('Passes unchanged', () => {
+		const ACTIVE_PLAYER = 41;
+		const NON_ACTIVE_PLAYER = 59;
+
+		const initialAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			generatedBy: 'test',
+			number: 12,
+			player: ACTIVE_PLAYER,
+		};
+
+		const gameState = new State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [], []),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+			spellMetaData: {},
+		});
+
+		const convertedAction = convert(initialAction, gameState, ACTIVE_PLAYER);
+
+		expect(convertedAction).toEqual(initialAction);
 	});
 });
 

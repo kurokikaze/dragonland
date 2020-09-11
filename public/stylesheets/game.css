@@ -85,6 +85,7 @@
 }
 
 .BaseMessage {
+    display: flex;
     position: absolute;
     top: 41px;
     margin: 0 300px;
@@ -97,8 +98,15 @@
     font-size: 1.5em;
     white-space: nowrap;
     vertical-align: middle;
-    line-height: 50px;
+    /* line-height: 50px;*/
     font-family: sans-serif;
+}
+
+.BaseMessage__messages {
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
 .BaseMessage__message {
@@ -106,8 +114,9 @@
 }
 
 .messageIcon {
-    display: inline-block;
+    display: flex;
     margin-right: 12px;
+    align-items: center;
 }
 
 .zone-magi .cardHolder img {
@@ -261,18 +270,18 @@
     position: relative;
 }
 
-.abilityIconHolder .creaturePowerIcon {
+.abilityIconHolder .cardIcons {
     position: absolute;
     bottom: -10px;
     right: -10px;
 }
 
-.zone-relics .abilityIconHolder .creaturePowerIcon {
+.zone-relics .abilityIconHolder .cardIcons {
     bottom: 12px;
     right: -5px;
 }
 
-.abilityIconHolder .magiPowerIcon {
+.abilityIconHolder .magiCardIcons {
     position: absolute;
     right: -15px;
     bottom: -15px;

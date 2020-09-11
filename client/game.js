@@ -2,32 +2,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { 
-	startPowerAnimation,
-	endPowerAnimation,
-	startAttackAnimation,
-	endAttackAnimation,
-	endAnimation,
-} from './actions';
+
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import {Observable, from, timer} from 'rxjs';
-import {delayWhen, concatMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import thunk from 'redux-thunk';
-
-import {
-	ACTION_POWER,
-	ACTION_ATTACK,
-	ACTION_EFFECT,
-	EFFECT_TYPE_START_STEP,
-} from 'moonlands/src/const.js';
 
 import App from './components/App.jsx';
 import rootReducer from './reducers';
-
-const POWER_MESSAGE_TIMEOUT = 4000;
-const ATTACK_MESSAGE_TIMEOUT = 600;
-const STEP_TIMEOUT = 500;
+import addAnimations from './addAnimations.js';
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -49,13 +32,10 @@ function startGame() {
 		document.getElementById('game'),
 	);
 
-	const actionTypesToAnimate = [
-		ACTION_POWER,
-	];
-
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io(`/?gameId=${window.gameId}&playerId=${window.playerId}`);
 		window.socket.on('action', function(action) {
+			console.log('Action type: ', action.type);
 			observer.next(action);
 		});
 
@@ -71,50 +51,7 @@ function startGame() {
 		window.socket.on('error', error => observer.error(error));
 	});
 
-	const delayedActions = actionsObservable
-		.pipe(
-			concatMap(action =>
-				from(actionTypesToAnimate.includes(action.type) && (action.player !== window.playerId) ?
-					[
-						startPowerAnimation(action.source.id, action.power, action.player), 
-						endPowerAnimation(action.power),
-						action,
-					] :
-					[action]
-				).pipe(
-					delayWhen(({endAnimation = false}) =>
-						endAnimation == true ? timer(POWER_MESSAGE_TIMEOUT): timer(0),
-					),		
-				),
-			),
-			concatMap(action =>
-				from(action.type === ACTION_ATTACK && (action.source.owner !== window.playerId) ?
-					[
-						startAttackAnimation(action.source.id, action.target.id, action.player), 
-						endAttackAnimation(action.source.id),
-						action,
-					] :
-					[action]
-				).pipe(
-					delayWhen(({endAnimation = false}) =>
-						endAnimation == true ? timer(ATTACK_MESSAGE_TIMEOUT): timer(0),
-					),		
-				),
-			),
-			concatMap(action =>
-				from(action.type === ACTION_EFFECT && action.effectType === EFFECT_TYPE_START_STEP && (action.step === 0 || action.step === 5) ?
-					[
-						endAnimation(),
-						action,
-					] :
-					[action]
-				).pipe(
-					delayWhen(({endAnimation = false}) =>
-						endAnimation == true ? timer(STEP_TIMEOUT): timer(0),
-					),		
-				),
-			),
-		);
+	const delayedActions = addAnimations(actionsObservable);
 
 	delayedActions.subscribe(transformedAction => {
 		console.log('Transformed');
