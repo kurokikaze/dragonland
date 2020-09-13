@@ -8,8 +8,9 @@ html
     script(src='/javascripts/game.js')
     script.
        window.initialState = JSON.parse(`!{JSON.stringify(initialState)}`);
-        window.playerId = !{playerId};
-        window.gameId = '!{gameId}';
+       window.playerId = !{playerId};
+       window.gameId = '!{gameId}';
+       window.playerHash = '!{playerHash}';
   body
     h1= title
     p You are player #{playerId}

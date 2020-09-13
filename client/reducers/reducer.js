@@ -27,9 +27,6 @@ import {
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
-	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_OWN_SINGLE_CREATURE,
-	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -49,6 +46,8 @@ import {
 	END_RELIC_ANIMATION,
 	START_SPELL_ANIMATION,
 	END_SPELL_ANIMATION,
+	START_PROMPT_RESOLUTION_ANIMATION,
+	END_PROMPT_RESOLUTION_ANIMATION,
 } from '../actions';
 
 import {
@@ -162,8 +161,10 @@ export default (state = defaultState, action) => {
 				...state,
 				message: {
 					type: MESSAGE_TYPE_RELIC,
-					source: action.source,
-					card: action.card,
+					card: {
+						...action.card,
+						card: action.card._card.name,
+					},
 				},
 			};
 		}
@@ -178,7 +179,10 @@ export default (state = defaultState, action) => {
 				...state,
 				message: {
 					type: MESSAGE_TYPE_SPELL,
-					card: action.card,
+					card: {
+						...action.card,
+						card: action.card._card.name,
+					},
 				},
 			};
 		}
@@ -265,42 +269,53 @@ export default (state = defaultState, action) => {
 				promptAvailableCards: action.availableCards || [],
 			};
 		}
-		case ACTION_RESOLVE_PROMPT: {
-			// If we're showing Power / Spell message, that might be the target chosen for it
-			// If so, append the message
+		case START_PROMPT_RESOLUTION_ANIMATION: {
 			var messageData = {...state.message};
-
-			if (action.player !== window.playerId) {
-				// Powers have source, spells have card
-
-				switch (state.promptType) {
-					case [PROMPT_TYPE_SINGLE_CREATURE_FILTERED]:
-					case [PROMPT_TYPE_OWN_SINGLE_CREATURE]:
-					case [PROMPT_TYPE_SINGLE_CREATURE]:
-					case [PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI]:
-					case [PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE]: {
-						if (action.target && action.target.card) {
-							messageData = {
-								type: MESSAGE_TYPE_PROMPT_RESOLUTION,
-								chosenTarget: action.target,
-							}; 
-						}
-						break;
-					}
-					case [PROMPT_TYPE_NUMBER]: {
-						if (messageData.card.id === action.generatedBy && action.number) {
-							messageData = {
-								type: MESSAGE_TYPE_PROMPT_RESOLUTION,
-								chosenNumber: action.number,
-							};
-						}
-						break;
-					}
-				}
+			if (typeof action.target === 'number') {
+				messageData = {
+					type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+					chosenNumber: action.target,
+				};
+			} else {
+				messageData = {
+					type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+					chosenTarget: action.target,
+				};
 			}
+
 			return {
 				...state,
 				message: messageData,
+			};
+		}
+		case END_PROMPT_RESOLUTION_ANIMATION: {
+			return {
+				...state,
+				message: null,
+			};
+		}
+		case ACTION_RESOLVE_PROMPT: {
+			// If we're showing Power / Spell message, that might be the target chosen for it
+			// If so, append the message
+			/* var messageData = {...state.message};
+
+			if (action.player !== window.playerId) {
+				// Powers have source, spells have card
+				if (action.target && action.target.card) {
+					messageData = {
+						type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+						chosenTarget: action.target,
+					}; 
+				} else if (Object.prototype.hasOwnProperty.call(action, 'number')) {
+					messageData = {
+						type: MESSAGE_TYPE_PROMPT_RESOLUTION,
+						chosenNumber: action.number,
+					};
+				}
+			} */
+			return {
+				...state,
+				// message: messageData,
 				prompt: false,
 				promptPlayer: null,
 				promptType: null,

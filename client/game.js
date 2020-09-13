@@ -33,7 +33,7 @@ function startGame() {
 	);
 
 	const actionsObservable = Observable.create(observer => {
-		window.socket = io(`/?gameId=${window.gameId}&playerId=${window.playerId}`);
+		window.socket = io(`/?playerHash=${window.playerHash}`);
 		window.socket.on('action', function(action) {
 			console.log('Action type: ', action.type);
 			observer.next(action);

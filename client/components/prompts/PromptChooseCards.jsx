@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers, withStateHandlers} from 'recompose';
 import cn from 'classnames';
-import Card from '../Card';
+import Card from '../Card.jsx';
 
 import {
 	ACTION_RESOLVE_PROMPT,

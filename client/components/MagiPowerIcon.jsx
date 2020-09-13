@@ -6,7 +6,7 @@ function MagiPowerIcon({active = false, icon = null}) {
 
 	return (
 		<div className="magiPowerIcon">
-			{icon && React.cloneElement(icon, {fillColor, size: 20})}
+			{icon && React.cloneElement(icon, {fillColor, size: 40})}
 			{!icon && <Power size={40} icon fillColor={fillColor} />}
 		</div>
 	);

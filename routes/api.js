@@ -8,11 +8,21 @@ import convertServerCommand from '../utils/convertServerCommand.js';
 
 var router = express.Router();
 
-var runningGames = {};
+const runningGames = {};
+const gamePlayers = {};
+const keyHash = {};
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 	const gameId = nanoid();
+	const playerOneHash = nanoid();
+	const playerTwoHash = nanoid();
 
+	keyHash[playerOneHash] = gameId;
+	keyHash[playerTwoHash] = gameId;
+
+	gamePlayers[playerOneHash] = 1;
+	gamePlayers[playerTwoHash] = 2;
+	
 	const zones = [];
 
 	const gameState = new State({
@@ -35,7 +45,7 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 
 	runningGames[gameId] = gameState;
 
-	return gameId;
+	return [gameId, playerOneHash, playerTwoHash];
 }
 
 router.post('/start', function(req, res) {
@@ -50,7 +60,11 @@ router.post('/start', function(req, res) {
 		req.body.deckTwo.split('\r\n'),
 	);
 
-	const gameId = createGame(
+	const [
+		gameId,
+		playerOneHash,
+		playerTwoHash
+	] = createGame(
 		playerOne,
 		playerTwo,
 		deckOne,
@@ -58,73 +72,96 @@ router.post('/start', function(req, res) {
 	);
 
 	runningGames[gameId].setup();
+	runningGames[gameId].enableDebug();
 
 	res.render('started', {
 		gameId,
-		playerOne,
-		playerTwo,
+		playerOneHash,
+		playerTwoHash,
 	});
 });
 
 var ioLaunched = false;
 
-router.get(/^\/game\/([a-zA-Z0-9_-]+)\/(\d)$/, function(req, res) {
-	const gameId = req.params[0];
-	const playerId = req.params[1];
+router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/, function(req, res) {
+	const playerHash = req.params[0];
 
-	if (!ioLaunched) {
-		const io = req.app.get('io');
+	const gameId = keyHash[playerHash];
+	const playerId = gamePlayers[playerHash];
 
-		console.log('Running games:');
-		console.dir(Object.keys(runningGames));
+	if (gameId && playerId) {
+		if (!ioLaunched) {
+			const io = req.app.get('io');
 
-		io.on('connection', function(socket) {
-			const gameId = socket.handshake.query.gameId;
-			const playerId = parseInt(socket.handshake.query.playerId, 10);
-			console.log(`Sent game id ${gameId}, player id ${playerId}`);
 			console.log('Running games:');
 			console.dir(Object.keys(runningGames));
-			runningGames[gameId].enableDebug();
-			// Converting game actions for sending
-			runningGames[gameId].actionStreamOne.on('action', action => {
-				const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
-				socket.emit('action', convertedAction);
-			});
 
-			// Converting client actions for game engine			
-			socket.on('clientAction', action => {
-				const expandedAction = convertClientCommand(action, runningGames[gameId]);
-				
-				try {
-					console.log('Expanded Action:');
-					console.dir(expandedAction);
-					runningGames[gameId].update(expandedAction);
-				} catch(e) {
-					console.log('Engine error!');
-					console.log('On action:');
-					console.dir(expandedAction);
-					console.log();
-					console.dir(runningGames[gameId].state);
-					console.log();
-					console.log(e.name);
-					console.log(e.message);
-					console.log(e.stack);
+			io.on('connection', function(socket) {
+				const playerHash = socket.handshake.query.playerHash;
+
+				const gameId = keyHash[playerHash];
+				const playerId = gamePlayers[playerHash];
+
+				console.log(`Sent game id ${gameId}, player id ${playerId}`);
+				console.log('Running games:');
+				console.dir(Object.keys(runningGames));
+
+				if (gameId && playerId) {
+				// const playerId = parseInt(socket.handshake.query.playerId, 10);
+					
+					// runningGames[gameId].enableDebug();
+					// Converting game actions for sending
+					runningGames[gameId].actionStreamOne.on('action', action => {
+						const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
+						socket.emit('action', convertedAction);
+					});
+
+					// Converting client actions for game engine
+					socket.on('clientAction', action => {
+						// Only process active player actions or specifically requested prompt resolutions
+						if (runningGames[gameId].state.activePlayer === playerId ||
+							(runningGames[gameId].state.prompt && runningGames[gameId].state.promptPlayer === playerId)) {
+							const expandedAction = convertClientCommand({ ...action, player: playerId}, runningGames[gameId]);
+
+							try {
+								console.log('Expanded Action:');
+								console.dir(expandedAction);
+								runningGames[gameId].update(expandedAction);
+							} catch(e) {
+								console.log('Engine error!');
+								console.log('On action:');
+								console.dir(expandedAction);
+								console.log();
+								console.dir(runningGames[gameId].state);
+								console.log();
+								console.log(e.name);
+								console.log(e.message);
+								console.log(e.stack);
+							}
+						}
+					});
+
+					socket.on('disconnect', function(){
+						console.log('user disconnected');
+					});
 				}
 			});
 
-			socket.on('disconnect', function(){
-				console.log('user disconnected');
-			});
+			ioLaunched = true;
+		}
+
+		res.render('game', {
+			gameId,
+			playerId,
+			playerHash,
+			initialState: runningGames[gameId].serializeData(playerId),
 		});
-
-		ioLaunched = true;
+	} else {
+		res.render('game-error', {
+			message: 'No such game or player',
+			subtext: 'Check the link please',
+		});
 	}
-
-	res.render('game', {
-		gameId,
-		playerId,
-		initialState: runningGames[gameId].serializeData(playerId),
-	});
 });
 
 export default router;

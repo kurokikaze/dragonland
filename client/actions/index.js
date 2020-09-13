@@ -23,6 +23,7 @@ export const startRelicAnimation = (card) => ({type: START_RELIC_ANIMATION, card
 export const endRelicAnimation = () => ({type: END_RELIC_ANIMATION, endAnimation: true});
 export const startSpellAnimation = (card) => ({type: START_SPELL_ANIMATION, card, endAnimation: true});
 export const endSpellAnimation = () => ({type: END_SPELL_ANIMATION, endAnimation: true});
+export const startPromptResolutionAnimation = (target) => ({type: START_PROMPT_RESOLUTION_ANIMATION, target});
 export const endPromptResolutionAnimation = () => ({type: END_PROMPT_RESOLUTION_ANIMATION});
 export const endStepAnimation = () => ({type: END_STEP_ANIMATION});
 export const endAnimation = () => ({type: END_ANIMATION, endAnimation: true});

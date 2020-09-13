@@ -22,6 +22,7 @@ import {
 	startSpellAnimation,
 	endSpellAnimation,
 	endStepAnimation,
+	startPromptResolutionAnimation,
 	endPromptResolutionAnimation,
 	END_POWER_ANIMATION,
 	END_RELIC_ANIMATION,
@@ -34,21 +35,23 @@ import {
 const POWER_MESSAGE_TIMEOUT = 4000;
 const RELIC_MESSAGE_TIMEOUT = 3000;
 const ATTACK_MESSAGE_TIMEOUT = 600;
+const PROMPT_RESOLUTION_TIMEOUT = 600;
 const STEP_TIMEOUT = 500;
 
 const convertAction = action => {
 	switch(action.type) {
 		case ACTION_RESOLVE_PROMPT:
 			return  (action.player !== window.playerId) ? [
+				startPromptResolutionAnimation(action.target ? action.target._card.name : action.number),
 				endPromptResolutionAnimation(),
 				action,
 			] : [action];
 		case ACTION_POWER:
-			return [
+			return (action.source.owner !== window.playerId) ? [
 				startPowerAnimation(action.source.id, action.power, action.player), 
 				endPowerAnimation(action.power),
 				action,
-			];
+			] : [action];
 		case ACTION_ATTACK: {
 			return (action.source.owner !== window.playerId) ? [
 				startAttackAnimation(action.source.id, action.target.id, action.player), 
@@ -84,7 +87,7 @@ const convertAction = action => {
 };
 
 const TIMERS_BY_EVENT = {
-	[END_PROMPT_RESOLUTION_ANIMATION]: POWER_MESSAGE_TIMEOUT,
+	[END_PROMPT_RESOLUTION_ANIMATION]: PROMPT_RESOLUTION_TIMEOUT,
 	[END_POWER_ANIMATION]: POWER_MESSAGE_TIMEOUT,
 	[END_RELIC_ANIMATION]: RELIC_MESSAGE_TIMEOUT,
 	[END_SPELL_ANIMATION]: POWER_MESSAGE_TIMEOUT,

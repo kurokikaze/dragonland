@@ -40,18 +40,15 @@ import {
 } from '../const.js';
 
 const EnhancedPowerMessage = withSingleCardData(PowerMessage);
-const EnhancedRelicMessage = withSingleCardData(RelicMessage);
-const EnhancedSpellMessage = withSingleCardData(SpellMessage);
-const EnhancedPromptResolutionMessage = withSingleCardData(PromptResolutionMessage);
 
 function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
 	return (
 		<div className="game">
 			<DndProvider backend={Backend}>
 				{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_RELIC && <EnhancedRelicMessage id={message.card.id} display={message.source && message.source.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_SPELL && <EnhancedSpellMessage id={message.card.id} display={message.source && message.source.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_PROMPT_RESOLUTION && <EnhancedPromptResolutionMessage id={message.source} card={message.chosenTarget} number={message.chosenNumber} />}
+				{message && message.type == MESSAGE_TYPE_RELIC && <RelicMessage card={message.card} display={message.card.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_SPELL && <SpellMessage card={message.card} display={message.card.owner !== window.playerId} />}
+				{message && message.type == MESSAGE_TYPE_PROMPT_RESOLUTION && <PromptResolutionMessage card={message.chosenTarget} number={message.chosenNumber} />}
 				<Zone zoneId="opponentHand" name='Opponent hand' />
 				<div className='middleZones'>
 					<div className='zone-placeholder' />

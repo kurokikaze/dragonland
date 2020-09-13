@@ -2,11 +2,11 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to the game!
 
   div
     ul
       li
-        a(href!='/api/game/' + gameId + '/' + playerOne target='_blank') Player one
+        a(href!='/api/game/' + playerOneHash + '/' target='_blank') Player one
       li
-        a(href!='/api/game/' + gameId + '/' + playerTwo target='_blank') Player two
+        a(href!='/api/game/' + playerTwoHash + '/' target='_blank') Player two
