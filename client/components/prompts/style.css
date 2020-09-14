@@ -1,10 +1,18 @@
 .promptOverlay {
     width: 900px;
     height: 100%;
-    background-color: rgba(51, 51, 51, 0.6);
+    background: radial-gradient(rgba(51, 51, 51, 0.6), rgba(51, 51, 51, 0.7), rgba(51, 51, 51, 0.9));
     position: absolute;
     top: 0;
     left: 0;
+}
+
+.promptMessage {
+    color: #ddd;
+    margin-top: 43px;
+    font-family: sans-serif;
+    width: 100%;
+    text-align: center;
 }
 
 .promptWindow {
