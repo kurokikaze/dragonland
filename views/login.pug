@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form.startConfig(action='/users/login',method='POST')
+    fieldset
+      label(for='username') Login
+      input(name='username')
+    fieldset
+      label(for='password') Password
+      input(name='password', type='password')
+
+    .startButton
+      button(type='submit',value='Enter') Enter

@@ -2,16 +2,21 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to #{title}, #{username}
+  p
+    a(href='/users/logout') Logout
+
   form.startConfig(action='/api/start',method='POST')
     div.deckSet(data-role='fieldcontain')
       fieldset.deck(data-role='controlgroup')
         label(for='deckOne') Deck one
-        textarea#deckOne(name='deckOne',rows=deckHeight).
-         #{deckOne}
+        select(name='chosenDeckOne')
+          each deck in decksOne
+            option(value=deck._id) #{deck.name}
       fieldset.deck(data-role='controlgroup')
         label(for='deckTwo') Deck two
-        textarea#deckTwo(name='deckTwo',rows=deckHeight).
-          #{deckTwo}
+        select(name='chosenDeckTwo')
+          each deck in decksOne
+            option(value=deck._id) #{deck.name}
     .startButton
       button(type='submit',value='Start!') Start!
