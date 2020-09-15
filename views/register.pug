@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1= title
+  p Registration
+  form.startConfig(action='/users/register',method='POST')
+    fieldset
+      label(for='name') Name
+      input(name='name')
+    fieldset
+      label(for='username') Username
+      input(name='username')
+    fieldset
+      label(for='password') Password
+      input(name='password', type='password')
+    fieldset
+      label(for='password2') Re-type password
+      input(name='password2', type='password')
+    fieldset
+      label(for='question') Name of the Fire region (starts with C and ends with D)
+      input(name='question', type='input')
+
+    .startButton
+      button(type='submit',value='Enter') Submit

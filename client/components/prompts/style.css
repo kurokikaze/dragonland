@@ -10,7 +10,7 @@
 .promptMessage {
     color: #ddd;
     margin-top: 43px;
-    font-family: sans-serif;
+    font: Lato, "Helvetica Neue", Helvetica, Arial;
     width: 100%;
     text-align: center;
 }

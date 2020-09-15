@@ -2,10 +2,10 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to Dragonlands
   form.startConfig(action='/users/login',method='POST')
     fieldset
-      label(for='username') Login
+      label(for='username') Username
       input(name='username')
     fieldset
       label(for='password') Password
