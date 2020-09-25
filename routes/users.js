@@ -1,8 +1,10 @@
 import express from 'express';
 import passport from 'passport';
+import ensure from 'connect-ensure-login';
 
-import {getUserByUsername, insertUser} from '../utils/database.js';
+import {getUserByUsername, insertUser, getUserDecks} from '../utils/database.js';
 import {getPasswordHash} from '../utils/crypto.js';
+import {getChallenges} from '../utils/challenge.js';
 
 const router = express.Router();
 
@@ -16,6 +18,24 @@ router.post('/login',
 	passport.authenticate('local', { failureRedirect: '/users/login', successRedirect: '/' }),
 	function(req, res) {
 		res.redirect('/');
+	});
+
+router.get('/challenge',
+	ensure.ensureLoggedIn('/users/login'),
+	async function(req, res) {
+		const decks = await getUserDecks(req.user.gameId);
+
+		res.render('challenge', {
+			title: 'Dragonlands',
+			playerId: req.user.gameId || null,
+			username: req.user.name,
+			initialState: {
+				username: req.user.name,
+				decks,
+				currentDeck: decks[0]._id,
+				challenges: getChallenges(),
+			},
+		});
 	}
 );
 

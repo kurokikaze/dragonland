@@ -4,23 +4,20 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import { createStore, applyMiddleware, compose } from 'redux';
-import { createEpicMiddleware } from 'redux-observable';
-// import {Observable} from 'rxjs';
 import thunk from 'redux-thunk';
 
+import {fetchChallenges} from './actions/index.js';
 import App from './components/ChallengeApp.jsx';
-// import rootReducer from './reducers';
+import rootReducer from './reducers/reducer.js';
 
-function startGame() {
+function start() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-	const epicMiddleware = createEpicMiddleware();
 
 	const store = createStore(
 		rootReducer,
 		window.initialState,
 		composeEnhancers(
 			applyMiddleware(thunk),
-			applyMiddleware(epicMiddleware),
 		),
 	);
 
@@ -30,37 +27,13 @@ function startGame() {
 		</Provider>,
 		document.getElementById('game'),
 	);
-
-	/* const actionsObservable = Observable.create(observer => {
-		window.socket = io(`/?playerHash=${window.playerHash}`);
-		window.socket.on('action', function(action) {
-			console.log('Action type: ', action.type);
-			observer.next(action);
-		});
-
-		window.socket.on('display', function(action) {
-			const displayAction = {
-				type: 'actions/display',
-				...action,
-			};
-
-			observer.next(displayAction);
-		});
-
-		window.socket.on('error', error => observer.error(error));
-	});
-
-	const delayedActions = addAnimations(actionsObservable);
-
-	delayedActions.subscribe(transformedAction => {
-		console.log('Transformed');
-		console.dir(transformedAction);
-		store.dispatch(transformedAction);
-	}); */
+	setInterval(() => {
+		store.dispatch(fetchChallenges());
+	}, 5000);
 }
 
 document.onreadystatechange = function() {
 	if (document.readyState == 'complete') {
-		startGame();
+		start();
 	}
 };

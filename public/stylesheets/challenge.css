@@ -1,0 +1,23 @@
+@font-face {
+    font-family: Lato;
+    src: url('/fonts/Lato/Lato-Regular.ttf');
+}
+
+html {
+    font-family: Lato, Arial, Helvetica, sans-serif;
+}
+
+.challenges {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 50px;
+    width: 800px;
+    border: 1px solid #ccc;
+}
+
+.challenge {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 5px;
+}

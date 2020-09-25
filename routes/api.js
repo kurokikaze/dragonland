@@ -1,13 +1,10 @@
 import express from 'express';
 import nanoid from 'nanoid';
 import {State} from 'moonlands';
-// import passport from 'passport';
-import mongoDb from 'mongodb';
+
 import ensure from 'connect-ensure-login';
-
-import config from '../config.js';
-
-const { MongoClient, ObjectID } = mongoDb;
+import {getDeckById} from '../utils/database.js';
+import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
 
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
@@ -15,8 +12,12 @@ import convertServerCommand from '../utils/convertServerCommand.js';
 var router = express.Router();
 
 const runningGames = {};
+// Player ID (Mongo) to player Id (game)
 const gamePlayers = {};
+// Player hash to game hash 
 const keyHash = {};
+// Player id (Mongo) to player hash
+const participants = {};
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 	const gameId = nanoid();
@@ -62,16 +63,10 @@ router.post('/start',
 
 		const chosenDeckOne = req.body.chosenDeckOne;
 		const chosenDeckTwo = req.body.chosenDeckTwo;
-		console.dir(req.body);
 
 		try {
-			const client = new MongoClient(config.databaseUri);
-			await client.connect();
-			const database = client.db(config.databaseName);
-			const collection = database.collection('decks');
-
-			const deckOneObject = await collection.findOne({_id: new ObjectID(chosenDeckOne)});
-			const deckTwoObject = await collection.findOne({_id: new ObjectID(chosenDeckTwo)});
+			const deckOneObject = await getDeckById(chosenDeckOne);
+			const deckTwoObject = await getDeckById(chosenDeckTwo);
 
 			const deckOne = deckOneObject.cards;
 			const deckTwo = deckTwoObject.cards;
@@ -193,6 +188,88 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 				subtext: 'Check the link please',
 			});
 		}
+	}
+);
+
+router.get('/challenges', 
+	ensure.ensureLoggedIn('/users/login'),
+	(req, res) => {
+		if (participants[req.user.gameId]) {
+			res.json({hash: participants[req.user.gameId]});
+		} else {
+			res.json(getChallenges());
+		}
+	}
+);
+
+router.post('/challenges',
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const challenges = getChallenges();
+		if (!challenges.some(challenge => challenge.user === req.user.name)) {
+			const deck = await getDeckById(req.body.deckId);
+			if (deck) {
+				addChallenge({
+					user: req.user.name,
+					userId: req.user.gameId,
+					deck: deck.name,
+					deckId: req.body.deckId,
+				});
+			}
+		}
+
+		res.json(getChallenges());
+	}
+);
+
+router.post('/cancel',
+	ensure.ensureLoggedIn('/users/login'),
+	(req, res) => {
+		removeByName(req.user.name);
+		res.json(getChallenges());
+	},
+);
+
+/*
+ * Fields to accept a challenge:
+ * name - matching name in challenge
+ * deckId - what deck to use
+ */
+router.post('/accept',
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const challenge = getChallenges().find(challenge => challenge.user === req.body.name);
+		if (challenge) {
+			const deckOne = await getDeckById(challenge.deckId);
+			const deckTwo = await getDeckById(req.body.deckId);
+
+			const [
+				gameId,
+				playerOneHash,
+				playerTwoHash
+			] = createGame(
+				1,
+				2,
+				deckOne.cards,
+				deckTwo.cards,
+			);
+
+			runningGames[gameId].setup();
+			runningGames[gameId].enableDebug();
+
+			participants[challenge.userId] = playerOneHash;
+			participants[req.user.gameId] = playerTwoHash;
+
+			removeByName(challenge.user);
+			removeByName(req.user.name);
+
+			res.json({
+				hash: playerTwoHash,
+			});
+		} else {
+			res.json(getChallenges());
+		}
+		
 	}
 );
 

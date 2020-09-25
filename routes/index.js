@@ -1,11 +1,9 @@
 import express from 'express';
 import {cards} from 'moonlands/src/cards.js';
 import {camelCase} from '../client/utils.js';
-import mongoDb from 'mongodb';
 import ensure from 'connect-ensure-login';
-import config from '../config.js';
 
-const { MongoClient } = mongoDb;
+import {getUserDecks} from '../utils/database.js';
 
 const router = express.Router();
 
@@ -16,19 +14,8 @@ router.get('/',
 	ensure.ensureLoggedIn('/users/login'),
 	async function(req, res) {
 		try {
-			const client = new MongoClient(config.databaseUri);
-			await client.connect();
-			const database = client.db(config.databaseName);
-			const collection = database.collection('decks');
-
-			const query = {playerId: req.user.gameId};
-			const options = {};
-			const cursor = collection.find(query, options);
-
-			const decks = [];
-
-			await cursor.forEach(deck => decks.push(deck));
-
+			const decks = await getUserDecks(req.user.gameId);
+			
 			res.render('index', {
 				title: 'Dragonlands',
 				decksOne: decks,

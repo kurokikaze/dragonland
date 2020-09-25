@@ -37,9 +37,9 @@ const initApp = (mainCallback) => {
 
 		passport.serializeUser(function(user, cb) {
 			cb(null, user[USER_ID_FIELD]);
-	  	});
+		});
 
-	  	passport.deserializeUser(function(id, cb) {
+		passport.deserializeUser(function(id, cb) {
 			getUserByGameId(id, function (err, user) {
 				if (err) { return cb(err); }
 				cb(null, user);
@@ -47,8 +47,7 @@ const initApp = (mainCallback) => {
 		});
 
 		// view engine setup
-		// eslint-disable-next-line
-		const dirname__ = path.dirname(import.meta.url.substring(8));
+		const dirname__ = path.dirname('./');
 		app.set('views', path.join(dirname__, 'views'));
 		app.set('view engine', 'pug');
 		
