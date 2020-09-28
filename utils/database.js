@@ -10,6 +10,10 @@ var close = () => {};
 
 export function connectToServer(callback) {
 	MongoClient.connect( config.databaseUri, { useNewUrlParser: true }, (err, connection) => {
+		if (err) {
+			console.dir(err);
+			process.exit(1);
+		}
 		console.log('database connected');
 		_db = connection.db(config.databaseName);
 		close = () => connection.close();

@@ -5,7 +5,7 @@ import {State} from 'moonlands';
 import ensure from 'connect-ensure-login';
 import {getDeckById} from '../utils/database.js';
 import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
-
+import { ACTION_PLAYER_WINS } from 'moonlands/src/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
 
@@ -139,6 +139,16 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 						// Converting game actions for sending
 						runningGames[gameId].actionStreamOne.on('action', action => {
 							const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
+							// if convertedAction signals game end, shut the session down
+							// and free the players
+							if (convertedAction.type === ACTION_PLAYER_WINS) {
+								socket.close();
+								setTimeout(() => {
+									delete runningGames[gameId];
+									delete keyHash[playerHash];
+									delete gamePlayers[playerHash];
+								}, 1000);
+							}							
 							socket.emit('action', convertedAction);
 						});
 
