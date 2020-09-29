@@ -7,10 +7,6 @@ import { DndProvider } from 'react-dnd';
 import {
 	ACTION_PASS,
 	ACTION_PLAY,
-
-	// ZONE_TYPE_ACTIVE_MAGI,
-	// ZONE_TYPE_HAND,
-	// ZONE_TYPE_IN_PLAY,
 } from 'moonlands/src/const.js';
 
 import Zone from './zones/Zone.jsx';
@@ -37,11 +33,15 @@ import {
 	MESSAGE_TYPE_RELIC,
 	MESSAGE_TYPE_SPELL,
 	MESSAGE_TYPE_PROMPT_RESOLUTION,
+
+	// Steps without priority
+	STEP_ENERGIZE,
+	STEP_DRAW,
 } from '../const.js';
 
 const EnhancedPowerMessage = withSingleCardData(PowerMessage);
 
-function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
+function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded}) {
 	return (
 		<div className="game">
 			<DndProvider backend={Backend}>
@@ -64,7 +64,7 @@ function App({prompt, message, isOurTurn, onPass, onPlay, gameEnded}) {
 				</div>
 				<ZoneHand zoneId="playerHand" name='Player hand' onCardClick={onPlay} />
 				<StepBoard />
-				{isOurTurn && <button onClick={() => onPass()}>Pass</button>}
+				{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={() => onPass()}>Pass</button>}
 				{prompt && <PromptOverlay />}
 				{gameEnded && <EndgameOverlay />}
 			</DndProvider>
@@ -76,6 +76,7 @@ function mapStateToProps(state) {
 	return {
 		prompt: isPromptActive(state),
 		isOurTurn: isOurTurn(state),
+		currentStep: state.step,
 		message: state.message,
 		gameEnded: state.gameEnded,
 	};

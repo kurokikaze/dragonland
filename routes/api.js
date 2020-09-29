@@ -133,16 +133,15 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 					console.dir(Object.keys(runningGames));
 
 					if (gameId && playerId) {
-					// const playerId = parseInt(socket.handshake.query.playerId, 10);
-						
-						// runningGames[gameId].enableDebug();
 						// Converting game actions for sending
 						runningGames[gameId].actionStreamOne.on('action', action => {
 							const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
 							// if convertedAction signals game end, shut the session down
 							// and free the players
 							if (convertedAction.type === ACTION_PLAYER_WINS) {
-								socket.close();
+								socket.removeAllListeners();
+								socket.disconnect();
+
 								setTimeout(() => {
 									delete runningGames[gameId];
 									delete keyHash[playerHash];
