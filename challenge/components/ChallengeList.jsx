@@ -5,7 +5,6 @@ import {acceptChallenge, createChallenge} from '../actions/index.js';
 function ChallengeList({challenges, currentDeck, username, acceptChallenge, createChallenge}) {
 	const hasChallenged = challenges.some(challenge => challenge.user === username);
 	return <div className='challenges'>
-		<pre>{JSON.stringify(challenges[0], null, 2)}</pre>
 		{challenges.map(challenge => (<div className='challenge' key={challenge.deckId || 'test'}>
 			<div>{challenge.user}</div>
 			<div>{challenge.deck}</div>
