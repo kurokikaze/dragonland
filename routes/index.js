@@ -4,31 +4,27 @@ import {camelCase} from '../client/utils.js';
 import ensure from 'connect-ensure-login';
 
 import {getUserDecks} from '../utils/database.js';
+import {getChallenges} from '../utils/challenge.js';
 
 const router = express.Router();
-
-const deckHeight = 18;
 
 /* GET home page. */
 router.get('/',
 	ensure.ensureLoggedIn('/users/login'),
 	async function(req, res) {
-		try {
-			const decks = await getUserDecks(req.user.gameId);
-			
-			res.render('index', {
-				title: 'Dragonlands',
-				decksOne: decks,
-				decksTwo: decks,
-				deckHeight,
+		const decks = await getUserDecks(req.user.gameId);
+
+		res.render('challenge', {
+			title: 'Dragonlands',
+			playerId: req.user.gameId || null,
+			username: req.user.name,
+			initialState: {
 				username: req.user.name,
-			});
-		} catch(e) {
-			res.render('game-error', { 
-				message: 'Database error',
-				subtext: 'Failed to connect to MongoDB',
-			});
-		}
+				decks,
+				currentDeck: decks[0]._id,
+				challenges: getChallenges(),
+			},
+		});
 	}
 );
 
