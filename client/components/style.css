@@ -29,13 +29,47 @@
     min-height: 100%;
 }
 
+.cardAbilities p {
+    margin: 0;
+}
+
+.cardAbilities p + p {
+    margin-top: 1em;
+}
+
 .cardAbilityHolder {
     position: relative;
     font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }
 
+.cardAbilityHolder .ability .abilityName {
+   color: #006CA9;
+   font-weight: bold;
+   text-decoration: underline;
+   cursor: pointer;
+}
+
+.cardAbilityHolder .opponentAbility .abilityName {
+    color: #949597;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: default;
+ }
+
+.cardAbilityHolder .ability .abilityCost,
+.cardAbilityHolder .opponentAbility .abilityCost {
+    display: inline-block;
+    border-radius: 8px;
+    border-color: #333;
+    width: 16px;
+    height: 16px;
+    background-color: #333;
+    color: #ccc;
+    text-align: center;
+}
+
 .cardAbilityHolder .ability.used b {
-    color: #aaa;
+    color: #949597;
 }
 
 .cardAbilityHolder:hover .cardAbilities {

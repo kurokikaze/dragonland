@@ -9,16 +9,19 @@ import {
 	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const.js';
 import Card from '../Card.jsx';
+import {withAbilities} from '../CardAbilities.jsx';
 import {
 	STEP_ATTACK,
 } from '../../const';
 import {withCardData, withZoneContent} from '../common';
 
+const CardWithAbilities = withAbilities(Card);
+
 function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
 	return (
 		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<Card
+				<CardWithAbilities
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}

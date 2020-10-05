@@ -8,6 +8,7 @@ import {
 	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const.js';
 import Card from '../Card.jsx';
+import {withAbilities} from '../CardAbilities.jsx';
 import {
 	STEP_ATTACK,
 } from '../../const';
@@ -18,6 +19,8 @@ import {
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
 } from '../common';
+
+const CardWithAbilities = withAbilities(Card);
 
 function ZoneOpponentInPlay({
 	name,
@@ -32,7 +35,7 @@ function ZoneOpponentInPlay({
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
-				<Card
+				<CardWithAbilities
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
