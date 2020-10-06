@@ -69,6 +69,11 @@
     text-align: center;
 }
 
+.cardAbilityHolder .ability.costTooHigh .abilityCost {
+    border-color: red;
+    background-color: red;
+}
+
 .cardAbilityHolder:hover .cardAbilities {
     display: block;
 }
@@ -107,6 +112,28 @@
     display: block;
 }
 
+.discardOverlay {
+    position: absolute;
+    width: 80%;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    height: 80%;
+    padding: 10px 30px;
+    background-color: #E7DCCA;
+    border-color: #D1A53E;
+    border-radius: 10px;
+    border-width: 1px;
+    color: #040403;
+}
+
+.discardOverlay .closeIcon {
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    font-size: 3em;
+    cursor: pointer;
+}
 @-webkit-keyframes fadeInDown {
     0% {
         opacity: 0;

@@ -6,9 +6,9 @@ import Ability from './icons/Ability.jsx';
 import cn from 'classnames';
 import { TYPE_MAGI } from 'moonlands/src/const.js';
 
-export const CardAbility = ({name, cost, text, used, onClick}) =>
+export const CardAbility = ({name, cost, text, used, costTooHigh, onClick}) =>
 	(
-		<div className={cn('ability', {'used': used})}>
+		<div className={cn('ability', {'used': used, 'costTooHigh': costTooHigh})}>
 			<span className='abilityName' onClick={onClick}>{name}</span>&nbsp;&mdash;&nbsp;<span className='abilityCost'>{cost}</span>: <span>{text}</span>
 		</div>
 	);
@@ -42,7 +42,8 @@ export const withAbilities = Component => (props) => {
 						name={name}
 						text={text}
 						cost={cost}
-						used={props.data.actionsUsed && props.data.actionsUsed.includes(name)}
+						used={(props.data.actionsUsed && props.data.actionsUsed.includes(name)) || (props.data.energy < cost)}
+						costTooHigh={props.data.energy < cost}
 						onClick={() => {console.log(`id:${props.id} , power ${name}`); props.onAbilityUse(props.id, name);}}
 					/>
 				)}
