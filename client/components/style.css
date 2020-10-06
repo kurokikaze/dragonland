@@ -49,6 +49,7 @@
    cursor: pointer;
 }
 
+.cardAbilityHolder .ability.used .abilityName,
 .cardAbilityHolder .opponentAbility .abilityName {
     color: #949597;
     font-weight: bold;
@@ -66,10 +67,6 @@
     background-color: #333;
     color: #ccc;
     text-align: center;
-}
-
-.cardAbilityHolder .ability.used b {
-    color: #949597;
 }
 
 .cardAbilityHolder:hover .cardAbilities {
