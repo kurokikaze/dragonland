@@ -24,6 +24,16 @@ const typeClass = {
 	[TYPE_MAGI]: 'magi',
 };
 
+const getCardUrl = (card, useLocket) => {
+	if (!card) {
+		return '/images/cards/cardBack.jpg';
+	} else if (useLocket) {
+		return `/images/masked/${camelCase(card.name)}.jpg`;
+	} else {
+		return `/images/cards/${camelCase(card.name)}.jpg`;
+	}
+};
+
 function Card({
 	id,
 	card,
@@ -79,15 +89,7 @@ function Card({
 		},
 		className
 	);
-	const getCardUrl = (card, useLocket) => {
-		if (!card) {
-			return '/images/cards/cardBack.jpg';
-		} else if (useLocket) {
-			return `/images/masked/${camelCase(card.name)}.jpg`;
-		} else {
-			return `/images/cards/${camelCase(card.name)}.jpg`;
-		}
-	};
+
 	return connector(
 		<div
 			className={classes}
@@ -95,9 +97,14 @@ function Card({
 			onClick={() => onClick && onClick(id)}
 		>
 			<img src={getCardUrl(card, useLocket)} alt={card ? card.name : null} />
-			{data && <div className="cardEnergy">
-				{data.energy || ''}
-			</div>}
+			{data && <>
+				{(card && data.energy && data.energy !== card.cost) ? <div className="startingEnergy">
+					{card.cost}
+				</div> : null}
+				<div className="cardEnergy">
+					{data.energy || ''}
+				</div>
+			</>}
 		</div>
 	);
 }

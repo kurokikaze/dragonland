@@ -30,8 +30,8 @@ export const withAbilities = Component => (props) => {
 	const PowerIcon = (props.card.type === TYPE_MAGI) ? MagiPowerIcon : CreaturePowerIcon;
 	const iconType = (props.card.type === TYPE_MAGI) ? 'cardIcons' : 'magiCardIcons';
 
-	const showAbilities = hasAbilities && !props.isOnPrompt;
-	const showEffects = hasEffects && !props.isOnPrompt;
+	const showAbilities = hasAbilities && !props.isOnPrompt && !props.isDragging;
+	const showEffects = hasEffects && !props.isOnPrompt && !props.isDragging;
 	const AbilityComponent = isOpponent ? OpponentCardAbility : CardAbility;
 	return <>
 		{(showAbilities || showEffects) && <div className='cardAbilityHolder'>

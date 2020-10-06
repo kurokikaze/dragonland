@@ -73,6 +73,10 @@
     display: block;
 }
 
+.cardAbilityHolder:hover .cardAbilities + .abilityIconHolder > .dragging {
+    display: none;
+}
+
 .cardView {
     font-size: 13px;
     display: none;

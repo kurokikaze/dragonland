@@ -39,6 +39,21 @@
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
+.cardHolder .startingEnergy {
+    position: absolute;
+    top: 0;
+    color: #000;
+    background-color: #f7e73a;
+    font-size: 0.8em;
+    text-align: center;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+    width: auto;
+    padding: 2px 5px;
+    border-radius: 4px;
+    border-color: #f7e73a;
+    opacity: 0.8;
+}
+
 .zone-creatures .cardHolder {
     position: relative;
     width: 80px;
