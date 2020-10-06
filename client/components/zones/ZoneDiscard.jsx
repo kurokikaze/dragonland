@@ -11,7 +11,7 @@ const CardWithView = withView(Card);
 
 function ZoneDiscard({ name, content }) {
 	return (
-		<div className='zone' data-zone-name={name}>
+		<div className='zone zone-discard' data-zone-name={name}>
 			{content.length ? content.map(cardData =>
 				<CardWithView
 					key={cardData.id}

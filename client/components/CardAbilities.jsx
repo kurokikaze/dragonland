@@ -25,13 +25,21 @@ export const withAbilities = Component => (props) => {
 	const isOpponent = props.data.controller !== window.playerId;
 	const hasAbilities = (props.card.data && props.card.data.powers);
 	const hasUnusedAbilities = hasAbilities && props.card.data.powers.some(power => !(props.data.actionsUsed || []).includes(power.name));
-	const hasEffects = props.card.data && (props.card.data.effects || props.card.data.triggerEffects);
-
+	
 	const PowerIcon = (props.card.type === TYPE_MAGI) ? MagiPowerIcon : CreaturePowerIcon;
 	const iconType = (props.card.type === TYPE_MAGI) ? 'cardIcons' : 'magiCardIcons';
 
 	const showAbilities = hasAbilities && !props.isOnPrompt && !props.isDragging;
+
+	const allEffects = [
+		...(props.card.data.effects || []),
+		...(props.card.data.triggerEffects || []),
+		...(props.card.data.staticAbilities || []),
+		...(props.card.data.replacementEffects || []),
+	];
+	const hasEffects = allEffects.length > 0;
 	const showEffects = hasEffects && !props.isOnPrompt && !props.isDragging;
+
 	const AbilityComponent = isOpponent ? OpponentCardAbility : CardAbility;
 	return <>
 		{(showAbilities || showEffects) && <div className='cardAbilityHolder'>
@@ -49,7 +57,7 @@ export const withAbilities = Component => (props) => {
 				)}
 			</div>}
 			{hasEffects && <div className='cardAbilities'>
-				{[...(props.card.data.effects || []), ...(props.card.data.triggerEffects || [])].map(({name, text}, i) =>
+				{allEffects.map(({name, text}, i) =>
 					<p key={i}><b>Effect &mdash; {name}</b>: {text}</p>
 				)}
 			</div>}

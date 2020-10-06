@@ -223,6 +223,11 @@
     bottom: initial;
 }
 
+.zone-discard .cardView {
+    top: 95px;
+    bottom: initial;
+}
+
 .zone-relics .cardAbilityHolder {
     display: flex;
     align-items: flex-end;
