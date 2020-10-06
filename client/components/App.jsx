@@ -65,6 +65,7 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 				<ZoneHand zoneId="playerHand" name='Player hand' onCardClick={onPlay} />
 				<StepBoard />
 				{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={() => onPass()}>Pass</button>}
+				{!isOurTurn && <div>Opponent&apos;s turn</div>}
 				{prompt && <PromptOverlay />}
 				{gameEnded && <EndgameOverlay />}
 			</DndProvider>
