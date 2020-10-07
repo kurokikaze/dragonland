@@ -7,7 +7,9 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 	ACTION_RESOLVE_PROMPT,
+	TYPE_CREATURE,
 } from 'moonlands/src/const.js';
+import {byName} from 'moonlands/src/cards.js';
 import Card from '../Card.jsx';
 import {withAbilities} from '../CardAbilities.jsx';
 import {
@@ -17,7 +19,7 @@ import {withCardData, withZoneContent} from '../common';
 
 const CardWithAbilities = withAbilities(Card);
 
-function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler }) {
+function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler, guarded }) {
 	return (
 		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
@@ -30,6 +32,7 @@ function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardCli
 					isOnPrompt={isOnMagiPrompt}
 					droppable={active}
 					target={active}
+					guarded={guarded}
 				/>,
 			) : null}
 		</div>
@@ -51,6 +54,7 @@ function mapStateToProps(state) {
 	return {
 		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
 		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
+		guarded: state.zones.opponentInPlay.some(card => byName(card.card).type === TYPE_CREATURE),
 	};
 }
 

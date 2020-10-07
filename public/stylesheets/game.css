@@ -222,6 +222,11 @@
     top: 80px;
     bottom: initial;
 }
+.zone-discard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-row-gap: 30px;
+}
 
 .zone-discard .cardView {
     top: 95px;

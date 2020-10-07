@@ -65,9 +65,9 @@ function Card({
 			const parentNode = attacker.parentNode;
 
 			if (parentNode && parentNode.classList) {
-				// if (parentNode.contains(attacker)) {
-				// 	parentNode.replaceChild(newAttacker, attacker);
-				// }
+				if (parentNode.contains(attacker)) {
+					parentNode.replaceChild(newAttacker, attacker);
+				}
 				parentNode.classList.add('animated');
 				setTimeout(() => {
 					parentNode.classList.remove('animated');
@@ -112,7 +112,7 @@ function Card({
 const cardSource = {
 	beginDrag(props) {
 		// Return the data describing the dragged item
-		return { id: props.id };
+		return props;
 	},
 
 	endDrag(props, monitor) {
@@ -123,11 +123,18 @@ const cardSource = {
 		// When dropped on a compatible target, do something
 		const item = monitor.getItem();
 		const dropResult = monitor.getDropResult();
-		window.socket.emit('clientAction', {
-			type: 'actions/attack',
-			source: item.id,
-			target: dropResult.id,
-		});
+
+		const canAttack = dropResult.card.type === TYPE_CREATURE ||
+			(dropResult.card.type === TYPE_MAGI && !dropResult.guarded) ||
+			(dropResult.card.type === TYPE_MAGI && item.card.data.canAttackMagiDirectly);
+
+		if (canAttack) {
+			window.socket.emit('clientAction', {
+				type: 'actions/attack',
+				source: item.id,
+				target: dropResult.id,
+			});
+		}
 	},
 };
 
@@ -142,8 +149,8 @@ function collect(connect, monitor) {
 }
 
 const cardTarget = {
-	drop({id}) {
-		return {id};
+	drop(card) {
+		return card;
 	},
 };
 
