@@ -30,7 +30,9 @@
 .cardHolder {
     position: relative;
     width: 64px;
-    height: 90px;    
+    height: 94px;
+    border-radius: 3px;
+    overflow: hidden;
 }
 
 .cardHolder .cardEnergy {
@@ -222,6 +224,7 @@
     top: 80px;
     bottom: initial;
 }
+
 .zone-discard {
     display: grid;
     grid-template-columns: repeat(5, 1fr);

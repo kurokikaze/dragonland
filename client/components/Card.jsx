@@ -58,6 +58,7 @@ function Card({
 			const attackerBox = attacker.getBoundingClientRect();
 			const offsetX = targetBox.left - attackerBox.left;
 			const offsetY = targetBox.top - attackerBox.top;
+			console.log(`Attack offsets: ${offsetX}, ${offsetY}`);
 			attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
 			attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
 
@@ -65,14 +66,14 @@ function Card({
 			const parentNode = attacker.parentNode;
 
 			if (parentNode && parentNode.classList) {
-				if (parentNode.contains(attacker)) {
-					parentNode.replaceChild(newAttacker, attacker);
-				}
+				// if (parentNode.contains(attacker)) {
+				// 	parentNode.replaceChild(newAttacker, attacker);
+				// }
 				parentNode.classList.add('animated');
 				setTimeout(() => {
 					parentNode.classList.remove('animated');
 					newAttacker.classList.remove('attackSource');
-				}, 600);
+				}, 6600);
 			}
 		}
 	}, [attacker]);

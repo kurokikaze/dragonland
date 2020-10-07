@@ -76,6 +76,7 @@ const defaultState = {
 		opponentDefeatedMagi: [],
 		opponentInPlay: [],
 	},
+	currentStaticAbilities: [],
 	animation: null,
 	message: {
 		type: 'power',
@@ -295,27 +296,8 @@ export default (state = defaultState, action) => {
 			};
 		}
 		case ACTION_RESOLVE_PROMPT: {
-			// If we're showing Power / Spell message, that might be the target chosen for it
-			// If so, append the message
-			/* var messageData = {...state.message};
-
-			if (action.player !== window.playerId) {
-				// Powers have source, spells have card
-				if (action.target && action.target.card) {
-					messageData = {
-						type: MESSAGE_TYPE_PROMPT_RESOLUTION,
-						chosenTarget: action.target,
-					}; 
-				} else if (Object.prototype.hasOwnProperty.call(action, 'number')) {
-					messageData = {
-						type: MESSAGE_TYPE_PROMPT_RESOLUTION,
-						chosenNumber: action.number,
-					};
-				}
-			} */
 			return {
 				...state,
-				// message: messageData,
 				prompt: false,
 				promptPlayer: null,
 				promptType: null,
@@ -357,11 +339,24 @@ export default (state = defaultState, action) => {
 		case ACTION_EFFECT: {
 			switch(action.effectType) {
 				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
+					const zonesToConsiderForStaticAbilities = new Set(['playerInPlay', 'opponentInPlay', 'playerActiveMagi', 'opponentActiveMagi']);
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
 					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
 
+					var currentStaticAbilities = state.currentStaticAbilities;
+
+					if (zonesToConsiderForStaticAbilities.has(sourceZone)) {
+						// We are removing card with static ability from the play
+						currentStaticAbilities = currentStaticAbilities.filter(card => card.id !== action.sourceCard.id);
+					} else if (zonesToConsiderForStaticAbilities.has(destinationZone) && byName(action.destinationCard.card).data.staticAbilities) {
+						currentStaticAbilities.push({
+							...action.destinationCard,
+							card: byName(action.destinationCard.card),
+						});
+					}
 					return {
 						...state,
+						currentStaticAbilities,
 						zones: {
 							...state.zones,
 							[sourceZone]: state.zones[sourceZone].filter(card => card.id !== action.sourceCard.id),
