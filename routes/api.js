@@ -136,19 +136,21 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 						// Converting game actions for sending
 						runningGames[gameId].actionStreamOne.on('action', action => {
 							const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
+							socket.emit('action', convertedAction);
+
 							// if convertedAction signals game end, shut the session down
 							// and free the players
 							if (convertedAction.type === ACTION_PLAYER_WINS) {
-								socket.removeAllListeners();
-								socket.disconnect();
 
 								setTimeout(() => {
+									socket.removeAllListeners();
+									socket.disconnect();
+
 									delete runningGames[gameId];
 									delete keyHash[playerHash];
 									delete gamePlayers[playerHash];
 								}, 1000);
-							}							
-							socket.emit('action', convertedAction);
+							}
 						});
 
 						// Converting client actions for game engine
