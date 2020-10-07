@@ -103,7 +103,7 @@ export default function addAnimations (actionsObservable) {
 	return actionsObservable.pipe(
 		concatMap(action =>
 			from(convertAction(action)).pipe(
-				delayWhen(({type}) => timer(5000) /*convertTimer(type)*/),
+				delayWhen(({type}) => convertTimer(type)),
 			),
 		),
 	);

@@ -69,11 +69,11 @@ function Card({
 				// if (parentNode.contains(attacker)) {
 				// 	parentNode.replaceChild(newAttacker, attacker);
 				// }
-				parentNode.classList.add('animated');
+				parentNode.closest('.zone').classList.add('animated');
 				setTimeout(() => {
-					parentNode.classList.remove('animated');
+					parentNode.closest('.zone').classList.remove('animated');
 					newAttacker.classList.remove('attackSource');
-				}, 6600);
+				}, 600);
 			}
 		}
 	}, [attacker]);

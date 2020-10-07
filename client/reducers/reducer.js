@@ -343,7 +343,7 @@ export default (state = defaultState, action) => {
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
 					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
 
-					var currentStaticAbilities = state.currentStaticAbilities;
+					var currentStaticAbilities = state.currentStaticAbilities || [];
 
 					if (zonesToConsiderForStaticAbilities.has(sourceZone)) {
 						// We are removing card with static ability from the play
