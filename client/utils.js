@@ -1,4 +1,4 @@
-import {byName} from 'moonlands/src/cards';
+import {byName} from 'moonlands/src/cards.js';
 
 export function camelCase(str){
 	return str.replace(/'/g, '').split(' ').map(function(word,index){
