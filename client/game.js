@@ -11,6 +11,7 @@ import thunk from 'redux-thunk';
 import App from './components/App.jsx';
 import rootReducer from './reducers';
 import addAnimations from './addAnimations.js';
+import {enrichState} from './utils.js';
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -18,7 +19,7 @@ function startGame() {
 
 	const store = createStore(
 		rootReducer,
-		window.initialState,
+		enrichState(window.initialState),
 		composeEnhancers(
 			applyMiddleware(thunk),
 			applyMiddleware(epicMiddleware),
@@ -35,7 +36,6 @@ function startGame() {
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io(`/?playerHash=${window.playerHash}`);
 		window.socket.on('action', function(action) {
-			console.log('Action type: ', action.type);
 			observer.next(action);
 		});
 
@@ -53,11 +53,7 @@ function startGame() {
 
 	const delayedActions = addAnimations(actionsObservable);
 
-	delayedActions.subscribe(transformedAction => {
-		console.log('Transformed');
-		console.dir(transformedAction);
-		store.dispatch(transformedAction);
-	});
+	delayedActions.subscribe(transformedAction => store.dispatch(transformedAction));
 }
 
 document.onreadystatechange = function() {

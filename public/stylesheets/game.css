@@ -282,11 +282,19 @@
 }
 
 .creaturePowerIcon {
+    position: relative;
     width: 20px;
     height: 20px;
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 0px 0 1px 1px rgba(0, 0, 0, .4);
+}
+
+.iconNumber {
+    position: absolute;
+    font-family: Lato, Verdana, sans-serif;
+    top: 0;
+    left: 5px;
 }
 
 .magiPowerIcon {
@@ -324,8 +332,14 @@
 
 .abilityIconHolder .magiCardIcons {
     position: absolute;
-    right: -15px;
-    bottom: -15px;
+    right: -10px;
+    bottom: -10px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.abilityIconHolder .magiCardIcons > div {
+    margin-left: 4px;
 }
 
 .libraryCounter {

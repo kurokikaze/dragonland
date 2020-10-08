@@ -5,6 +5,7 @@ import CreaturePowerIcon from '../client/components/CreaturePowerIcon.jsx';
 import Power from '../client/components/icons/Power.jsx';
 import Relic from '../client/components/icons/Relic.jsx';
 import Spell from '../client/components/icons/Spell.jsx';
+import Dagger from '../client/components/icons/Dagger.jsx';
 import Energize from '../client/components/icons/Energize.jsx';
 import Attack from '../client/components/icons/Attack.jsx';
 import Ability from '../client/components/icons/Ability.jsx';
@@ -19,7 +20,7 @@ export default {
 		icon: {
 			control: {
 				type: 'select',
-				options: ['Power', 'Ability', 'Relic', 'Spell', 'Energize', 'Attack'],
+				options: ['Power', 'Ability', 'Relic', 'Spell', 'Energize', 'Attack', 'Dagger'],
 			},
 		},
 		active: {
@@ -40,8 +41,10 @@ const Template = ({icon, active}) => {
 			return <CreaturePowerIcon icon={<Ability />} active={active} />;
 		case 'Energize':
 			return <CreaturePowerIcon icon={<Energize />} active={active} />;
+		case 'Dagger':
+			return <CreaturePowerIcon icon={<Dagger />} active={active} />;
 		case 'Attack':
-			return <CreaturePowerIcon icon={<Attack />} active={active} />;
+			return <CreaturePowerIcon icon={<Attack />} active={active} number={2} />;
 	}
 };
 

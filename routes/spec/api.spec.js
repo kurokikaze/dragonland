@@ -14,7 +14,7 @@ async function login(server, username, password) {
 		.then(res => {
 			console.dir(res.headers);
 			console.dir(res.headers['set-cookie'].length);
-			console.log('Now to Expect');
+
 			expect(res.headers['set-cookie']).toHaveLength(1);
 			cookie = res
 				.headers['set-cookie'][0]

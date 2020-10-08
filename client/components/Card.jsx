@@ -58,7 +58,7 @@ function Card({
 			const attackerBox = attacker.getBoundingClientRect();
 			const offsetX = targetBox.left - attackerBox.left;
 			const offsetY = targetBox.top - attackerBox.top;
-			console.log(`Attack offsets: ${offsetX}, ${offsetY}`);
+
 			attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
 			attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
 

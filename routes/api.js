@@ -146,6 +146,10 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 									socket.removeAllListeners();
 									socket.disconnect();
 
+									const participantKey = Object.entries(participants).find(([, value]) => value === playerHash);
+									if (participantKey) {
+										delete participants[participantKey];
+									}
 									delete runningGames[gameId];
 									delete keyHash[playerHash];
 									delete gamePlayers[playerHash];
@@ -168,9 +172,9 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 									console.log('Engine error!');
 									console.log('On action:');
 									console.dir(expandedAction);
-									console.log();
+									console.log('');
 									console.dir(runningGames[gameId].state);
-									console.log();
+									console.log('');
 									console.log(e.name);
 									console.log(e.message);
 									console.log(e.stack);

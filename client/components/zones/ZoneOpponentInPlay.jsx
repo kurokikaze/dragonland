@@ -33,13 +33,14 @@ function ZoneOpponentInPlay({
 	animation,
 }) {
 	return (
-		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
+		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name} data-items={content.length}>
 			{content.length ? content.map(cardData =>
 				<CardWithAbilities
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
+					modifiedData={cardData.modifiedData}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					droppable={active && cardData.card.type === TYPE_CREATURE}

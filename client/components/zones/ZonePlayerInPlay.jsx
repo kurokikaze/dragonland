@@ -45,10 +45,11 @@ function ZonePlayerInPlay({
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
+					modifiedData={cardData.modifiedData}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
-					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
-					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
+					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
+					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
 					actionsAvailable={prsAvailable}
 					onAbilityUse={abilityUseHandler}
 					className={cn({'attackTarget': animation && animation.target === cardData.id})}

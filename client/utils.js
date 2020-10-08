@@ -1,3 +1,5 @@
+import {byName} from 'moonlands/src/cards';
+
 export function camelCase(str){
 	return str.replace(/'/g, '').split(' ').map(function(word,index){
 		// If it is the first word make sure to lowercase all the chars.
@@ -7,4 +9,22 @@ export function camelCase(str){
 		// If it is not the first word only upper case the first char and lowercase the rest.
 		return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 	}).join('');
+}
+
+const onlyCardsWithStaticAbilities = card => byName(card.card).data.staticAbilities;
+const addCardData = card => ({...card, card: byName(card.card)});
+
+export function enrichState(state) {
+	const result = {
+		...state,
+		staticAbilities: [
+			...state.zones.playerInPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
+			...state.zones.playerActiveMagi.filter(onlyCardsWithStaticAbilities).map(addCardData),
+			...state.zones.opponentInPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
+			...state.zones.opponentActiveMagi.filter(onlyCardsWithStaticAbilities).map(addCardData),
+		],
+	};
+
+	console.dir(result);
+	return result;
 }
