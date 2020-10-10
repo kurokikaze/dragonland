@@ -5,20 +5,23 @@ import {compose, withHandlers, withStateHandlers} from 'recompose';
 import {getAvailableStartingCards} from '../../selectors';
 import cn from 'classnames';
 import Card from '../Card.jsx';
-
+import {withView} from '../CardView.jsx';
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 } from 'moonlands/src/const.js';
 
-function PromptChooseCards({cards, triggerElement, selected, onSend, numberOfCards}) {
+function PromptChooseCards({cards, message, triggerElement, selected, onSend, numberOfCards}) {
+	const CardDisplay = (cards.length > 4) ? withView(Card) : Card;
+
 	return (
 		<div className="promptWindow promptChooseCards">
 			<h1>Choose {numberOfCards} card(s)</h1>
+			{message && <h3>{message}</h3>}
 			<div className={cn('cardsRow', {'smallCards': cards.length > 4})}>
 				{cards.map(({card, id}, i) => (
 					<div className={cn('zoneCardSelect', {'chosen': selected.includes(id)})} key={i}>
-						<Card
+						<CardDisplay
 							id={`test${i}`}
 							card={{name: card}}
 							data={{}}
@@ -39,6 +42,7 @@ const mapStateToProps = (state) => {
 		cards: state.promptParams.cards,
 		zone: state.promptParams.zone,
 		zoneOwner: state.promptParams.zoneOwner,
+		message: state.promptParams.message,
 		generatedBy: state.promptGeneratedBy,
 		availableCards: getAvailableStartingCards(state.promptParams.cards, state),
 		numberOfCards: state.promptParams.numberOfCards,
@@ -69,5 +73,7 @@ const enhance  = compose(
 		},
 	}),
 );
+
+export {PromptChooseCards as Base};
 
 export default enhance(PromptChooseCards);

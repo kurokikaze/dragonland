@@ -10,9 +10,16 @@ import {
 	PROMPT_TYPE_CHOOSE_CARDS,
 } from 'moonlands/src/const.js';
 
-function PromptChooseCards({cards, triggerElement, selected, onSend, availableCards}) {
+function PromptChooseCards({cards, triggerElement, selected, onSend, availableCards, magi}) {
 	return (
 		<div className="promptWindow promptChooseCards">
+			<div className='promptMagi'>
+				<Card
+					id={magi.id}
+					card={{name: magi.card}}
+					data={{}}
+				/>				
+			</div>
 			<h1>Choose starting cards</h1>
 			<div className="cardsRow">
 				{cards.map((card, i) => (
@@ -35,6 +42,7 @@ function PromptChooseCards({cards, triggerElement, selected, onSend, availableCa
 
 const mapStateToProps = (state) => {
 	return {
+		magi: state.zones.playerActiveMagi[0],
 		cards: state.promptParams.cards,
 		generatedBy: state.promptGeneratedBy,
 		availableCards: state.promptParams.availableCards,//getAvailableStartingCards(state.promptParams.cards, state),
@@ -63,5 +71,7 @@ const enhance  = compose(
 		},
 	}),
 );
+
+export {PromptChooseCards as Base};
 
 export default enhance(PromptChooseCards);

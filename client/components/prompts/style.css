@@ -20,13 +20,25 @@
     position: absolute;
     top: 10%;
     left: 10%;
-    height: 80%;
+    min-height: 80%;
     padding: 10px 30px;
     background-color: #E7DCCA;
     border-color: #D1A53E;
     border-radius: 10px;
     border-width: 1px;
     color: #040403;
+}
+
+.promptWindow h3 {
+    margin-left: 6px;
+}
+
+.promptWindow .cardHolder {
+    cursor: pointer;
+}
+
+.promptWindow .cardView {
+    top: 95px;
 }
 
 .promptWindow .cardHolder {
@@ -41,8 +53,31 @@
     max-height: 180px;
 }
 
+.promptWindow .promptMagi {
+    display: flex;
+    justify-content: center;
+}
+
+.promptWindow .cardsRow.smallCards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    row-gap: 12px;
+    max-height: 310px;
+    overflow-y: scroll;
+}
+
+.promptWindow .cardsRow.smallCards .zoneCardSelect {
+    display: flex;
+    justify-content: center;
+}
+
 .promptWindow .cardsRow.smallCards .zoneCardSelect .cardHolder img {
     max-width: 64px;
+}
+
+.promptWindow .cardsRow.smallCards .zoneCardSelect .cardHolder {
+    width: 64px;
+    height: 94px;
 }
 
 .promptWindow .buttonHolder {
@@ -71,18 +106,18 @@
     align-items: center;
 }
 
-.promptChooseCards .cardsRow .zoneCardSelect {
+.promptChooseCards .cardsRow .zoneCardSelect .cardHolder {
     opacity: 0.6;
 }
 
-.promptChooseCards .zoneCardSelect.chosen {
+.promptChooseCards .zoneCardSelect.chosen .cardHolder {
     opacity: 1;
 }
 
-.promptChooseCards .cardSelect {
+.promptChooseCards .cardSelect .cardHolder {
     opacity: 0.6;
 }
 
-.promptChooseCards .cardSelect.chosen {
+.promptChooseCards .cardSelect.chosen .cardHolder {
     opacity: 1;
 }

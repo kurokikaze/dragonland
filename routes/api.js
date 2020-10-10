@@ -135,20 +135,31 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 					if (gameId && playerId) {
 						// Converting game actions for sending
 						runningGames[gameId].actionStreamOne.on('action', action => {
-							const convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
+							var convertedAction = null;
+							try {
+								convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
+							} catch (error) {
+								console.dir(error);
+								console.log('Error converting server command:');
+								console.dir(action);
+								console.log('Because of:');
+								console.dir(action.sourceCard);
+							}
 							socket.emit('action', convertedAction);
 
 							// if convertedAction signals game end, shut the session down
 							// and free the players
-							if (convertedAction.type === ACTION_PLAYER_WINS) {
-
+							if (convertedAction.type === ACTION_PLAYER_WINS) 
 								setTimeout(() => {
 									socket.removeAllListeners();
 									socket.disconnect();
 
-									const participantKey = Object.entries(participants).find(([, value]) => value === playerHash);
+									/* const participantKey = Object.entries(participants).find(([, value]) => value === playerHash);
 									if (participantKey) {
 										delete participants[participantKey];
+									}*/
+									if (runningGames[gameId].userHashes) {
+										runningGames[gameId].userHashes.forEach(userHash => delete participants[userHash]);
 									}
 									delete runningGames[gameId];
 									delete keyHash[playerHash];
@@ -274,6 +285,8 @@ router.post('/accept',
 
 			participants[challenge.userId] = playerOneHash;
 			participants[req.user.gameId] = playerTwoHash;
+
+			runningGames[gameId].userHashes = [challenge.userId, req.user.gameId];
 
 			removeByName(challenge.user);
 			removeByName(req.user.name);

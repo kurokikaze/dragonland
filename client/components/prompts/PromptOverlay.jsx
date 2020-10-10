@@ -5,6 +5,8 @@ import PromptChooseCards from './PromptChooseCards.jsx';
 import PromptChooseCardsInZone from './PromptChooseCardsInZone.jsx';
 import PromptChooseNumber from './PromptChooseNumber.jsx';
 
+import {getPromptType} from '../../selectors/index.js'; 
+
 import './style.css';
 
 import {
@@ -26,7 +28,7 @@ function PromptOverlay({promptType, promptParams, promptMessage}) {
 
 function mapStateToProps(state) {
 	return {
-		promptType: state.promptType,
+		promptType: getPromptType(state),
 		promptParams: state.promptParams || { min: 0, max: 10},
 		promptMessage: state.promptMessage,
 	};
