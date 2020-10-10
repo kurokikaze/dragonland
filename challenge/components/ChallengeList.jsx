@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {acceptChallenge, createChallenge, cancelChallenge} from '../actions/index.js';
 
-function ChallengeList({challenges, currentDeck, username, acceptChallenge, createChallenge}) {
+function ChallengeList({challenges, currentDeck, username, acceptChallenge, createChallenge, cancelChallenge}) {
 	const hasChallenged = challenges.some(challenge => challenge.user === username);
 	return <div className='challenges'>
 		{challenges.map(challenge => (<div className='challenge' key={challenge.deckId || 'test'}>
