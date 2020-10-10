@@ -9,7 +9,7 @@ function ChallengeList({challenges, currentDeck, username, acceptChallenge, crea
 			<div>{challenge.user}</div>
 			<div>{challenge.deck}</div>
 			<div>{challenge.user == username ? 
-				<button onClick={() => cancelChallenge(challenge.user, currentDeck)}>Cancel</button> :
+				<button onClick={() => cancelChallenge()}>Cancel</button> :
 				<button onClick={() => acceptChallenge(challenge.user, currentDeck)}>Accept!</button> }</div>
 		</div>))}
 		{!hasChallenged && <div className='create_challenge'>
@@ -28,7 +28,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		cancelChallenge: (name, deck) => dispatch(cancelChallenge(name, deck)),
+		cancelChallenge: () => dispatch(cancelChallenge()),
 		acceptChallenge: (name, deck) => dispatch(acceptChallenge(name, deck)),
 		createChallenge: (deckId) => dispatch(createChallenge(deckId)),
 	};
