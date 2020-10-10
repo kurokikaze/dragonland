@@ -98,6 +98,7 @@ function convertClientCommands(action, game) {
 			const player = action.payload.player;
 			const cardInHand = game.getZone(ZONE_TYPE_HAND, player).byId(action.payload.card);
 			expandedAction.payload.card = cardInHand;
+			expandedAction.forcePriority = false;
 			break;
 		}
 	}
