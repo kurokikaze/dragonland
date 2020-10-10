@@ -45,11 +45,13 @@ export function createChallenge(deckId) {
 			body: JSON.stringify({deckId}),
 		})
 			.then(
-				response => response.json()
+				response => response.json(),
 			)
-			.then(json =>
-				dispatch(fetchChallengesSuccess(json))
-			);
+			.then(json => {
+				if (Array.isArray(json)) {
+					dispatch(fetchChallengesSuccess(json));
+				}
+			});
 	};
 }
 
@@ -63,10 +65,10 @@ export function acceptChallenge(name, deckId) {
 			body: JSON.stringify({name, deckId}),
 		})
 			.then(
-				response => response.json()
+				response => response.json(),
 			)
 			.then(json => {
-				if (json.length) {
+				if (Array.isArray(json)) {
 					dispatch(fetchChallengesSuccess(json));
 				}
 				if (json.hash) {
@@ -89,7 +91,7 @@ export function cancelChallenge() {
 				response => response.json(),
 			)
 			.then(json => {
-				if (json.length) {
+				if (Array.isArray(json)) {
 					dispatch(fetchChallengesSuccess(json));
 				}
 				if (json.hash) {
