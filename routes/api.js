@@ -149,7 +149,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 
 							// if convertedAction signals game end, shut the session down
 							// and free the players
-							if (convertedAction.type === ACTION_PLAYER_WINS) 
+							if (convertedAction.type === ACTION_PLAYER_WINS) {
 								setTimeout(() => {
 									socket.removeAllListeners();
 									socket.disconnect();
@@ -159,7 +159,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 										delete participants[participantKey];
 									}*/
 									if (runningGames[gameId].userHashes) {
-										runningGames[gameId].userHashes.forEach(userHash => delete participants[userHash]);
+										runningGames[gameId].userHashes.forEach(userHash => {delete participants[userHash];});
 									}
 									delete runningGames[gameId];
 									delete keyHash[playerHash];
