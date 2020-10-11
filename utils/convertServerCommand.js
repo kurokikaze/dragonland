@@ -23,7 +23,6 @@ import {
 	ZONE_TYPE_HAND,
 } from 'moonlands/src/const.js';
 
-import {makeCardFilter} from 'moonlands/src/utils/restrictions.js';
 import {clone} from './index.js';
 
 const hiddenZonesHash = {
@@ -103,7 +102,7 @@ function convertServerCommand(initialAction, game, playerId) {
 					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
 					const numberOfCards = game.getMetaValue(action.numberOfCards, action.generatedBy);
 					const zoneContent = game.getZone(action.zone, zoneOwner).cards;
-					const cardFilter = makeCardFilter(action.restrictions);
+					const cardFilter = game.makeCardFilter(action.restrictions);
 
 					const cards = action.restrictions ? zoneContent.filter(cardFilter) : zoneContent;
 

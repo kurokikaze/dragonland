@@ -4,3 +4,4 @@ config.js
 public/javascripts/
 public/images/cards/*.jpg
 mongodb-data/*
+logs/*.log

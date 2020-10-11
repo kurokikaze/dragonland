@@ -1,10 +1,13 @@
 import express from 'express';
 import nanoid from 'nanoid';
+import {open, write, close} from 'fs';
+import {join as joinPath} from 'path';
 import {State} from 'moonlands';
 
 import ensure from 'connect-ensure-login';
 import {getDeckById} from '../utils/database.js';
 import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
+import config from '../config.js';
 import { ACTION_PLAYER_WINS } from 'moonlands/src/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
@@ -279,6 +282,21 @@ router.post('/accept',
 				deckOne.cards,
 				deckTwo.cards,
 			);
+
+			open(joinPath(config.logDirectory, `${gameId}.log`), 'w', (err, file) => {
+				if (!err) {
+					runningGames[gameId].logStream.on('action', action => {
+						write(file, JSON.stringify(action, null, 2) + ',\n', () => null);
+					});
+					runningGames[gameId].logStream.on('close', () => {
+						close(file, () => null);
+					});
+				} else {
+					console.log('===================');
+					console.dir(err);
+					console.log('===================');
+				}
+			});
 
 			runningGames[gameId].setup();
 			runningGames[gameId].enableDebug();

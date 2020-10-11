@@ -1,0 +1,1 @@
+Logs are stored in kinda-JSON, where you have to add [] around the file data to deserialize it correctly.
