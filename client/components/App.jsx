@@ -9,6 +9,7 @@ import {
 	ACTION_PLAY,
 } from 'moonlands/src/const.js';
 
+import Log from './Log.jsx';
 import Zone from './zones/Zone.jsx';
 import ZoneHand from './zones/ZoneHand.jsx';
 import ZoneDiscard from './zones/ZoneDiscard.jsx';
@@ -46,48 +47,51 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 	const [discardShown, setDiscardShown] = useState(false);
 	const [opponentDiscardShown, setOpponentDiscardShown] = useState(false);
 	return (
-		<div className="game">
-			<DndProvider backend={Backend}>
-				{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_RELIC && <RelicMessage card={message.card} display={message.card.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_SPELL && <SpellMessage card={message.card} display={message.card.owner !== window.playerId} />}
-				{message && message.type == MESSAGE_TYPE_PROMPT_RESOLUTION && <PromptResolutionMessage card={message.chosenTarget} number={message.chosenNumber} />}
-				<Zone zoneId='opponentHand' name='Opponent hand' />
-				<div className='middleZones'>
-					<div className='zone-placeholder'>
-						<div className='libraryCounter'>{cardsInOpponentDeck}</div>
-						<div className='discardCounter' onClick={() => {setDiscardShown(false); setOpponentDiscardShown(true);}}>{cardsInOpponentDiscard}</div>
+		<div className='gameContainer'>
+			<div className="game">
+				<DndProvider backend={Backend}>
+					{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
+					{message && message.type == MESSAGE_TYPE_RELIC && <RelicMessage card={message.card} display={message.card.owner !== window.playerId} />}
+					{message && message.type == MESSAGE_TYPE_SPELL && <SpellMessage card={message.card} display={message.card.owner !== window.playerId} />}
+					{message && message.type == MESSAGE_TYPE_PROMPT_RESOLUTION && <PromptResolutionMessage card={message.chosenTarget} number={message.chosenNumber} />}
+					<Zone zoneId='opponentHand' name='Opponent hand' />
+					<div className='middleZones'>
+						<div className='zone-placeholder'>
+							<div className='libraryCounter'>{cardsInOpponentDeck}</div>
+							<div className='discardCounter' onClick={() => {setDiscardShown(false); setOpponentDiscardShown(true);}}>{cardsInOpponentDiscard}</div>
+						</div>
+						<ZoneOpponentActiveMagi zoneId='opponentActiveMagi' name='Opponent Active Magi' />
+						<ZonePlayerRelics  zoneId='opponentRelics' name='Opponent Relics' />
 					</div>
-					<ZoneOpponentActiveMagi zoneId='opponentActiveMagi' name='Opponent Active Magi' />
-					<ZonePlayerRelics  zoneId='opponentRelics' name='Opponent Relics' />
-				</div>
-				<ZoneOpponentInPlay zoneId='opponentInPlay' name='Opponent in play' />
-				<ZonePlayerInPlay zoneId='playerInPlay' name='Player in play' />
-				<div className='middleZones'>
-					<ZonePlayerRelics  zoneId='playerRelics' name='Player Relics' />
-					<ZonePlayerActiveMagi zoneId='playerActiveMagi' name='Player Active Magi' />
-					<div className='zone-placeholder'>
-						<div className='discardCounter' onClick={() => {setDiscardShown(true); setOpponentDiscardShown(false);}}>{cardsInOurDiscard}</div>
-						<div className='libraryCounter'>{cardsInOurDeck}</div>
+					<ZoneOpponentInPlay zoneId='opponentInPlay' name='Opponent in play' />
+					<ZonePlayerInPlay zoneId='playerInPlay' name='Player in play' />
+					<div className='middleZones'>
+						<ZonePlayerRelics  zoneId='playerRelics' name='Player Relics' />
+						<ZonePlayerActiveMagi zoneId='playerActiveMagi' name='Player Active Magi' />
+						<div className='zone-placeholder'>
+							<div className='discardCounter' onClick={() => {setDiscardShown(true); setOpponentDiscardShown(false);}}>{cardsInOurDiscard}</div>
+							<div className='libraryCounter'>{cardsInOurDeck}</div>
+						</div>
 					</div>
-				</div>
-				<ZoneHand zoneId='playerHand' name='Player hand' onCardClick={onPlay} />
-				<StepBoard />
-				{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={() => onPass()}>Pass</button>}
-				{!isOurTurn && <div>Opponent&apos;s turn</div>}
-				{discardShown && <div className='discardOverlay'>
-					<h2>Discard</h2>
-					<div className='closeIcon' onClick={() => setDiscardShown(false)}>&times;</div>
-					<ZoneDiscard zoneId='playerDiscard' name='Player discard' />
-				</div>}
-				{opponentDiscardShown && <div className='discardOverlay'>
-					<h2>Opponent&apos;s Discard</h2>
-					<div className='closeIcon' onClick={() => setOpponentDiscardShown(false)}>&times;</div>
-					<ZoneDiscard zoneId='opponentDiscard' name='Opponent discard' />
-				</div>}
-				{prompt && <PromptOverlay />}
-				{gameEnded && <EndgameOverlay />}
-			</DndProvider>
+					<ZoneHand zoneId='playerHand' name='Player hand' onCardClick={onPlay} />
+					<StepBoard />
+					{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={() => onPass()}>Pass</button>}
+					{!isOurTurn && <div>Opponent&apos;s turn</div>}
+					{discardShown && <div className='discardOverlay'>
+						<h2>Discard</h2>
+						<div className='closeIcon' onClick={() => setDiscardShown(false)}>&times;</div>
+						<ZoneDiscard zoneId='playerDiscard' name='Player discard' />
+					</div>}
+					{opponentDiscardShown && <div className='discardOverlay'>
+						<h2>Opponent&apos;s Discard</h2>
+						<div className='closeIcon' onClick={() => setOpponentDiscardShown(false)}>&times;</div>
+						<ZoneDiscard zoneId='opponentDiscard' name='Opponent discard' />
+					</div>}
+					{prompt && <PromptOverlay />}
+					{gameEnded && <EndgameOverlay />}
+				</DndProvider>
+			</div>
+			<Log />
 		</div>
 	);
 }

@@ -112,6 +112,31 @@
     display: block;
 }
 
+.gameContainer {
+    display: flex;
+}
+
+.actionLog {
+    display: flex;
+    flex-direction: column;
+    max-height: 650px;
+    overflow-y: scroll;
+}
+
+.actionLog .logEntry {
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+    color: #333;
+    padding: 5px;
+}
+
+.actionLog .logEntry.ours {
+    background-color: gold;
+}
+
+.actionLog .logEntry.theirs {
+    background-color: lightblue;
+}
+
 .discardOverlay {
     position: absolute;
     width: 80%;
@@ -134,6 +159,7 @@
     font-size: 3em;
     cursor: pointer;
 }
+
 @-webkit-keyframes fadeInDown {
     0% {
         opacity: 0;

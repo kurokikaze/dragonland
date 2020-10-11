@@ -25,7 +25,7 @@ async function login(server, username, password) {
 	return cookie;
 }
 
-describe('challenges', () => {
+describe.skip('challenges', () => {
 	it('GET challenges', async (done) => {
 		initApp(async app => {
 	

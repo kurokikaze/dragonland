@@ -1,5 +1,6 @@
 /* global window */
 import {
+	ACTION_PLAY,
 	ACTION_EFFECT,
 	ACTION_PASS,
 	ACTION_ATTACK,
@@ -22,11 +23,19 @@ import {
 	EFFECT_TYPE_START_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
+	EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY,
+	EFFECT_TYPE_CREATURE_ATTACKS,
+	EFFECT_TYPE_DRAW,
+	EFFECT_TYPE_MAGI_IS_DEFEATED,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_SINGLE_CREATURE,
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_OWN_SINGLE_CREATURE,
+	PROMPT_TYPE_SINGLE_MAGI,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -35,6 +44,19 @@ import {
 	ZONE_TYPE_DISCARD,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
+
+	LOG_ENTRY_POWER_ACTIVATION,
+	LOG_ENTRY_TARGETING,
+	LOG_ENTRY_NUMBER_CHOICE,
+	LOG_ENTRY_CREATURE_ENERGY_LOSS,
+	LOG_ENTRY_CREATURE_ENERGY_GAIN,
+	LOG_ENTRY_ATTACK,
+	LOG_ENTRY_PLAY,
+	LOG_ENTRY_DRAW,
+	LOG_ENTRY_CREATURE_DISCARDED_FROM_PLAY,
+	LOG_ENTRY_MAGI_ENERGY_LOSS,
+	LOG_ENTRY_MAGI_ENERGY_GAIN,
+	LOG_ENTRY_MAGI_DEFEATED,
 } from 'moonlands/src/const.js';
 
 import {
@@ -85,6 +107,7 @@ const defaultState = {
 			name: 'Power Name',
 		},
 	},
+	log: [],
 	gameEnded: false,
 	winner: null,
 };
@@ -109,8 +132,37 @@ const getZoneName = (serverZoneType, source) => {
 	return `${zonePrefix}${zoneName}`;
 };
 
+const findInPlay = (state, id) => {
+	const cardPlayerInPlay = state.zones.playerInPlay.find(card => card.id === id);
+	if (cardPlayerInPlay) return cardPlayerInPlay;
+
+	const cardOpponentInPlay = state.zones.opponentInPlay.find(card => card.id === id);
+	if (cardOpponentInPlay) return cardOpponentInPlay;
+
+	const cardPlayerMagi = state.zones.playerActiveMagi.find(card => card.id === id);
+	if (cardPlayerMagi) return cardPlayerInPlay;
+
+	const cardOpponentMagi = state.zones.opponentActiveMagi.find(card => card.id === id);
+	if (cardOpponentMagi) return cardOpponentMagi;
+
+	return null;
+};
+
 export default (state = defaultState, action) => {
 	switch (action.type) {
+		case ACTION_PLAY: {
+
+			newLogEntry = {
+				type: LOG_ENTRY_PLAY,
+				card: action.payload.card.card,
+				player: action.player,
+			};
+
+			return {
+				...state,
+				log: [...state.log, newLogEntry],
+			};
+		}
 		case ACTION_PLAYER_WINS: {
 			return {
 				...state,
@@ -197,6 +249,19 @@ export default (state = defaultState, action) => {
 		case ACTION_POWER: {
 			const sourceId = action.source.id;
 			const sourceName = action.power;
+			var newLogEntry = null;
+
+			const card = findInPlay(state, sourceId);
+
+			if (card) {
+				newLogEntry = {
+					type: LOG_ENTRY_POWER_ACTIVATION,
+					card: card.card,
+					name: sourceName,
+					player: action.player,
+				};
+			}
+
 			return {
 				...state,
 				zones: {
@@ -222,6 +287,7 @@ export default (state = defaultState, action) => {
 							: card
 					),
 				},
+				log: card ? [...state.log, newLogEntry] : state.log,
 			};
 		}
 		case ACTION_ENTER_PROMPT: {
@@ -296,6 +362,30 @@ export default (state = defaultState, action) => {
 			};
 		}
 		case ACTION_RESOLVE_PROMPT: {
+			var promptLogEntry = null;
+
+			if (
+				state.promptType === PROMPT_TYPE_SINGLE_CREATURE ||
+				state.promptType === PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE ||
+				state.promptType === PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI ||
+				state.promptType === PROMPT_TYPE_OWN_SINGLE_CREATURE ||
+				state.promptType === PROMPT_TYPE_SINGLE_MAGI
+			) {
+				const target = findInPlay(state, action.target.id);
+
+				promptLogEntry = {
+					type: LOG_ENTRY_TARGETING,
+					card: target.card,
+					player: action.player,
+				};
+			} else if (state.promptType === PROMPT_TYPE_NUMBER) {
+				promptLogEntry = {
+					type: LOG_ENTRY_NUMBER_CHOICE,
+					number: action.number,
+					player: action.player,
+				};
+			}
+
 			return {
 				...state,
 				prompt: false,
@@ -304,6 +394,7 @@ export default (state = defaultState, action) => {
 				promptParams: null,
 				promptGeneratedBy: null,
 				promptAvailableCards: null,
+				log: promptLogEntry ? [...state.log, promptLogEntry] : state.log,
 			};
 		}
 		case ACTION_ATTACK: {
@@ -338,6 +429,47 @@ export default (state = defaultState, action) => {
 		}
 		case ACTION_EFFECT: {
 			switch(action.effectType) {
+				case EFFECT_TYPE_DRAW: {
+					const drawLogEntry = {
+						type: LOG_ENTRY_DRAW,
+						player: action.player,
+					};
+
+					return {
+						...state,
+						log: [...state.log, drawLogEntry],
+					};
+				}
+				case EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY: {
+					const discardTarget = findInPlay(state, action.target.id);
+					
+					const discardLogEntry = {
+						type: LOG_ENTRY_CREATURE_DISCARDED_FROM_PLAY,
+						card: discardTarget.card,
+						player: action.player,
+					};
+
+					return {
+						...state,
+						log: [...state.log, discardLogEntry],
+					};
+				}
+				case EFFECT_TYPE_CREATURE_ATTACKS: {
+					const attackSource = findInPlay(state, action.source.id);
+					const attackTarget = findInPlay(state, action.target.id);
+
+					const attackLogEntry = {
+						type: LOG_ENTRY_ATTACK,
+						player: action.player,
+						source: attackSource.card,
+						target: attackTarget.card,
+					};
+
+					return {
+						...state,
+						log: [...state.log, attackLogEntry],
+					};
+				}
 				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
 					const zonesToConsiderForStaticAbilities = new Set(['playerInPlay', 'opponentInPlay', 'playerActiveMagi', 'opponentActiveMagi']);
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
@@ -477,6 +609,8 @@ export default (state = defaultState, action) => {
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE: {
 					const idsToFind = action.target.length ? action.target.map(({id}) => id) : [action.target.id];
 
+					const newLogEntries = idsToFind.map(id => findInPlay(state, id)).filter(Boolean).map(card => ({type: LOG_ENTRY_CREATURE_ENERGY_LOSS, card: card.card, amount: action.amount}));
+
 					const playerInPlay = [...state.zones.playerInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 					const opponentInPlay = [...state.zones.opponentInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 
@@ -487,10 +621,18 @@ export default (state = defaultState, action) => {
 							playerInPlay,
 							opponentInPlay,
 						},
+						log: [...state.log, ...newLogEntries],
 					};                    
 				}
                 
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
+					const magiFound = findInPlay(state, action.target.id);
+					const newLogEntry = {
+						type: LOG_ENTRY_MAGI_ENERGY_LOSS,
+						card: magiFound.card,
+						amount: action.amount,
+					};
+
 					const playerActiveMagi = [...state.zones.playerActiveMagi].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 					const opponentActiveMagi = [...state.zones.opponentActiveMagi].map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 
@@ -501,6 +643,7 @@ export default (state = defaultState, action) => {
 							playerActiveMagi,
 							opponentActiveMagi,
 						},
+						log: [...state.log, newLogEntry],
 					};
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {
@@ -531,8 +674,22 @@ export default (state = defaultState, action) => {
 						},
 					};
 				}
+				case EFFECT_TYPE_MAGI_IS_DEFEATED: {
+					const magiDefeatEntry = {
+						type: LOG_ENTRY_MAGI_DEFEATED,
+						target: action.target.card,
+					};
+
+					return {
+						...state,
+						log: [...state.log, magiDefeatEntry],
+					};
+				}
 				case EFFECT_TYPE_ADD_ENERGY_TO_CREATURE: {
 					const idsToFind = action.target.length ? action.target.map(({id}) => id) : [action.target.id];
+
+					const newLogEntries = idsToFind.map(id => findInPlay(state, id)).filter(Boolean).map(card => ({type: LOG_ENTRY_CREATURE_ENERGY_GAIN, card: card.card, amount: action.amount}));
+
 					const playerInPlay = [...(state.zones.playerInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 					const opponentInPlay = [...(state.zones.opponentInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 
@@ -543,9 +700,16 @@ export default (state = defaultState, action) => {
 							playerInPlay,
 							opponentInPlay,
 						},
+						log: [...state.log, ...newLogEntries],
 					};
-				}                
+				}
 				case EFFECT_TYPE_ADD_ENERGY_TO_MAGI: {
+					const magiFound = findInPlay(state, action.target.id);
+					const newLogEntry = magiFound ? {
+						type: LOG_ENTRY_MAGI_ENERGY_GAIN,
+						card: magiFound.card,
+						amount: action.amount,
+					} : null;
 					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
 						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 					const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
@@ -558,6 +722,7 @@ export default (state = defaultState, action) => {
 							playerActiveMagi,
 							opponentActiveMagi,
 						},
+						log: newLogEntry ? [...state.log, newLogEntry] : state.log,
 					};
 				}
 			}

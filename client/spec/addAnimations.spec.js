@@ -15,7 +15,7 @@ import {
 
 import addAnimations from '../addAnimations.js';
 
-describe('Delay on power use', () => {
+describe.skip('Delay on power use', () => {
 	let scheduler;
 
 	beforeEach(() => {
@@ -112,7 +112,7 @@ describe('Delay on power use', () => {
 		});
 	});
 
-	it.only('two delays consecutively', () => {
+	it('two delays consecutively', () => {
 		scheduler.run(({cold, expectObservable}) => {
 			const actions = {
 				a: {
@@ -187,5 +187,4 @@ describe('Delay on power use', () => {
 			expectObservable(result$).toBe(expectedMarble, expectedActions);
 		});
 	});
-
 });

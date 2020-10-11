@@ -1,5 +1,6 @@
 import {
 	ACTION_PASS,
+	ACTION_PLAY,
 	ACTION_ENTER_PROMPT,
 	ACTION_EFFECT,
 	ACTION_POWER,
@@ -17,6 +18,8 @@ import {
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
+	EFFECT_TYPE_CREATURE_ATTACKS,
+	EFFECT_TYPE_MAGI_IS_DEFEATED,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
@@ -78,6 +81,20 @@ function convertServerCommand(initialAction, game, playerId) {
 			return {
 				...action,
 				newStep,
+			};
+		}
+		case ACTION_PLAY: {
+			const metaValue = game.getMetaValue(action.card, action.generatedBy);
+			const metaCard = Array.isArray(metaValue) ? metaValue[0] : metaValue;
+
+			const cardPlayed = action.payload ? action.payload.card : metaCard;
+
+			return {
+				...action,
+				payload: {
+					...action.payload,
+					card: convertCard(cardPlayed),
+				}
 			};
 		}
 		case ACTION_ENTER_PROMPT: {
@@ -171,6 +188,12 @@ function convertServerCommand(initialAction, game, playerId) {
 						amount,
 					};
 				}
+				case EFFECT_TYPE_MAGI_IS_DEFEATED: {
+					return {
+						...action,
+						target: convertCard(action.target),
+					};
+				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
 					const fromCard = (typeof action.from == 'string') ?
 						game.getMetaValue(action.from, action.generatedBy) :
@@ -208,6 +231,13 @@ function convertServerCommand(initialAction, game, playerId) {
 						...action,
 						target: convertCard(target),
 						amount,
+					};
+				}
+				case EFFECT_TYPE_CREATURE_ATTACKS: {
+					return {
+						...action,
+						source: convertCard(action.source),
+						target: convertCard(action.target),
 					};
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {

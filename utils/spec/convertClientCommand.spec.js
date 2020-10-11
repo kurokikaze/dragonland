@@ -444,6 +444,7 @@ describe('ACTION_PLAY', () => {
 
 		const expectedAction = {
 			type: ACTION_PLAY,
+			forcePriority: false,
 			payload: {
 				player: ACTIVE_PLAYER,
 				card: arbolit,

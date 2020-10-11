@@ -4,6 +4,10 @@
 }
 
 #game {
+    width: 1280px;
+}
+
+.game {
     width: 900px;
     position: relative;
 }
