@@ -140,7 +140,7 @@ const findInPlay = (state, id) => {
 	if (cardOpponentInPlay) return cardOpponentInPlay;
 
 	const cardPlayerMagi = state.zones.playerActiveMagi.find(card => card.id === id);
-	if (cardPlayerMagi) return cardPlayerInPlay;
+	if (cardPlayerMagi) return cardPlayerMagi;
 
 	const cardOpponentMagi = state.zones.opponentActiveMagi.find(card => card.id === id);
 	if (cardOpponentMagi) return cardOpponentMagi;
