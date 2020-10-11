@@ -157,11 +157,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 									socket.removeAllListeners();
 									socket.disconnect();
 
-									/* const participantKey = Object.entries(participants).find(([, value]) => value === playerHash);
-									if (participantKey) {
-										delete participants[participantKey];
-									}*/
-									if (runningGames[gameId].userHashes) {
+									if (runningGames[gameId] && runningGames[gameId].userHashes) {
 										runningGames[gameId].userHashes.forEach(userHash => {delete participants[userHash];});
 									}
 									delete runningGames[gameId];
