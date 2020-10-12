@@ -221,7 +221,12 @@
 }
 
 .zone-relics .cardAbilities {
-    margin-bottom: 80px;
+    margin-bottom: 66px;
+}
+
+.zone-relics .abilityIconHolder .magiCardIcons {
+    bottom: 10px;
+    right: -8px;
 }
 
 .zone-relics.opponentRelics .cardView {
@@ -243,7 +248,7 @@
 .zone-relics .cardAbilityHolder {
     display: flex;
     align-items: flex-end;
-    height: 85px;
+    height: 64px;
 }
 
 .zone-placeholder {
