@@ -698,7 +698,7 @@ export default (state = defaultState, action) => {
 				case EFFECT_TYPE_MAGI_IS_DEFEATED: {
 					const magiDefeatEntry = {
 						type: LOG_ENTRY_MAGI_DEFEATED,
-						target: action.target.card,
+						card: action.target.card,
 					};
 
 					return {

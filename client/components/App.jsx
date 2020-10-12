@@ -9,7 +9,7 @@ import {
 	ACTION_PLAY,
 } from 'moonlands/src/const.js';
 
-import Log from './Log.jsx';
+import Log from './Log/Log.jsx';
 import Zone from './zones/Zone.jsx';
 import ZoneHand from './zones/ZoneHand.jsx';
 import ZoneDiscard from './zones/ZoneDiscard.jsx';

@@ -19,6 +19,8 @@ import {
 	LOG_ENTRY_MAGI_DEFEATED,	
 } from 'moonlands/src/const.js';
 
+import './style.css';
+
 const mapEntryToText = entry => {
 	switch (entry.type) {
 		case LOG_ENTRY_PLAY:
@@ -62,6 +64,13 @@ const Log = ({entries = []}) => {
 		if (listElement && listElement.children.length) {
 			listElement.children[listElement.children.length - 1].scrollIntoView(false);
 		}
+		setTimeout(() => {
+			[].forEach.call(listElement.children, child => {
+				if (!child.classList.contains('show')) { 
+					child.classList.add('show');
+				}
+			});
+		}, 10);
 	}, [entries]);
 
 	return <div className='actionLog' ref={listRef}>{entries.map((entry, i) => <LogEntry key={i} entry={entry} />)}</div>;
