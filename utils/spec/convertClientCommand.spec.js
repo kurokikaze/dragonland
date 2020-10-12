@@ -17,7 +17,7 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
-	// PROMPT_TYPE_SINGLE_RELIC,
+	PROMPT_TYPE_RELIC,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_DECK,
@@ -26,9 +26,6 @@ import {
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
 } from 'moonlands/src/const.js';
-
-// @todo move to moonlands
-const PROMPT_TYPE_SINGLE_RELIC = 'prompt/single_relic';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;
@@ -89,20 +86,20 @@ describe('ACTION_RESOLVE_PROMPT', () => {
 		expect(result).toEqual(expectedAction);
 	});
 
-	it.skip('PROMPT_TYPE_SINGLE_RELIC', () => {
-		const ACTIVE_PLAYER = 0;
+	it('PROMPT_TYPE_RELIC / opponent', () => {
+		const ACTIVE_PLAYER = 20;
 		const NON_ACTIVE_PLAYER = 1;
 
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
-		const robesOfTheAges = new CardInGame(byName('Robes of the Ages'), ACTIVE_PLAYER);
+		const robesOfTheAges = new CardInGame(byName('Robes of the Ages'), NON_ACTIVE_PLAYER);
 
 		const gameState = new moonlands.State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER),
 			step: STEP_PRS_SECOND,
 			activePlayer: ACTIVE_PLAYER,
 			prompt: true,
-			promptType: PROMPT_TYPE_SINGLE_RELIC,
+			promptType: PROMPT_TYPE_RELIC,
 			promptParams: {},			
 		});
 		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
@@ -160,34 +157,35 @@ describe('ACTION_RESOLVE_PROMPT', () => {
 		expect(result).toEqual(expectedAction);
 	});
 
-	it('PROMPT_TYPE_SINGLE_RELIC', () => {
+	it('PROMPT_TYPE_RELIC', () => {
 		const ACTIVE_PLAYER = 0;
 		const NON_ACTIVE_PLAYER = 1;
 
 		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
 		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+		const robeOfVines = new CardInGame(byName('Robe of Vines'), ACTIVE_PLAYER);
 
 		const gameState = new moonlands.State({
 			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER),
 			step: STEP_PRS_SECOND,
 			activePlayer: ACTIVE_PLAYER,
 			prompt: true,
-			promptType: PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
+			promptType: PROMPT_TYPE_RELIC,
 			promptParams: {},			
 		});
 		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
 
 		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, ACTIVE_PLAYER).add([yaki]);
-		gameState.getZone(ZONE_TYPE_IN_PLAY, null).add([weebo]);
+		gameState.getZone(ZONE_TYPE_IN_PLAY, null).add([weebo, robeOfVines]);
 
 		const clientAction = {
 			type: ACTION_RESOLVE_PROMPT,
-			target: weebo.id,
+			target: robeOfVines.id,
 		};
 
 		const expectedAction = {
 			type: ACTION_RESOLVE_PROMPT,
-			target: weebo,
+			target: robeOfVines,
 		};
 
 		const result = convert(clientAction, gameState);

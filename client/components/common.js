@@ -9,7 +9,7 @@ import {
 	TYPE_MAGI,
 
 	PROMPT_TYPE_SINGLE_MAGI,
-	// PROMPT_TYPE_SINGLE_RELIC,
+	PROMPT_TYPE_RELIC,
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
@@ -41,9 +41,6 @@ import {
 } from 'moonlands/src/const.js';
 
 import {zoneContent} from '../selectors';
-
-// @todo move to moonlands
-const PROMPT_TYPE_SINGLE_RELIC = 'prompt/single_relic';
 
 const cardMatchesSelector = (card, selector, source) => {
 	switch (selector) {
@@ -182,13 +179,15 @@ export const UNFILTERED_CREATURE_PROMPTS = [
 
 export const FILTERED_CREATURE_PROMPTS = [
 	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_SINGLE_RELIC,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, 
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 ];
 
+export const UNFILTERED_RELIC_PROMPTS = [
+	PROMPT_TYPE_RELIC,
+];
 const getRestrictionFilter = (restriction, value) => {
 	switch(restriction) {
 		case RESTRICTION_TYPE:
@@ -208,7 +207,7 @@ const getRestrictionFilter = (restriction, value) => {
 
 export const getPromptFilter = (promptType, promptParams) => {
 	switch (promptType) {
-		case PROMPT_TYPE_SINGLE_RELIC:
+		case PROMPT_TYPE_RELIC:
 			return card => card.card.type === TYPE_RELIC;
 		case PROMPT_TYPE_SINGLE_CREATURE:
 			return card => card.card.type === TYPE_CREATURE;

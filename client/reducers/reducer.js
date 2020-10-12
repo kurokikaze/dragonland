@@ -27,6 +27,7 @@ import {
 	EFFECT_TYPE_CREATURE_ATTACKS,
 	EFFECT_TYPE_DRAW,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
+	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
@@ -475,20 +476,20 @@ export default (state = defaultState, action) => {
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
 					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
 
-					var currentStaticAbilities = state.currentStaticAbilities || [];
+					var staticAbilities = state.staticAbilities || [];
 
 					if (zonesToConsiderForStaticAbilities.has(sourceZone)) {
 						// We are removing card with static ability from the play
-						currentStaticAbilities = currentStaticAbilities.filter(card => card.id !== action.sourceCard.id);
+						staticAbilities = staticAbilities.filter(card => card.id !== action.sourceCard.id);
 					} else if (zonesToConsiderForStaticAbilities.has(destinationZone) && byName(action.destinationCard.card).data.staticAbilities) {
-						currentStaticAbilities.push({
+						staticAbilities.push({
 							...action.destinationCard,
 							card: byName(action.destinationCard.card),
 						});
 					}
 					return {
 						...state,
-						currentStaticAbilities,
+						staticAbilities,
 						zones: {
 							...state.zones,
 							[sourceZone]: state.zones[sourceZone].filter(card => card.id !== action.sourceCard.id),
@@ -603,6 +604,26 @@ export default (state = defaultState, action) => {
 							...state.zones,
 							playerActiveMagi,
 							opponentActiveMagi,
+						},
+					};
+				}
+				case EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE: {
+					const playerInPlay = [...state.zones.playerInPlay].map(
+						card => card.id === action.target.id ?
+							{...card, data: {...card.data, attacked: Infinity}} :
+							card,
+					);
+					const opponentInPlay = [...state.zones.opponentInPlay].map(
+						card => card.id === action.target.id ?
+							{...card, data: {...card.data, attacked: Infinity}} :
+							card,
+					);
+					return {
+						...state,
+						zones: {
+							...state.zones,
+							playerInPlay,
+							opponentInPlay,
 						},
 					};
 				}

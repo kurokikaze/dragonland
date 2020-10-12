@@ -20,6 +20,7 @@ import {
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 	EFFECT_TYPE_CREATURE_ATTACKS,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
+	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
@@ -203,6 +204,16 @@ function convertServerCommand(initialAction, game, playerId) {
 					return {
 						...action,
 						from: convertCard(from),
+					};
+				}
+				case EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE: {
+					const targetCard = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+
+					return {
+						...action,
+						target: convertCard(targetCard),
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {

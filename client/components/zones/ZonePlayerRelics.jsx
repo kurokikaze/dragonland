@@ -6,6 +6,7 @@ import cn from 'classnames';
 import {
 	ACTION_POWER,
 	TYPE_RELIC,
+	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/src/const.js';
 import Card from '../Card.jsx';
 
@@ -13,6 +14,7 @@ import {isPRSAvailable} from '../../selectors';
 import {
 	withCardData, 
 	withZoneContent,
+	UNFILTERED_RELIC_PROMPTS,
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
 import {withView} from '../CardView.jsx';
@@ -28,6 +30,7 @@ function ZonePlayerRelics({
 	cardClickHandler, 
 	abilityUseHandler, 
 	prsAvailable,
+	isOnUnfilteredPrompt,
 }) {
 	return (
 		<div className={cn('zone', 'zone-relics', zoneId)} data-zone-name={name}>
@@ -39,7 +42,7 @@ function ZonePlayerRelics({
 					card={cardData.card}
 					data={cardData.data}
 					onClick={cardClickHandler}
-					isOnPrompt={false}
+					isOnPrompt={isOnUnfilteredPrompt}
 					actionsAvailable={prsAvailable}
 					available={active && cardData.card.type === TYPE_RELIC && prsAvailable}
 					onAbilityUse={abilityUseHandler}
@@ -52,28 +55,26 @@ function ZonePlayerRelics({
 
 const propsTransformer = props => ({
 	...props,
-	// cardClickHandler: props.isOnCreaturePrompt ? cardId => {
-	// 	window.socket.emit('clientAction', {
-	// 		type: ACTION_RESOLVE_PROMPT,
-	// 		target: cardId,
-	// 		generatedBy: props.promptGeneratedBy,
-	// 	});
-	// } : () => {},
+	cardClickHandler: props.isOnPrompt ? cardId => {
+		window.socket.emit('clientAction', {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: props.promptGeneratedBy,
+		});
+	} : () => {},
 	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
 		type: ACTION_POWER,
 		source: id,
 		power: powerName,
 	}),
-	// isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	// isOnFilteredPrompt:  props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	// promptFilter: getPromptFilter(props.promptType, props.promptParams),
+	isOnUnfilteredPrompt: props.isOnPrompt && UNFILTERED_RELIC_PROMPTS.includes(props.promptType),
 });
 
 function mapStateToProps(state) {
 	return {
 		prsAvailable: isPRSAvailable(state),
 		active: false,
-		// isOnCreaturePrompt: state.prompt,
+		isOnPrompt: state.prompt,
 		promptType: state.promptType,
 		promptParams: state.promptParams,
 		promptGeneratedBy: state.promptGeneratedBy,

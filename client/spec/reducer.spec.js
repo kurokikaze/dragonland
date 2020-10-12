@@ -73,8 +73,8 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const resultingState = simpleReducer(state, action);
-		expect(resultingState.currentStaticAbilities.length).toEqual(1, 'One new static ability added');
-		expect(resultingState.currentStaticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
+		expect(resultingState.staticAbilities.length).toEqual(1, 'One new static ability added');
+		expect(resultingState.staticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
 	});
 
 	it('Static abilities are removed correctly', () => {
@@ -107,8 +107,8 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const resultingState = simpleReducer(state, action);
-		expect(resultingState.currentStaticAbilities.length).toEqual(1, 'One new static ability added');
-		expect(resultingState.currentStaticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
+		expect(resultingState.staticAbilities.length).toEqual(1, 'One new static ability added');
+		expect(resultingState.staticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
 
 		const removingAction = {
 			type: ACTION_EFFECT,
@@ -128,7 +128,7 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const thirdState = simpleReducer(resultingState, removingAction);
-		expect(thirdState.currentStaticAbilities.length).toEqual(0, 'Static ability is removed if card has moved out');
+		expect(thirdState.staticAbilities.length).toEqual(0, 'Static ability is removed if card has moved out');
 	});
 
 	it('Static abilities of relics are added correctly', () => {
@@ -162,8 +162,8 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const resultingState = simpleReducer(state, action);
-		expect(resultingState.currentStaticAbilities.length).toEqual(1, 'One new static ability added');
-		expect(resultingState.currentStaticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
+		expect(resultingState.staticAbilities.length).toEqual(1, 'One new static ability added');
+		expect(resultingState.staticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
 	});
 
 	it('Static abilities are not added if they are not needed', () => {
@@ -196,6 +196,6 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const resultingState = simpleReducer(state, action);
-		expect(resultingState.currentStaticAbilities.length).toEqual(0, 'No static abilities added if the card doesnt have them');
+		expect(resultingState.staticAbilities.length).toEqual(0, 'No static abilities added if the card doesnt have them');
 	});
 });

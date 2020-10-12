@@ -6,7 +6,7 @@ import Ability from './icons/Ability.jsx';
 import Attack from './icons/Attack.jsx';
 import Dagger from './icons/Dagger.jsx';
 import cn from 'classnames';
-import { TYPE_MAGI } from 'moonlands/src/const.js';
+import { TYPE_MAGI, TYPE_RELIC } from 'moonlands/src/const.js';
 
 export const CardAbility = ({name, cost, text, used, costTooHigh, onClick}) =>
 	(
@@ -26,6 +26,7 @@ export const OpponentCardAbility = ({name, cost, text}) =>
 export const withAbilities = Component => (props) => {
 	const isOpponent = props.data.controller !== window.playerId;
 	const hasAbilities = (props.card.data && props.card.data.powers);
+	const isRelic = props.card.type === TYPE_RELIC;
 	const hasUnusedAbilities = hasAbilities && props.card.data.powers.some(power => !(props.data.actionsUsed || []).includes(power.name));
 
 	const hasSeveralAttacks = props.modifiedData && props.modifiedData.attacksPerTurn > 1;
@@ -57,7 +58,7 @@ export const withAbilities = Component => (props) => {
 						text={text}
 						cost={cost}
 						used={(props.data.actionsUsed && props.data.actionsUsed.includes(name)) || (props.data.energy < cost)}
-						costTooHigh={props.data.energy < cost}
+						costTooHigh={(props.data.energy < cost) && !isRelic}
 						onClick={() => props.onAbilityUse(props.id, name)}
 					/>
 				)}
