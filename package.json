@@ -10,6 +10,8 @@
     "watch-challenge": "parcel watch challenge/index.js --out-dir public/javascripts",
     "build-challenge": "parcel build challenge/index.js --out-dir public/javascripts",
     "start": "node ./bin/www.js",
+    "start-prod": "pm2 start www --restart-delay=3000",
+    "restart-prod": "pm2 restart www --restart-delay=3000",
     "test": "jest --no-cache",
     "storybook": "start-storybook -p 6006 -s ./public/",
     "build-storybook": "build-storybook -s ./public/"

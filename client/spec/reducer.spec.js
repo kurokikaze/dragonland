@@ -29,7 +29,7 @@ const defaultState = () => ({
 		opponentDefeatedMagi: [],
 		opponentInPlay: [],
 	},
-	currentStaticAbilities: [],
+	staticAbilities: [],
 	animation: null,
 	message: {
 		type: 'power',
