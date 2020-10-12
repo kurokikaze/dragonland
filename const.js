@@ -14,3 +14,8 @@ export const ARDERIAL_DECK = {
 	playerId: 1,
 	cards: ['Lasada','Jaela','Ora','Pharan','Pharan','Pharan','Alaban','Alaban','Alaban','Ayebaw','Ayebaw','Ayebaw','Cyclone Vashp','Cyclone Vashp','Cyclone Vashp','Shockwave','Shockwave','Shockwave','Shooting Star','Shooting Star','Shooting Star','Storm Cloud','Storm Cloud','Storm Cloud','Thunder Hyren','Thunder Hyren','Thunder Hyren','Xyx','Xyx','Xyx','Xyx Elder','Xyx Elder','Xyx Elder','Updraft','Updraft','Updraft','Typhoon','Typhoon','Typhoon','Syphon Stone'],
 };
+export const OROTHE_DECK = {
+	name: 'Orothe deck',
+	playerId: 1,
+	cards: ['Ebylon','Whall','O\'Qua','Paralit','Paralit','Paralit','Giant Parathin','Giant Parathin','Giant Parathin','Deep Hyren','Deep Hyren','Deep Hyren','Bwill','Bwill','Bwill','Sea Barl','Sea Barl','Sea Barl','Orathan','Orathan','Orathan','Coral Hyren','Coral Hyren','Coral Hyren','Undertow','Undertow','Undertow','Typhoon','Typhoon','Typhoon','Submerge','Submerge','Submerge','Water of Life','Water of Life','Water of Life','Book of Ages','Book of Ages','Orothean Gloves','Orothean Gloves','Warrior\'s Boots','Warrior\'s Boots','Warrior\'s Boots'],
+};

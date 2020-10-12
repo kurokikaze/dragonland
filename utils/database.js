@@ -1,7 +1,7 @@
 import mongodb from 'mongodb';
 
 import config from '../config.js';
-import {USER_ID_FIELD, CALD_DECK, NAROOM_DECK, ARDERIAL_DECK} from '../const.js';
+import {USER_ID_FIELD, CALD_DECK, NAROOM_DECK, ARDERIAL_DECK, OROTHE_DECK} from '../const.js';
 
 const { MongoClient, ObjectID } = mongodb;
 
@@ -87,6 +87,11 @@ export async function insertUser(username, name, passwordHash) {
 		{
 			...ARDERIAL_DECK,
 			name: `${name}'s Arderial Deck`,
+			playerId: nextGameId,
+		},
+		{
+			...OROTHE_DECK,
+			name: `${name}'s Orothe Deck`,
 			playerId: nextGameId,
 		}
 	]);
