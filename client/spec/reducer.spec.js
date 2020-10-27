@@ -73,6 +73,7 @@ describe('Separating static abilities into state property', () => {
 		};
 
 		const resultingState = simpleReducer(state, action);
+
 		expect(resultingState.staticAbilities.length).toEqual(1, 'One new static ability added');
 		expect(resultingState.staticAbilities[0].card.data.staticAbilities.length).toEqual(1, 'Card data is included in static ability store');
 	});

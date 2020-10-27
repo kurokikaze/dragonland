@@ -1,5 +1,5 @@
 /* global window */
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers} from 'recompose';
 import Backend from 'react-dnd-html5-backend';
@@ -46,6 +46,33 @@ const EnhancedPowerMessage = withSingleCardData(PowerMessage);
 function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded, cardsInOurDiscard, cardsInOpponentDiscard, cardsInOurDeck, cardsInOpponentDeck}) {
 	const [discardShown, setDiscardShown] = useState(false);
 	const [opponentDiscardShown, setOpponentDiscardShown] = useState(false);
+
+	const handleOurDiscardClick = useCallback(
+		() => {
+			setDiscardShown(true);
+			setOpponentDiscardShown(false);
+		},
+		[],
+	);
+
+	const handleOurDiscardClose = useCallback(
+		() => setDiscardShown(false),
+		[],
+	);
+
+	const handleOpponentDiscardClick = useCallback(
+		() => {
+			setDiscardShown(false);
+			setOpponentDiscardShown(true);
+		},
+		[],
+	);
+
+	const handleOpponentDiscardClose = useCallback(
+		() => setOpponentDiscardShown(false),
+		[],
+	);
+
 	return (
 		<div className='gameContainer'>
 			<div className="game">
@@ -58,7 +85,7 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 					<div className='middleZones'>
 						<div className='zone-placeholder'>
 							<div className='libraryCounter'>{cardsInOpponentDeck}</div>
-							<div className='discardCounter' onClick={() => {setDiscardShown(false); setOpponentDiscardShown(true);}}>{cardsInOpponentDiscard}</div>
+							<div className='discardCounter' onClick={handleOpponentDiscardClick}>{cardsInOpponentDiscard}</div>
 						</div>
 						<ZoneOpponentActiveMagi zoneId='opponentActiveMagi' name='Opponent Active Magi' />
 						<ZonePlayerRelics  zoneId='opponentRelics' name='Opponent Relics' />
@@ -69,7 +96,7 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 						<ZonePlayerRelics  zoneId='playerRelics' name='Player Relics' />
 						<ZonePlayerActiveMagi zoneId='playerActiveMagi' name='Player Active Magi' />
 						<div className='zone-placeholder'>
-							<div className='discardCounter' onClick={() => {setDiscardShown(true); setOpponentDiscardShown(false);}}>{cardsInOurDiscard}</div>
+							<div className='discardCounter' onClick={handleOurDiscardClick}>{cardsInOurDiscard}</div>
 							<div className='libraryCounter'>{cardsInOurDeck}</div>
 						</div>
 					</div>
@@ -79,12 +106,12 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 					{!isOurTurn && <div>Opponent&apos;s turn</div>}
 					{discardShown && <div className='discardOverlay'>
 						<h2>Discard</h2>
-						<div className='closeIcon' onClick={() => setDiscardShown(false)}>&times;</div>
+						<div className='closeIcon' onClick={handleOurDiscardClose}>&times;</div>
 						<ZoneDiscard zoneId='playerDiscard' name='Player discard' />
 					</div>}
 					{opponentDiscardShown && <div className='discardOverlay'>
 						<h2>Opponent&apos;s Discard</h2>
-						<div className='closeIcon' onClick={() => setOpponentDiscardShown(false)}>&times;</div>
+						<div className='closeIcon' onClick={handleOpponentDiscardClose}>&times;</div>
 						<ZoneDiscard zoneId='opponentDiscard' name='Opponent discard' />
 					</div>}
 					{prompt && <PromptOverlay />}

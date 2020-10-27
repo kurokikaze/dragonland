@@ -14,7 +14,7 @@ export function connectToServer(callback) {
 			console.dir(err);
 			process.exit(1);
 		}
-		console.log('database connected');
+		console.log('Database connected');
 		_db = connection.db(config.databaseName);
 		close = () => connection.close();
 
@@ -51,7 +51,6 @@ export function getUserByGameId(gameId, callback) {
 }
 
 async function getNextSequenceValue(sequenceName) {
-	console.log('getting new sequence number');
 	const filter = {
 		_id: sequenceName,
 	};
@@ -61,7 +60,6 @@ async function getNextSequenceValue(sequenceName) {
 		},
 	};
 	var sequenceDocument = await _db.collection('counters').findOneAndUpdate(filter, update);
-	console.log('Sequence number is', sequenceDocument.value.sequenceValue);
 	return sequenceDocument.value.sequenceValue;
 }
 
