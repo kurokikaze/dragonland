@@ -5,8 +5,27 @@ import {USER_ID_FIELD, CALD_DECK, NAROOM_DECK, ARDERIAL_DECK, OROTHE_DECK} from 
 
 const { MongoClient, ObjectID } = mongodb;
 
+const USERS_COLLECTION = 'users';
+const DECKS_COLLECTION = 'decks';
+const COUNTERS_COLLECTION = 'counters';
+
 var _db;
 var close = () => {};
+
+export function setupDatabase() {
+	connectToServer(() => {
+		_db.collection(COUNTERS_COLLECTION).insertMany([
+			{
+				_id: USERS_COLLECTION,
+				sequenceValue: 1,
+			},
+			{
+				_id: DECKS_COLLECTION,
+				sequenceValue: 1,
+			},
+		]);
+	});
+}
 
 export function connectToServer(callback) {
 	MongoClient.connect( config.databaseUri, { useNewUrlParser: true }, (err, connection) => {
@@ -23,7 +42,7 @@ export function connectToServer(callback) {
 }
 
 export async function getUserDecks(playerId) {
-	const collection = _db.collection('decks');
+	const collection = _db.collection(DECKS_COLLECTION);
 
 	const query = {playerId};
 	const options = {};
@@ -37,17 +56,17 @@ export async function getUserDecks(playerId) {
 }
 
 export async function getDeckById(deckId) {
-	const deckObject = await _db.collection('decks').findOne({_id: new ObjectID(deckId)});
+	const deckObject = await _db.collection(DECKS_COLLECTION).findOne({_id: new ObjectID(deckId)});
 
 	return deckObject;
 }
 
 export function getUserByUsername(username, callback) {
-	_db.collection('users').findOne({login: username}, callback);
+	_db.collection(USERS_COLLECTION).findOne({login: username}, callback);
 }
 
 export function getUserByGameId(gameId, callback) {
-	_db.collection('users').findOne({[USER_ID_FIELD]: gameId}, callback);
+	_db.collection(USERS_COLLECTION).findOne({[USER_ID_FIELD]: gameId}, callback);
 }
 
 async function getNextSequenceValue(sequenceName) {
@@ -60,20 +79,20 @@ async function getNextSequenceValue(sequenceName) {
 			sequenceValue: 1,
 		},
 	};
-	var sequenceDocument = await _db.collection('counters').findOneAndUpdate(filter, update);
+	var sequenceDocument = await _db.collection(COUNTERS_COLLECTION).findOneAndUpdate(filter, update);
 	console.log('Sequence number is', sequenceDocument.value.sequenceValue);
 	return sequenceDocument.value.sequenceValue;
 }
 
 export async function insertUser(username, name, passwordHash) {
-	const nextGameId = await getNextSequenceValue('users');
-	const newUser = await _db.collection('users').insertOne({
+	const nextGameId = await getNextSequenceValue(USERS_COLLECTION);
+	const newUser = await _db.collection(USERS_COLLECTION).insertOne({
 		gameId: nextGameId,
 		login: username,
 		name,
 		password: passwordHash,
 	});
-	_db.collection('decks').insertMany([
+	_db.collection(DECKS_COLLECTION).insertMany([
 		{
 			...CALD_DECK,
 			name: `${name}'s Cald Deck`,
