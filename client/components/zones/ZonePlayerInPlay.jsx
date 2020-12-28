@@ -1,5 +1,5 @@
 /* global window */
-import React from 'react';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
@@ -22,11 +22,13 @@ import {
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
 
+import './style.css';
+
 const CardWithAbilities = withAbilities(Card);
 
 function ZonePlayerInPlay({
 	name, 
-	content, 
+	content = [], 
 	active, 
 	cardClickHandler, 
 	abilityUseHandler, 
@@ -37,24 +39,50 @@ function ZonePlayerInPlay({
 	animation,
 }) {
 	const SelectedCard = CardWithAbilities;
+	const hasPackHunters = content.some(cardData => cardData.card.data && cardData.card.data.canPackHunt);
+
+	const [packs, setPacks] = useState([]);
+
+	const onAddToPack = (newLeader, newHunter) => {
+		console.log('Creating pack ', newLeader, newHunter);
+		const pack = packs.find(p => p.leader === newLeader);
+		if (pack) {
+			setPacks(packs.map(({leader, hunters}) => leader === newLeader ? {leader, hunters: [...hunters, newHunter]} : {leader, hunters}));
+		} else {
+			setPacks([...packs, {leader: newLeader, hunters: [newHunter]}]);
+		}
+	};
+
+	const onRemovePack = (leaderId) => {
+		setPacks(packs.filter(({leader}) => leader !== leaderId));
+	};
+
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
-			{content.length ? content.map(cardData =>
-				<SelectedCard
-					key={cardData.id}
-					id={cardData.id}
-					card={cardData.card}
-					data={cardData.data}
-					modifiedData={cardData.modifiedData}
-					onClick={cardClickHandler}
-					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
-					draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
-					available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
-					actionsAvailable={prsAvailable}
-					onAbilityUse={abilityUseHandler}
-					className={cn({'attackTarget': animation && animation.target === cardData.id})}
-				/>,
-			) : null}
+			{content.filter(({id}) => !packs.some(pack => pack.hunters.includes(id))).map(cardData =>
+				<div key={cardData.id} className='packHolder'>
+					<SelectedCard
+						id={cardData.id}
+						card={cardData.card}
+						data={cardData.data}
+						modifiedData={cardData.modifiedData}
+						onClick={cardClickHandler}
+						isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
+						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
+						target={active && hasPackHunters}
+						pack={packs.find(({leader}) => leader === cardData.id)}
+						droppable={active && hasPackHunters}
+						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
+						actionsAvailable={prsAvailable}
+						onAbilityUse={abilityUseHandler}
+						onPackHunt={onAddToPack}
+						className={cn({'attackTarget': animation && animation.target === cardData.id})}
+					/>
+					{packs.some(({leader}) => leader === cardData.id) ? 
+						<div className='packHuntCounter' onClick={() => onRemovePack(cardData.id)}>+ {packs.find(({leader}) => leader === cardData.id).hunters.length}</div>
+						: null}
+				</div>
+			)}
 		</div>
 	);
 }

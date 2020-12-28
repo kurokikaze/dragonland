@@ -1,13 +1,17 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {Select} from 'antd';
 import {changeCurrentDeck} from '../actions/index.js';
+
+const {Option} = Select;
 
 function DeckSelector({decks, currentDeck, setDeck}) {
 	return <div>
 		<h2>Decks</h2>
-		<select onChange={(event) => {setDeck(event.target.value);}} defaultValue={currentDeck}>
-			{decks.map(deck => (<option key={deck._id} value={deck._id}>{deck.name}</option>))}
-		</select>
+		<pre>{currentDeck}</pre>
+		<Select onChange={value => setDeck(value)} defaultValue={currentDeck}>
+			{decks.map(deck => (<Option key={deck._id} value={deck._id}>{deck.name}</Option>))}
+		</Select>
 	</div>;
 }
 

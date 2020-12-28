@@ -3,6 +3,10 @@
     src: url('/fonts/Lato/Lato-Regular.ttf');
 }
 
+body {
+    margin: 2px;
+}
+
 #game {
     width: 1280px;
 }
@@ -414,5 +418,20 @@
 
     100% {
         transform: translateX(0px) translateY(0px);
+    }
+}
+
+@media (max-width: 900px) {
+    .gameContainer {
+        max-height: 100%;
+        flex-direction: column;
+    }
+
+    .gameContainer .game {
+        width: 890px;
+    }
+
+    .gameContainer .actionLog {
+        max-height: 290px;
     }
 }

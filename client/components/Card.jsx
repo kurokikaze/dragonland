@@ -10,7 +10,7 @@ import {
 	TYPE_SPELL,
 	TYPE_MAGI,
 } from 'moonlands/src/const.js';
-
+import {canFirstAttackSecond, canPackHuntWith} from './helpers';
 import {camelCase} from '../utils';
 
 const DraggableTypes = {
@@ -77,8 +77,26 @@ function Card({
 			}
 		}
 	}, [attacker]);
+	let connector;
+	/* if (draggable && target) {
+		connector = compose(
+			connectDragSource,
+			connectDropTarget,
+		);
+	} else { */
+	connector = identity;
 
-	const connector = (draggable && connectDragSource) ? connectDragSource : (target && connectDropTarget ? connectDropTarget : identity);
+	if (draggable && connectDragSource && target && connectDropTarget) {
+		connector = compose(
+			connectDragSource,
+			connectDropTarget,
+		);
+	} else if (draggable && connectDragSource) {
+		connector = connectDragSource;
+	} else if (target && connectDropTarget) {
+		connector = connectDropTarget;
+	}
+
 	const classes = cn(
 		'cardHolder',
 		card ? typeClass[card.type] : null,
@@ -112,7 +130,6 @@ function Card({
 
 const cardSource = {
 	beginDrag(props) {
-		// Return the data describing the dragged item
 		return props;
 	},
 
@@ -125,16 +142,30 @@ const cardSource = {
 		const item = monitor.getItem();
 		const dropResult = monitor.getDropResult();
 
-		const canAttack = dropResult.card.type === TYPE_CREATURE ||
-			(dropResult.card.type === TYPE_MAGI && !dropResult.guarded) ||
-			(dropResult.card.type === TYPE_MAGI && item.card.data.canAttackMagiDirectly);
+		const canAttack = canFirstAttackSecond(item, dropResult);
+
+		const canPackHunt = canPackHuntWith(item, dropResult);
 
 		if (canAttack) {
+			let additionalAttackers = [];
+
+			if (props.pack) {
+				additionalAttackers = props.pack.hunters;
+			}
+			/* console.dir({
+				type: 'actions/attack',
+				source: item.id,
+				target: dropResult.id,
+				additionalAttackers,
+			}); */
 			window.socket.emit('clientAction', {
 				type: 'actions/attack',
 				source: item.id,
 				target: dropResult.id,
+				additionalAttackers,
 			});
+		} else if (canPackHunt) {
+			props.onPackHunt(dropResult.id, item.id);
 		}
 	},
 };
@@ -161,8 +192,8 @@ const collectDrop = (connect, monitor) => ({
 });
 
 const enhance = compose(
-	branch(({draggable}) => draggable, DragSource(DraggableTypes.CARD, cardSource, collect)),
 	branch(({droppable}) => droppable, DropTarget(DraggableTypes.CARD, cardTarget, collectDrop)),
+	branch(({draggable}) => draggable, DragSource(DraggableTypes.CARD, cardSource, collect)),
 );
 
 export default enhance(Card);

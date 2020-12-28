@@ -1,0 +1,13 @@
+.packHolder {
+    position: relative;
+}
+
+.packHuntCounter {
+    position: absolute;
+    bottom: -12px;
+    left: -9px;
+    color: white;
+    background-color: violet;
+    padding: 4px;
+    border-radius: 2px;
+}

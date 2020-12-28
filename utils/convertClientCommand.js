@@ -87,6 +87,11 @@ function convertClientCommands(action, game) {
 		case ACTION_ATTACK: {
 			expandedAction.source = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
 			expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+
+			if (action.additionalAttackers) {
+				expandedAction.additionalAttackers = action.additionalAttackers.map(id => game.getZone(ZONE_TYPE_IN_PLAY, null).byId(id));
+			}
+
 			if (!expandedAction.target) {
 				const opponentId = game.getOpponent(expandedAction.source.data.controller);
 				expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, opponentId).byId(action.target);

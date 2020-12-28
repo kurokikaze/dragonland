@@ -29,7 +29,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		cancelChallenge: () => dispatch(cancelChallenge()),
-		acceptChallenge: (name, deck) => dispatch(acceptChallenge(name, deck)),
+		acceptChallenge: (name, deck) => { console.dir(name); console.dir(deck); return dispatch(acceptChallenge(name, deck));},
 		createChallenge: (deckId) => dispatch(createChallenge(deckId)),
 	};
 }
