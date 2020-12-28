@@ -399,14 +399,14 @@ export default (state = defaultState, action) => {
 			};
 		}
 		case ACTION_ATTACK: {
-			const attackerId = action.source.id;
+			const attackerIds = [action.source.id, ...(action.additionalAttackers || []).map(({id}) => id)];
 
 			return {
 				...state,
 				zones: {
 					...state.zones,
 					playerInPlay: state.zones.playerInPlay.map(card =>
-						card.id === attackerId ? ({
+						attackerIds.includes(card.id) ? ({
 							...card,
 							data: {
 								...card.data,
@@ -416,7 +416,7 @@ export default (state = defaultState, action) => {
 						}) : card,
 					),
 					opponentInPlay: state.zones.opponentInPlay.map(card =>
-						card.id === attackerId ? ({
+						attackerIds.includes(card.id) ? ({
 							...card,
 							data: {
 								...card.data,
@@ -459,17 +459,21 @@ export default (state = defaultState, action) => {
 					const attackSource = findInPlay(state, action.source.id);
 					const attackTarget = findInPlay(state, action.target.id);
 
-					const attackLogEntry = {
-						type: LOG_ENTRY_ATTACK,
-						player: action.player,
-						source: attackSource.card,
-						target: attackTarget.card,
-					};
+					if (attackSource && attackTarget) {
+						const attackLogEntry = {
+							type: LOG_ENTRY_ATTACK,
+							player: action.player,
+							source: attackSource.card,
+							target: attackTarget.card,
+						};
 
-					return {
-						...state,
-						log: [...state.log, attackLogEntry],
-					};
+						return {
+							...state,
+							log: [...state.log, attackLogEntry],
+						};
+					}
+
+					return state;					
 				}
 				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
 					const zonesToConsiderForStaticAbilities = new Set(['playerInPlay', 'opponentInPlay', 'playerActiveMagi', 'opponentActiveMagi']);

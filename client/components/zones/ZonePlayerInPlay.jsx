@@ -69,7 +69,7 @@ function ZonePlayerInPlay({
 						onClick={cardClickHandler}
 						isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
-						target={active && hasPackHunters}
+						target={active && hasPackHunters && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
 						pack={packs.find(({leader}) => leader === cardData.id)}
 						droppable={active && hasPackHunters}
 						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
