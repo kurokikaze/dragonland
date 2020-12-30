@@ -23,7 +23,7 @@ initApp(app => {
 			? 'pipe ' + addr
 			: 'port ' + addr.port;
 
-		serverDebug('Listening on ' + bind);
+		serverDebug('Listening on ' + addr + ':' + bind);
 	};
 
 	const server = http.createServer(app);
