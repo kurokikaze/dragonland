@@ -1,5 +1,5 @@
 /* global window */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';
@@ -52,6 +52,11 @@ function ZonePlayerInPlay({
 			setPacks([...packs, {leader: newLeader, hunters: [newHunter]}]);
 		}
 	};
+
+	useEffect(() => {
+		const ids = new Set(content.map(({id}) => id));
+		setPacks(packs => packs.filter(({leader}) => ids.has(leader)));
+	}, [content]);
 
 	const onRemovePack = (leaderId) => {
 		setPacks(packs.filter(({leader}) => leader !== leaderId));
