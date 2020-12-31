@@ -1,8 +1,8 @@
 import React from 'react';
 import Power from './icons/Power.jsx';
 
-function CreaturePowerIcon({active = false, icon = null, number = null}) {
-	const fillColor = active ? '#F8E71C' : '#9A9A8F';
+function CreaturePowerIcon({active = false, icon = null, number = null, activeColor = '#F8E71C', inactiveColor = '#9A9A8F'}) {
+	const fillColor = active ? activeColor : inactiveColor;
 
 	return (
 		<div className="creaturePowerIcon">

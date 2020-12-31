@@ -7,7 +7,15 @@
     bottom: -12px;
     left: -9px;
     color: white;
-    background-color: violet;
-    padding: 4px;
+    background-color: rgb(131, 49, 131);
+    padding: 0 4px;
     border-radius: 2px;
+}
+
+.zone-player-creatures .cardHolder.available {
+    box-shadow: 0 0 6px 6px green;
+}
+
+.zone-player-creatures .cardHolder.canPackHunt.available {
+    box-shadow: -6px -6px 6px 0px rgb(131, 49, 131), 0 0 6px 6px green;
 }

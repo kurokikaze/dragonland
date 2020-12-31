@@ -21,10 +21,13 @@ import {
 	getPromptFilter,
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
+import Velociraptor from '../icons/Velociraptor.jsx';
 
 import './style.css';
 
 const CardWithAbilities = withAbilities(Card);
+
+const packHuntFilter = cardData => cardData.card.data && cardData.card.data.canPackHunt;
 
 function ZonePlayerInPlay({
 	name, 
@@ -39,9 +42,11 @@ function ZonePlayerInPlay({
 	animation,
 }) {
 	const SelectedCard = CardWithAbilities;
-	const hasPackHunters = content.some(cardData => cardData.card.data && cardData.card.data.canPackHunt);
 
 	const [packs, setPacks] = useState([]);
+
+	const hasPackHunters = content.some(packHuntFilter);
+	const packHuntersList = content.filter(packHuntFilter).map(({id}) => id);
 
 	const onAddToPack = (newLeader, newHunter) => {
 		console.log('Creating pack ', newLeader, newHunter);
@@ -55,15 +60,15 @@ function ZonePlayerInPlay({
 
 	useEffect(() => {
 		const ids = new Set(content.map(({id}) => id));
-		setPacks(packs => packs.filter(({leader}) => ids.has(leader)));
-	}, [content]);
+		setPacks(packs => active ? packs.filter(({leader}) => ids.has(leader)) : []);
+	}, [content, active]);
 
 	const onRemovePack = (leaderId) => {
 		setPacks(packs.filter(({leader}) => leader !== leaderId));
 	};
 
 	return (
-		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
+		<div className={cn('zone', 'zone-player-creatures', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
 			{content.filter(({id}) => !packs.some(pack => pack.hunters.includes(id))).map(cardData =>
 				<div key={cardData.id} className='packHolder'>
 					<SelectedCard
@@ -74,9 +79,9 @@ function ZonePlayerInPlay({
 						onClick={cardClickHandler}
 						isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
-						target={active && hasPackHunters && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
+						target={active && hasPackHunters && cardData.data.attacked < cardData.modifiedData.attacksPerTurn && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
 						pack={packs.find(({leader}) => leader === cardData.id)}
-						droppable={active && hasPackHunters}
+						droppable={active && hasPackHunters && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
 						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
 						actionsAvailable={prsAvailable}
 						onAbilityUse={abilityUseHandler}
@@ -84,7 +89,7 @@ function ZonePlayerInPlay({
 						className={cn({'attackTarget': animation && animation.target === cardData.id})}
 					/>
 					{packs.some(({leader}) => leader === cardData.id) ? 
-						<div className='packHuntCounter' onClick={() => onRemovePack(cardData.id)}>+ {packs.find(({leader}) => leader === cardData.id).hunters.length}</div>
+						<div className='packHuntCounter' onClick={() => onRemovePack(cardData.id)}>+ <Velociraptor size={20} fillColor='#fff' /></div>
 						: null}
 				</div>
 			)}

@@ -42,6 +42,8 @@ function Card({
 	draggable,
 	isDragging,
 	available,
+	modifiedData,
+	pack,
 	target,
 	connectDragSource,
 	connectDropTarget,
@@ -105,6 +107,7 @@ function Card({
 			'available': available,
 			'target': target,
 			'onPrompt': isOnPrompt,
+			'canPackHunt': (card && modifiedData) ? (card.data.canPackHunt && data.attacked < modifiedData.attacksPerTurn && !pack) : null,
 		},
 		className
 	);
@@ -152,12 +155,7 @@ const cardSource = {
 			if (props.pack) {
 				additionalAttackers = props.pack.hunters;
 			}
-			/* console.dir({
-				type: 'actions/attack',
-				source: item.id,
-				target: dropResult.id,
-				additionalAttackers,
-			}); */
+
 			window.socket.emit('clientAction', {
 				type: 'actions/attack',
 				source: item.id,
