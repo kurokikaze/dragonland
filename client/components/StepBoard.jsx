@@ -1,5 +1,8 @@
+/* global window */
 import React from 'react';
 import {connect} from 'react-redux';
+import cn from 'classnames';
+
 import StepIcon from './StepIcon.jsx';
 import Energize from './icons/Energize.jsx';
 import Attack from './icons/Attack.jsx';
@@ -16,15 +19,17 @@ import {
 } from '../const.js';
 import './style.css';
 
-function StepBoard({currentStep}) {
+const OUR_TURN_ACTIVE = '#32bb32';
+
+function StepBoard({currentStep, ourTurn}) {
 	return (
-		<div className="StepBoard">
-			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} />
-			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} />
-			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} />
-			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} />
+		<div className={cn('StepBoard', {'ourTurn': ourTurn})}>
+			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
 		</div>
 	);
 }
@@ -32,7 +37,7 @@ function StepBoard({currentStep}) {
 function mapStateToProps(state) {
 	return {
 		currentStep: state.step,
-		promptParams: state.promptParams,
+		ourTurn: state.activePlayer == window.playerId,
 	};
 }
 

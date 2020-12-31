@@ -1,7 +1,7 @@
 import React from 'react';
 
-function StepIcon({icon, active = false}) {
-	const fillColor = active ? '#F8E71C' : '#9A9A8F';
+function StepIcon({icon, active = false, activeColor = '#F8E71C', inactiveColor = '#9A9A8F'}) {
+	const fillColor = active ? activeColor : inactiveColor;
 
 	return (
 		<div className="stepIcon">
