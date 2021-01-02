@@ -8,7 +8,6 @@ import {
 	TYPE_RELIC,
 	TYPE_MAGI,
 
-	PROMPT_TYPE_SINGLE_MAGI,
 	PROMPT_TYPE_RELIC,
 	PROMPT_TYPE_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
@@ -175,7 +174,7 @@ function mapStateToProps(state, {zoneId}) {
 export const withZoneContent = connect(mapStateToProps);
 
 export const UNFILTERED_CREATURE_PROMPTS = [
-	PROMPT_TYPE_SINGLE_MAGI,
+	PROMPT_TYPE_SINGLE_CREATURE,
 ];
 
 export const FILTERED_CREATURE_PROMPTS = [

@@ -20,16 +20,19 @@ import {
 import './style.css';
 
 const OUR_TURN_ACTIVE = '#32bb32';
+const NOT_OUR_TURN_ACTIVE = '#F8E71C';
 
 function StepBoard({currentStep, ourTurn}) {
+	const activeColor = ourTurn ? OUR_TURN_ACTIVE : NOT_OUR_TURN_ACTIVE;
+
 	return (
 		<div className={cn('StepBoard', {'ourTurn': ourTurn})}>
-			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
-			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
-			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
-			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} activeColor={ourTurn ? OUR_TURN_ACTIVE : null} />
+			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} activeColor={activeColor} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} activeColor={activeColor} />
+			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} activeColor={activeColor} />
+			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} activeColor={activeColor} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} activeColor={activeColor} />
+			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} activeColor={activeColor} />
 		</div>
 	);
 }
