@@ -1,8 +1,8 @@
 /* global expect, describe, it */
 
 import {State} from 'moonlands';
-import CardInGame from 'moonlands/src/classes/CardInGame.js';
-import Zone from 'moonlands/src/classes/Zone.js';
+import CardInGame from 'moonlands/dist/classes/CardInGame';
+import Zone from 'moonlands/dist/classes/Zone';
 
 import {
 	ACTION_PASS,
@@ -35,7 +35,7 @@ import {
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_IN_PLAY,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;
@@ -46,7 +46,7 @@ const STEP_PRS_SECOND = 4;
 const STEP_DRAW = 5;
 /* eslint-enable no-unused-vars */
 
-import {byName} from 'moonlands/src/cards.js';
+import {byName} from 'moonlands/dist/cards';
 import convert from '../convertServerCommand';
 
 const createZones = (player1, player2, creatures = [], activeMagi = []) => [

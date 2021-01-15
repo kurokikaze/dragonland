@@ -58,7 +58,7 @@ import {
 	LOG_ENTRY_MAGI_ENERGY_LOSS,
 	LOG_ENTRY_MAGI_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_DEFEATED,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 import {
 	START_POWER_ANIMATION,
@@ -80,7 +80,7 @@ import {
 	MESSAGE_TYPE_PROMPT_RESOLUTION,
 } from '../const.js';
 
-import {byName} from 'moonlands/src/cards';
+import {byName} from 'moonlands/dist/cards';
 
 const defaultState = {
 	zones: {

@@ -7,7 +7,7 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 	TYPE_CREATURE,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {
 	STEP_ATTACK,
@@ -21,7 +21,7 @@ import {
 	getPromptFilter,
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
-import Velociraptor from '../icons/Velociraptor.jsx';
+import Velociraptor from '../icons/Velociraptor.tsx';
 
 import './style.css';
 

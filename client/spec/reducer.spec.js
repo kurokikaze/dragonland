@@ -10,7 +10,7 @@ import {
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 const defaultState = () => ({
 	zones: {

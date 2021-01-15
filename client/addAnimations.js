@@ -10,7 +10,7 @@ import {
 	EFFECT_TYPE_PLAY_RELIC,
 	EFFECT_TYPE_PLAY_SPELL,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 import { 
 	startPowerAnimation,

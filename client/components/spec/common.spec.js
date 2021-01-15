@@ -1,5 +1,5 @@
 /* global expect, describe, it */
-import {byName} from 'moonlands/src/cards';
+import {byName} from 'moonlands/dist/cards';
 import {mapCardDataFromProps, cardDataTransformer} from '../common.js';
 
 describe('Common code from components', () => {

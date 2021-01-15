@@ -6,8 +6,8 @@ import {
 	TYPE_CREATURE,
 	TYPE_RELIC,
 	TYPE_SPELL,
-} from 'moonlands/src/const.js';
-import {cards} from 'moonlands/src/cards.js';
+} from 'moonlands/dist/const';
+import {cards} from 'moonlands/dist/cards';
 import Card from '../Card.jsx';
 import {getMagiEnergy} from '../../selectors';
 import {

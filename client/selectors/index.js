@@ -5,11 +5,11 @@ import {
 	STEP_PRS_SECOND,
 } from '../const.js';
 
-import {cards} from 'moonlands/src/cards';
+import {cards} from 'moonlands/dist/cards';
 
 import {
 	TYPE_RELIC,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 const relicsHash = {};
 

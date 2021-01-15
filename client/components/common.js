@@ -1,7 +1,7 @@
 /* global window */
 // import {mapProps} from 'recompose';
 import {connect} from 'react-redux';
-import {byName} from 'moonlands/src/cards.js';
+import {byName} from 'moonlands/dist/cards';
 
 import {
 	TYPE_CREATURE,
@@ -38,7 +38,7 @@ import {
 
 	PROPERTY_ATTACKS_PER_TURN,
 	PROPERTY_ENERGIZE,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 import {zoneContent} from '../selectors';
 
@@ -114,6 +114,8 @@ export const cardDataTransformer = (state, props) => {
 			staticAbilityCards.forEach(staticAbilityCard => {
 				staticAbilityCard.card.data.staticAbilities.forEach(staticAbility => {
 					if (cardMatchesSelector(result, staticAbility.selector, staticAbilityCard)) {
+						console.log(card.name, staticAbility.selector);
+						console.log('Matches');
 						const modifierFunction = initialValue => {
 							const {operator, operandOne} = staticAbility.modifier;
 						
@@ -132,6 +134,8 @@ export const cardDataTransformer = (state, props) => {
 							}
 							case PROPERTY_ENERGIZE: {
 								result.modifiedData.energize = modifierFunction(result.modifiedData.energize);
+								console.log(result.modifiedData.energize);
+								console.dir(result.modifiedData);
 								break;
 							}
 						}

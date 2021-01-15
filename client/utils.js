@@ -1,7 +1,7 @@
-import {byName} from 'moonlands/src/cards.js';
+import { byName } from 'moonlands/dist/cards.js';
 
 export function camelCase(str){
-	return str.replace(/'/g, '').split(' ').map(function(word,index){
+	return str.replace(/'/g, '').split(' ').map(function(word, index){
 		// If it is the first word make sure to lowercase all the chars.
 		if(index == 0){
 			return word.toLowerCase();
@@ -25,6 +25,6 @@ export function enrichState(state) {
 		],
 	};
 
-	console.dir(result);
+	console.dir(result.staticAbilities);
 	return result;
 }

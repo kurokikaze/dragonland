@@ -9,7 +9,7 @@ import {
 
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 
 import {isPRSAvailable} from '../../selectors';
@@ -26,6 +26,7 @@ function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClick
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
+					modifiedData={cardData.modifiedData}
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnMagiPrompt}

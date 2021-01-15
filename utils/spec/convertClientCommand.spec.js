@@ -1,10 +1,10 @@
 /* global expect, describe, it */
 
 import * as moonlands from 'moonlands';
-import CardInGame from 'moonlands/src/classes/CardInGame.js';
-import Zone from 'moonlands/src/classes/Zone.js';
+import CardInGame from 'moonlands/dist/classes/CardInGame';
+import Zone from 'moonlands/dist/classes/Zone';
 
-import {byName} from 'moonlands/src/cards.js';
+import {byName} from 'moonlands/dist/cards';
 import convert from '../convertClientCommand.js';
 
 import {
@@ -25,7 +25,7 @@ import {
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;

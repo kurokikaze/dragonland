@@ -7,7 +7,7 @@ import {
 	ACTION_POWER,
 	TYPE_RELIC,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 
 import {isPRSAvailable} from '../../selectors';

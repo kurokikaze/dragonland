@@ -1,6 +1,6 @@
 import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
-import Relic from '../icons/Relic.jsx';
+import Relic from '../icons/Relic.tsx';
 
 export default function RelicMessage ({card, display}) {
 	return (card && display &&

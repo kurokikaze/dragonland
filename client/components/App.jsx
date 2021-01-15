@@ -7,9 +7,9 @@ import { DndProvider } from 'react-dnd';
 import {
 	ACTION_PASS,
 	ACTION_PLAY,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
-import Log from './Log/Log.jsx';
+import Log from './Log/Log.tsx';
 import Zone from './zones/Zone.jsx';
 import ZoneHand from './zones/ZoneHand.jsx';
 import ZoneDiscard from './zones/ZoneDiscard.jsx';

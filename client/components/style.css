@@ -29,6 +29,9 @@
     min-height: 100%;
 }
 
+.zone-magi .cardAbilities {
+    left: -33%;
+}
 .cardAbilities p {
     margin: 0;
 }
@@ -101,6 +104,32 @@
 
 .cardView img {
     width: 200px;
+}
+
+.abilityIconHolder .cardName {
+    position: absolute;
+    left: -100px;
+    right: -100px;
+
+    bottom: -25px;
+
+    display: none;
+    text-align: center;
+    animation: fadeInDown .2s;
+
+    z-index: 1;
+}
+
+.abilityIconHolder .cardName .innerName {
+    background-color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.abilityIconHolder:hover .cardName {
+    display: block;
 }
 
 .cardViewHolder {

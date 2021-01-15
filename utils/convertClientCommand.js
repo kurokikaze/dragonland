@@ -16,7 +16,7 @@ import {
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 import {clone} from './index.js';
 
 function convertClientCommands(action, game) {

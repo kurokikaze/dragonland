@@ -1,6 +1,4 @@
 import express from 'express';
-import {cards} from 'moonlands/src/cards.js';
-import {camelCase} from '../client/utils.js';
 import ensure from 'connect-ensure-login';
 
 import {getUserDecks} from '../utils/database.js';
@@ -27,12 +25,5 @@ router.get('/',
 		});
 	}
 );
-
-router.get('/coverage', function(req, res) {
-	res.render('implementation', { 
-		title: 'Implemented cards',
-		cards: cards.map(card => ({ name: camelCase(card.name), implemented: true })),
-	});
-});
 
 export default router;

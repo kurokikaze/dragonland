@@ -2,8 +2,9 @@ import fs from 'fs';
 import fetch from 'node-fetch';
 
 import config from '../config.js';
-import {cards} from 'moonlands/src/cards.js';
-import {camelCase} from '../client/utils.js';
+import {cards} from 'moonlands/dist/cards';
+import {TYPE_MAGI}  from 'moonlands/dist/const';
+import {camelCase} from '../common/utils.js';
 
 // Fire ball is named inconsistently with other cards,
 // it's fixed in Moonlands, but we still have to download file by old URL
@@ -66,15 +67,20 @@ async function main() {
 
 	const fileNameHash = getFileNames(cardData);
 
-	cards.forEach(async card => {
-		const cardName = CORRECTIONS[card.name] ? CORRECTIONS[card.name] : card.name; 
+	const cardNames = cards.map(card => card.name);
+	const startingCardNames = cards.filter(card => card.type === TYPE_MAGI).map(card => card.data.startingCards).flat().filter(Boolean);
+
+	const rawNames = [...new Set([...cardNames, ...startingCardNames])];
+
+	rawNames.forEach(async rawName => {
+		const cardName = CORRECTIONS[rawName] || rawName; 
 		if (fileNameHash[cardName]) {
 			const url = fileNameHash[cardName];
-			console.log('Downloaded', cardName, url);
+			console.log('Downloading', cardName, url);
 			const request = await fetch(filenameToUrl(url));
 
 			const data = await request.buffer();
-			fs.writeFileSync('./public/images/cards/' + camelCase(card.name) + '.jpg', data, {flag: 'w'});
+			fs.writeFileSync('./public/images/cards/' + camelCase(rawName) + '.jpg', data, {flag: 'w'});
 		} else {
 			console.warn('Couldnt download', cardName);
 		}

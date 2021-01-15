@@ -6,7 +6,7 @@ import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {withAbilities} from '../CardAbilities.jsx';
 import {

@@ -2,13 +2,14 @@
 import React from 'react';
 import CreaturePowerIcon from './CreaturePowerIcon.jsx';
 import MagiPowerIcon from './MagiPowerIcon.jsx';
-import Ability from './icons/Ability.jsx';
-import Attack from './icons/Attack.jsx';
-import Dagger from './icons/Dagger.jsx';
-import Velociraptor from './icons/Velociraptor.jsx';
+import Ability from './icons/Ability.tsx';
+import Attack from './icons/Attack.tsx';
+import Dagger from './icons/Dagger.tsx';
+import Energize from './icons/Energize.tsx';
+import Velociraptor from './icons/Velociraptor.tsx';
 
 import cn from 'classnames';
-import { TYPE_MAGI, TYPE_RELIC } from 'moonlands/src/const.js';
+import { TYPE_MAGI, TYPE_RELIC } from 'moonlands/dist/const';
 
 export const CardAbility = ({name, cost, text, used, costTooHigh, onClick}) =>
 	(
@@ -36,7 +37,7 @@ export const withAbilities = Component => (props) => {
 	const stillHasAttacks = props.data.attacked < (props.modifiedData ? props.modifiedData.attacksPerTurn : 0);
 
 	const PowerIcon = (props.card.type === TYPE_MAGI) ? MagiPowerIcon : CreaturePowerIcon;
-	const iconType = (props.card.type === TYPE_MAGI) ? 'cardIcons' : 'magiCardIcons';
+	const iconType = (props.card.type === TYPE_MAGI) ? 'cardIcons' : 'cardIcons';
 
 	const showAbilities = hasAbilities && !props.isOnPrompt && !props.isDragging;
 
@@ -46,12 +47,15 @@ export const withAbilities = Component => (props) => {
 		...(props.card.data.staticAbilities || []),
 		...(props.card.data.replacementEffects || []),
 	];
+	const energizeProperty = props.modifiedData ? props.modifiedData.energize : props.card.data.energize;
 	const hasEffects = allEffects.length > 0;
 	const canPackHunt = props.card.data.canPackHunt;
-	const hasAdditionalIcons = hasSeveralAttacks || canAttackDirectly || canPackHunt;
+	const hasEnergize = energizeProperty > 0;
+	const hasAdditionalIcons = hasSeveralAttacks || canAttackDirectly || canPackHunt || hasEnergize;
 	const showEffects = hasEffects && !props.isOnPrompt && !props.isDragging;
 
 	const AbilityComponent = isOpponent ? OpponentCardAbility : CardAbility;
+	console.dir(props.modifiedData);
 	return <>
 		{(showAbilities || showEffects || hasAdditionalIcons) && <div className='cardAbilityHolder'>
 			{hasAbilities && (props.actionsAvailable || isOpponent) && <div className='cardAbilities'>
@@ -80,9 +84,11 @@ export const withAbilities = Component => (props) => {
 					{showEffects && <PowerIcon icon={<Ability />} />}
 					{hasSeveralAttacks && <PowerIcon icon={<Attack />} number={props.modifiedData.attacksPerTurn} />}
 					{canAttackDirectly && <PowerIcon icon={<Dagger />} />}
+					{hasEnergize &&  <PowerIcon icon={<Energize />} number={`+${energizeProperty}`} active />}
 					{canPackHunt && <PowerIcon icon={<Velociraptor/>} active={stillHasAttacks} activeColor='rgb(131, 49, 131)' />}
 					{showAbilities && <PowerIcon active={hasUnusedAbilities && props.actionsAvailable} />}
 				</div>
+				<div className='cardName'><div className='innerName'>{props.card.name}</div></div>
 			</div>
 		</div>
 		}

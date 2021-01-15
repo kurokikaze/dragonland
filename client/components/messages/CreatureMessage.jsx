@@ -1,6 +1,6 @@
 import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
-import Creature from '../icons/Creature.jsx';
+import Creature from '../icons/Creature.tsx';
 
 export default function CreatureMessage ({card, display}) {
 	return ((card && display) ?

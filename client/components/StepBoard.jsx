@@ -4,11 +4,11 @@ import {connect} from 'react-redux';
 import cn from 'classnames';
 
 import StepIcon from './StepIcon.jsx';
-import Energize from './icons/Energize.jsx';
-import Attack from './icons/Attack.jsx';
-import Power from './icons/Power.jsx';
-import Creature from './icons/Creature.jsx';
-import Draw from './icons/Draw.jsx';
+import Energize from './icons/Energize.tsx';
+import Attack from './icons/Attack.tsx';
+import Power from './icons/Power.tsx';
+import Creature from './icons/Creature.tsx';
+import Draw from './icons/Draw.tsx';
 import {
 	STEP_ENERGIZE,
 	STEP_PRS_FIRST,

@@ -13,7 +13,7 @@ import {
 	PROMPT_TYPE_CHOOSE_CARDS,
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 function PromptOverlay({promptType, promptParams, promptMessage}) {
 	return (

@@ -9,14 +9,15 @@ import {
 	TYPE_RELIC,
 	TYPE_SPELL,
 	TYPE_MAGI,
-} from 'moonlands/src/const.js';
-import {canFirstAttackSecond, canPackHuntWith} from './helpers';
-import {camelCase} from '../utils';
+} from 'moonlands/dist/const.js';
+import {canFirstAttackSecond, canPackHuntWith} from './helpers.js';
+import {camelCase} from '../utils.js';
 
 const DraggableTypes = {
 	CARD: 'card',
 };
 
+// type ClassTypesType = Record<CardType, string>
 const typeClass = {
 	[TYPE_CREATURE]: 'creature',
 	[TYPE_RELIC]: 'relic',
@@ -33,6 +34,25 @@ const getCardUrl = (card, useLocket) => {
 		return `/images/cards/${camelCase(card.name)}.jpg`;
 	}
 };
+
+/*type CardProps = {
+	id: string;
+	card: MoonlandsCard;
+	data: CardData;
+	onClick: () => void;
+	draggable: boolean;
+	isDragging: boolean;
+	available: boolean;
+	useLocket: boolean;
+	modifiedData: MoonlandsCard;
+	pack: string[];
+	target: boolean;
+	connectDragSource: () => void;
+	connectDropTarget: () => void;
+	isOnPrompt: boolean;
+	className: string;
+	attacker: boolean;
+}*/
 
 function Card({
 	id,
@@ -71,22 +91,18 @@ function Card({
 				// if (parentNode.contains(attacker)) {
 				// 	parentNode.replaceChild(newAttacker, attacker);
 				// }
+				// @ts-ignore
 				parentNode.closest('.zone').classList.add('animated');
 				setTimeout(() => {
+					// @ts-ignore
 					parentNode.closest('.zone').classList.remove('animated');
+					// @ts-ignore
 					newAttacker.classList.remove('attackSource');
 				}, 600);
 			}
 		}
 	}, [attacker]);
-	let connector;
-	/* if (draggable && target) {
-		connector = compose(
-			connectDragSource,
-			connectDropTarget,
-		);
-	} else { */
-	connector = identity;
+	let connector = identity;
 
 	if (draggable && connectDragSource && target && connectDropTarget) {
 		connector = compose(

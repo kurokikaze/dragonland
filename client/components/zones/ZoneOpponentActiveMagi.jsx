@@ -8,8 +8,8 @@ import {
 	PROMPT_TYPE_SINGLE_MAGI,
 	ACTION_RESOLVE_PROMPT,
 	TYPE_CREATURE,
-} from 'moonlands/src/const.js';
-import {byName} from 'moonlands/src/cards.js';
+} from 'moonlands/dist/const';
+import {byName} from 'moonlands/dist/cards';
 import Card from '../Card.jsx';
 import {withAbilities} from '../CardAbilities.jsx';
 import {
@@ -27,6 +27,7 @@ function ZoneOpponentActiveMagi({ name, content, active, isOnMagiPrompt, cardCli
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
+					modifiedData={cardData.modifiedData}
 					data={cardData.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnMagiPrompt}

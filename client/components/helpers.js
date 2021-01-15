@@ -1,7 +1,7 @@
 import {
 	TYPE_CREATURE,
 	TYPE_MAGI,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 
 export function canFirstAttackSecond(first, second) {
 	return (first.data.controller !== second.data.controller) && second.card.type === TYPE_CREATURE ||

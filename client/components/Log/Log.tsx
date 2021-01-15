@@ -17,11 +17,12 @@ import {
 	LOG_ENTRY_CREATURE_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_DEFEATED,	
-} from 'moonlands/src/const.js';
+} from 'moonlands/src/const';
+import { LogEntryType } from 'moonlands/src/types';
 
 import './style.css';
 
-const mapEntryToText = entry => {
+const mapEntryToText = (entry: LogEntryType) => {
 	switch (entry.type) {
 		case LOG_ENTRY_PLAY:
 			return `Player ${entry.player} plays ${entry.card}`;
@@ -54,10 +55,14 @@ const mapEntryToText = entry => {
 	}
 };
 
-const LogEntry = ({entry}) => <div className={cn('logEntry', {'ours': entry.player === window.playerId, 'theirs': entry.player !== window.playerId})}>{mapEntryToText(entry)}</div>;
+type LogEntryProps = {
+	entry: LogEntryType;
+}
+// @ts-ignore
+const LogEntry = ({entry}: LogEntryProps) => <div className={cn('logEntry', {'ours': ('player' in entry && entry.player === window.playerId), 'theirs': ('player' in entry && entry.player !== window.playerId)})}>{mapEntryToText(entry)}</div>;
 
 const Log = ({entries = []}) => {
-	const listRef = useRef(null);
+	const listRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const listElement = listRef.current;
@@ -65,18 +70,24 @@ const Log = ({entries = []}) => {
 			listElement.children[listElement.children.length - 1].scrollIntoView(false);
 		}
 		setTimeout(() => {
-			[].forEach.call(listElement.children, child => {
-				if (!child.classList.contains('show')) { 
-					child.classList.add('show');
-				}
-			});
+			if (listElement) {
+				[].forEach.call(listElement.children, (child: HTMLElement) => {
+					if (!child.classList.contains('show')) { 
+						child.classList.add('show');
+					}
+				});
+			}
 		}, 10);
 	}, [entries]);
 
 	return <div className='actionLog' ref={listRef}>{entries.map((entry, i) => <LogEntry key={i} entry={entry} />)}</div>;
 };
 
-const mapStateToProps = (state) => ({
+type AppState = {
+	log: LogEntryType[];
+}
+
+const mapStateToProps = (state: AppState) => ({
 	entries: state.log,
 });
 

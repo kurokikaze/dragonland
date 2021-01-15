@@ -8,7 +8,7 @@ import ensure from 'connect-ensure-login';
 import {getDeckById} from '../utils/database.js';
 import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
 import config from '../config.js';
-import { ACTION_PLAYER_WINS } from 'moonlands/src/const.js';
+import { ACTION_PLAYER_WINS } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
 

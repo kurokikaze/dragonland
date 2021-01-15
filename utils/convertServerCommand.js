@@ -25,7 +25,7 @@ import {
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
 

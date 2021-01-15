@@ -1,7 +1,7 @@
 import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
-import Power from '../icons/Power.jsx';
-import Spell from '../icons/Spell.jsx';
+import Power from '../icons/Power.tsx';
+import Spell from '../icons/Spell.tsx';
 
 export default function PromptResolutionMessage ({type = 'power', chosenTarget = null, chosenNumber = null}) {
 	return (chosenTarget || chosenNumber) ? <div className="BaseMessage">
