@@ -326,6 +326,7 @@ export default (state = defaultState, action) => {
 					break;
 				}
 			}
+
 			return {
 				...state,
 				prompt: true,

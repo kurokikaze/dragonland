@@ -117,19 +117,26 @@ function convertServerCommand(initialAction, game, playerId) {
 					break;
 				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
+					const restrictions = action.restrictions || (action.restriction ? [
+						{
+							type: game.getMetaValue(action.restriction, action.generatedBy),
+							value: game.getMetaValue(action.restrictionValue, action.generatedBy),
+						},
+					] : null);
+
+					const zone = game.getMetaValue(action.zone, action.generatedBy);
 					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
 					const numberOfCards = game.getMetaValue(action.numberOfCards, action.generatedBy);
-					const zoneContent = game.getZone(action.zone, zoneOwner).cards;
-					const cardFilter = game.makeCardFilter(action.restrictions);
-
-					const cards = action.restrictions ? zoneContent.filter(cardFilter) : zoneContent;
+					const cardFilter = game.makeCardFilter(restrictions || []);
+					const zoneContent = game.getZone(zone, zoneOwner).cards;
+					const cards = restrictions ? zoneContent.filter(cardFilter) : zoneContent;
 
 					return {
 						type: ACTION_ENTER_PROMPT,
 						promptType: PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 						player: action.player,
-						zone: action.zone,
-						restrictions: action.restrictions,
+						zone,
+						restrictions,
 						cards: cards.map(convertCard),
 						zoneOwner,
 						numberOfCards,

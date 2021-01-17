@@ -2,7 +2,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers, withStateHandlers} from 'recompose';
-import {getAvailableStartingCards} from '../../selectors';
 import cn from 'classnames';
 import Card from '../Card.jsx';
 import {withView} from '../CardView.jsx';
@@ -22,7 +21,7 @@ function PromptChooseCards({cards, message, triggerElement, selected, onSend, nu
 				{cards.map(({card, id}, i) => (
 					<div className={cn('zoneCardSelect', {'chosen': selected.includes(id)})} key={i}>
 						<CardDisplay
-							id={`test${i}`}
+							id={`card${i}`}
 							card={{name: card}}
 							data={{}}
 							onClick={() => triggerElement(id)}
@@ -44,7 +43,6 @@ const mapStateToProps = (state) => {
 		zoneOwner: state.promptParams.zoneOwner,
 		message: state.promptParams.message,
 		generatedBy: state.promptGeneratedBy,
-		availableCards: getAvailableStartingCards(state.promptParams.cards, state),
 		numberOfCards: state.promptParams.numberOfCards,
 	};
 };

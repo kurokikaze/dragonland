@@ -138,9 +138,7 @@ export const cardDataTransformer = (state, props) => {
 								break;
 							}
 							case PROPERTY_ENERGIZE: {
-								result.modifiedData.energize = modifierFunction(result.modifiedData.energize);
-								console.log(result.modifiedData.energize);
-								console.dir(result.modifiedData);
+								result.modifiedData.energize = modifierFunction(result.modifiedData.energize || 0);
 								break;
 							}
 						}
