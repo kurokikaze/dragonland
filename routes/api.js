@@ -111,6 +111,19 @@ router.post('/start',
 
 var ioLaunched = false;
 
+router.get(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const deckId = req.params[0];
+		const deck = await getDeckById(deckId);
+
+		if (deck && deck.cards) {
+			res.json(deck);
+		} else {
+			res.sendStatus(404);
+		}
+	});
+
 router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 	function(req, res) {
 		const playerHash = req.params[0];

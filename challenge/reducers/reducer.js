@@ -1,6 +1,11 @@
-import {FETCH_CHALLENGES_SUCCESS, CHANGE_CURRENT_DECK} from '../actions/index.js';
+import {
+	FETCH_CHALLENGES_SUCCESS,
+	CHANGE_CURRENT_DECK,
+	FETCH_DECK_SUCCESS,
+} from '../actions/index.js';
 
 const defaultState = {
+	deck: null,
 	decks: [],
 	challenges: [],
 	currentDeck: null,
@@ -19,7 +24,14 @@ export default (state = defaultState, action) => {
 		case CHANGE_CURRENT_DECK: {
 			return {
 				...state,
+				deck: null,
 				currentDeck: action.deck,
+			};
+		}
+		case FETCH_DECK_SUCCESS: {
+			return {
+				...state,
+				deck: action.deck,
 			};
 		}
 		default: {

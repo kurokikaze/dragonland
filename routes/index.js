@@ -1,7 +1,7 @@
 import express from 'express';
 import ensure from 'connect-ensure-login';
 
-import {getUserDecks} from '../utils/database.js';
+import {getDeckById, getUserDecks} from '../utils/database.js';
 import {getChallenges} from '../utils/challenge.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/',
 	ensure.ensureLoggedIn('/users/login'),
 	async function(req, res) {
 		const decks = await getUserDecks(req.user.gameId);
+		const deck = await getDeckById(decks[0]._id);
 
 		res.render('challenge', {
 			title: 'Dragonlands',
@@ -19,6 +20,7 @@ router.get('/',
 			initialState: {
 				username: req.user.name,
 				decks,
+				deck,
 				currentDeck: decks[0]._id,
 				challenges: getChallenges(),
 			},
