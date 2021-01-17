@@ -54,12 +54,14 @@ export const withAbilities = Component => (props) => {
 	const hasAdditionalIcons = hasSeveralAttacks || canAttackDirectly || canPackHunt || hasEnergize;
 	const showEffects = hasEffects && !props.isOnPrompt && !props.isDragging;
 
+	const powers = (props.modifiedData ? props.modifiedData.powers : props.card.data.powers);
+
 	const AbilityComponent = isOpponent ? OpponentCardAbility : CardAbility;
-	console.dir(props.modifiedData);
+
 	return <>
 		{(showAbilities || showEffects || hasAdditionalIcons) && <div className='cardAbilityHolder'>
 			{hasAbilities && (props.actionsAvailable || isOpponent) && <div className='cardAbilities'>
-				{props.card.data.powers.map(({name, text, cost}, i) =>
+				{powers.map(({name, text, cost}, i) =>
 					<AbilityComponent 
 						key={i}
 						name={name}
@@ -81,10 +83,10 @@ export const withAbilities = Component => (props) => {
 					{...props}
 				/>
 				<div className={iconType}>
+					{hasEnergize &&  <PowerIcon icon={<Energize />} number={`+${energizeProperty}`} active />}
 					{showEffects && <PowerIcon icon={<Ability />} />}
 					{hasSeveralAttacks && <PowerIcon icon={<Attack />} number={props.modifiedData.attacksPerTurn} />}
 					{canAttackDirectly && <PowerIcon icon={<Dagger />} />}
-					{hasEnergize &&  <PowerIcon icon={<Energize />} number={`+${energizeProperty}`} active />}
 					{canPackHunt && <PowerIcon icon={<Velociraptor/>} active={stillHasAttacks} activeColor='rgb(131, 49, 131)' />}
 					{showAbilities && <PowerIcon active={hasUnusedAbilities && props.actionsAvailable} />}
 				</div>

@@ -38,6 +38,7 @@ import {
 
 	PROPERTY_ATTACKS_PER_TURN,
 	PROPERTY_ENERGIZE,
+	PROPERTY_POWER_COST,
 } from 'moonlands/dist/const';
 
 import {zoneContent} from '../selectors';
@@ -114,8 +115,6 @@ export const cardDataTransformer = (state, props) => {
 			staticAbilityCards.forEach(staticAbilityCard => {
 				staticAbilityCard.card.data.staticAbilities.forEach(staticAbility => {
 					if (cardMatchesSelector(result, staticAbility.selector, staticAbilityCard)) {
-						console.log(card.name, staticAbility.selector);
-						console.log('Matches');
 						const modifierFunction = initialValue => {
 							const {operator, operandOne} = staticAbility.modifier;
 						
@@ -128,6 +127,12 @@ export const cardDataTransformer = (state, props) => {
 						};
 
 						switch(staticAbility.property) {
+							case PROPERTY_POWER_COST: {
+								if ('powers' in result.modifiedData) {
+									result.modifiedData.powers = result.modifiedData.powers.map(power => ({...power, cost: modifierFunction(power.cost)}));
+								}
+								break;
+							}
 							case PROPERTY_ATTACKS_PER_TURN: {
 								result.modifiedData.attacksPerTurn = modifierFunction(result.modifiedData.attacksPerTurn);
 								break;
