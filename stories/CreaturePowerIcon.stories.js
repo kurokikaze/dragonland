@@ -2,14 +2,14 @@ import React from 'react';
 
 import CreaturePowerIcon from '../client/components/CreaturePowerIcon.jsx';
 
-import Power from '../client/components/icons/Power.jsx';
-import Relic from '../client/components/icons/Relic.jsx';
-import Spell from '../client/components/icons/Spell.jsx';
-import Dagger from '../client/components/icons/Dagger.jsx';
-import Energize from '../client/components/icons/Energize.jsx';
-import Attack from '../client/components/icons/Attack.jsx';
-import Ability from '../client/components/icons/Ability.jsx';
-import Velociraptor from '../client/components/icons/Velociraptor.jsx';
+import Power from '../client/components/icons/Power.tsx';
+import Relic from '../client/components/icons/Relic.tsx';
+import Spell from '../client/components/icons/Spell.tsx';
+import Dagger from '../client/components/icons/Dagger.tsx';
+import Energize from '../client/components/icons/Energize.tsx';
+import Attack from '../client/components/icons/Attack.tsx';
+import Ability from '../client/components/icons/Ability.tsx';
+import Velociraptor from '../client/components/icons/Velociraptor.tsx';
 
 // eslint-disable-next-line no-unused-vars
 import styles from '../public/stylesheets/game.css';

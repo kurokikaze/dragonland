@@ -17,6 +17,7 @@
 
 .promptWindow {
     width: 80%;
+    font: Lato, "Helvetica Neue", Helvetica, Arial;
     position: absolute;
     top: 10%;
     left: 10%;
@@ -120,4 +121,15 @@
 
 .promptChooseCards .cardSelect.chosen .cardHolder {
     opacity: 1;
+}
+
+.promptMayEffect {
+    width: 30%;
+    min-height: 30%;
+}
+
+.promptMayEffect .buttons {
+    margin: 20px;
+    display: flex;
+    justify-content: space-around;
 }
