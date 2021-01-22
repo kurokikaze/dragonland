@@ -29,7 +29,7 @@ const getCardUrl = (card, useLocket) => {
 	if (!card) {
 		return '/images/cards/cardBack.jpg';
 	} else if (useLocket) {
-		return `/images/masked/${camelCase(card.name)}.jpg`;
+		return `/images/masked/${camelCase(card.name)}.png`;
 	} else {
 		return `/images/cards/${camelCase(card.name)}.jpg`;
 	}

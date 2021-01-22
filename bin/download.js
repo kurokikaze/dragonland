@@ -9,6 +9,9 @@ import {camelCase} from '../common/utils.js';
 // Fire ball is named inconsistently with other cards,
 // it's fixed in Moonlands, but we still have to download file by old URL
 
+// Locket creation:
+// convert public/images/cards/waterOfLife.jpg masks/relic.png -alpha off -compose CopyOpacity -composite -trim public/images/masked/waterOfLife.png
+
 const ALL_SETS_FIELD_NAME = 'plugins/magination2/sets/allsets.txt';
 const CORRECTIONS = {
 	'Fire Ball': 'Fire ball',
