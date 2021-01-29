@@ -9919,9 +9919,9 @@ mongodb@^3.6.2:
   optionalDependencies:
     saslprep "^1.0.0"
 
-"moonlands@https://github.com/kurokikaze/moonlands/archive/v0.5.17.tar.gz":
+"moonlands@https://github.com/kurokikaze/moonlands/archive/v0.5.18.tar.gz":
   version "0.5.17"
-  resolved "https://github.com/kurokikaze/moonlands/archive/v0.5.17.tar.gz#2c9dd8b4c1e6835e4cbe629b93d8e779660108e7"
+  resolved "https://github.com/kurokikaze/moonlands/archive/v0.5.18.tar.gz#68af7f210d489a97a6151cc96b429b42b8f790df"
   dependencies:
     "@babel/preset-env" "^7.11.5"
     "@babel/preset-typescript" "^7.12.7"
