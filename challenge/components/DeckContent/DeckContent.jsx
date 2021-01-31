@@ -2,19 +2,9 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Row, Col} from 'antd';
 import {camelCase} from '../../../common/utils.js';
+import CardView from  '../CardView/CardView.jsx';
 
 import './style.css';
-
-const CardView = ({name}) => {
-	return (
-		<div className='cardViewHolder fadeInDown'>
-			<div className='cardView'>
-				<img src={`/images/cards/${camelCase(name)}.jpg`} alt={name} />
-			</div>
-			<span>{name}</span>
-		</div>
-	);
-};
 
 function DeckContent({deck}) {
 	const magiOne = deck.cards[0];
@@ -31,9 +21,9 @@ function DeckContent({deck}) {
 			<Col span={24}><h3>Magi</h3></Col>
 		</Row>
 		<Row>
-			<Col span={8}><img className={'smaller'} src={`/images/cards/${camelCase(magiOne)}.jpg`} /></Col>
-			<Col span={8}><img className={'smaller'} src={`/images/cards/${camelCase(magiTwo)}.jpg`} /></Col>
-			<Col span={8}><img className={'smaller'} src={`/images/cards/${camelCase(magiThree)}.jpg`} /></Col>
+			<Col span={8}><img className='smaller' src={`/images/cards/${camelCase(magiOne)}.jpg`} /></Col>
+			<Col span={8}><img className='smaller' src={`/images/cards/${camelCase(magiTwo)}.jpg`} /></Col>
+			<Col span={8}><img className='smaller' src={`/images/cards/${camelCase(magiThree)}.jpg`} /></Col>
 		</Row>
 		<Row>
 			<Col span={24}><h3>Cards</h3></Col>

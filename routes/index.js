@@ -28,4 +28,25 @@ router.get('/',
 	}
 );
 
+router.get('/deck-editor(/[a-zA-Z0-9]+)?',
+	ensure.ensureLoggedIn('/users/login'),
+	async function(req, res) {
+		const decks = await getUserDecks(req.user.gameId);
+		const deck = await getDeckById(decks[0]._id);
+
+		res.render('challenge', {
+			title: 'Dragonlands',
+			playerId: req.user.gameId || null,
+			username: req.user.name,
+			initialState: {
+				username: req.user.name,
+				decks,
+				deck,
+				currentDeck: decks[0]._id,
+				challenges: getChallenges(),
+			},
+		});
+	}
+);
+
 export default router;

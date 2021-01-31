@@ -1,0 +1,35 @@
+.deckView {
+    display: inline-block;
+}
+
+.deckView li {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.deckView .cardViewHolder {
+    flex-grow: 1;
+}
+
+.cardCount {
+    margin: 0 10px;
+}
+
+.magiHolder {
+    display: flex;
+    justify-content: space-around;
+}
+
+.magiVignette {
+    width: 150px;
+    height: 150px;
+    background-position: top -25px left -20px;
+    border-radius: 75px;
+    overflow: hidden;
+    background-size: 130%;
+}
+
+.magiVignette.chosenMagi {
+    box-shadow: 0 0 11px 9px green;
+}

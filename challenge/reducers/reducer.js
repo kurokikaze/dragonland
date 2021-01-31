@@ -2,6 +2,7 @@ import {
 	FETCH_CHALLENGES_SUCCESS,
 	CHANGE_CURRENT_DECK,
 	FETCH_DECK_SUCCESS,
+	SAVE_DECK,
 } from '../actions/index.js';
 
 const defaultState = {
@@ -26,6 +27,13 @@ export default (state = defaultState, action) => {
 				...state,
 				deck: null,
 				currentDeck: action.deck,
+			};
+		}
+		case SAVE_DECK: {
+			return {
+				...state,
+				decks: state.decks.map(d => d._id === action.deck._id ? action.deck : d),
+				deck: state.deck._id === action.deck._id ? action.deck : state.deck,
 			};
 		}
 		case FETCH_DECK_SUCCESS: {

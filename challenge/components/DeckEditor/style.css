@@ -1,0 +1,44 @@
+.startingCard {
+    color: green;
+}
+
+.allCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 30px;
+}
+
+.allCardsContainer {
+    margin-top: 50px;
+}
+
+.allCards .cardImage {
+    overflow: hidden;
+    border-radius: 13px;
+    width: 270px;
+}
+
+.cardImage img {
+    filter: grayscale(100%);
+}
+
+.cardImage.canAdd img {
+    filter: none;
+}
+
+.cardSlot {
+    width: 270px;
+    position: relative;
+}
+
+.cardSlot .addIcon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.cardSlot .addIcon svg {
+    filter: drop-shadow(2px 4px 6px black);
+}

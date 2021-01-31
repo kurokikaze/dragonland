@@ -5,7 +5,7 @@ import {join as joinPath} from 'path';
 import {State} from 'moonlands';
 import ensure from 'connect-ensure-login';
 
-import {getDeckById} from '../utils/database.js';
+import {getDeckById, saveDeckById} from '../utils/database.js';
 import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
 import config from '../config.js';
 import { ACTION_PLAYER_WINS } from 'moonlands/dist/const.js';
@@ -118,6 +118,28 @@ router.get(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 		const deck = await getDeckById(deckId);
 
 		if (deck && deck.cards) {
+			res.json(deck);
+		} else {
+			res.sendStatus(404);
+		}
+	});
+
+router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const newDeck = req.body;
+		const deckId = req.params[0];
+		const gameId = req.user.gameId;
+
+		const deck = await getDeckById(deckId);
+
+		if (deck && deck.cards && deck.playerId === gameId) {
+			if (newDeck._id) {
+				await saveDeckById({
+					...newDeck,
+					playerId: gameId,
+				});
+			}
 			res.json(deck);
 		} else {
 			res.sendStatus(404);

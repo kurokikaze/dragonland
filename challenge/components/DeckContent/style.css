@@ -23,23 +23,3 @@
     flex: 1 1 25%;
     text-align: center;
 }
-
-.cardViewHolder {
-    position: relative;
-    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
-}
-
-.cardViewHolder .cardView {
-    display: none;
-    position: absolute;
-}
-
-.cardView {
-    bottom: 80px;
-    border-radius: 13px;
-    overflow: hidden;
-}
-
-.cardViewHolder:hover .cardView {
-    display: block;
-}

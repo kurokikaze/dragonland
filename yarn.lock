@@ -7288,6 +7288,11 @@ hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.0, hoist-non-react-
   dependencies:
     react-is "^16.7.0"
 
+hookrouter@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/hookrouter/-/hookrouter-1.2.5.tgz#ea1b88fd9f6a48816b17145bfb2b38dfc93df21e"
+  integrity sha512-9OLve2u+JZDCOgPnxJu5dvg/mU1w2ZWWlSOFxCKcGQKRSH1MXI8tMwEgm64mQfjZLET/7yFRTUrZ4hUYoK0ezw==
+
 hosted-git-info@^2.1.4:
   version "2.8.8"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.8.tgz#7539bd4bc1e0e0a895815a2e0262420b12858488"
@@ -9919,9 +9924,9 @@ mongodb@^3.6.2:
   optionalDependencies:
     saslprep "^1.0.0"
 
-"moonlands@https://github.com/kurokikaze/moonlands/archive/v0.5.18.tar.gz":
-  version "0.5.17"
-  resolved "https://github.com/kurokikaze/moonlands/archive/v0.5.18.tar.gz#68af7f210d489a97a6151cc96b429b42b8f790df"
+"moonlands@https://github.com/kurokikaze/moonlands/archive/v0.5.19.tar.gz":
+  version "0.5.19"
+  resolved "https://github.com/kurokikaze/moonlands/archive/v0.5.19.tar.gz#175ba7465357599391e68cfa6eb861f01a573629"
   dependencies:
     "@babel/preset-env" "^7.11.5"
     "@babel/preset-typescript" "^7.12.7"
@@ -13860,6 +13865,11 @@ style-to-object@0.3.0, style-to-object@^0.3.0:
   integrity sha512-CzFnRRXhzWIdItT3OmF8SQfWyahHhjq3HwcMNCNLn+N7klOOqPjMeG/4JSu77D7ypZdGvSzvkrbyeTMizz2VrA==
   dependencies:
     inline-style-parser "0.1.1"
+
+style.css@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/style.css/-/style.css-1.0.0.tgz#0ee5aa605dfa962ab2b2ed06a809f672594ce344"
+  integrity sha512-Ko0Bj+wqvyBpejOUKwPGNabkXl73yLZygnsfwKtL8YVYyyOXp4GXWGsKlAxw4Na83JOBSFzwh6yCr0P2ohcwJQ==
 
 stylehacks@^4.0.0:
   version "4.0.3"

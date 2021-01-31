@@ -61,6 +61,16 @@ export async function getDeckById(deckId) {
 	return deckObject;
 }
 
+export async function saveDeckById(deck) {
+	const deckId = deck._id;
+	delete deck._id;
+	await _db.collection(DECKS_COLLECTION).replaceOne({_id: new ObjectID(deckId)}, deck);
+}
+
+export async function saveNewDeck(deck) {
+	await _db.collection(DECKS_COLLECTION).insertOne(deck);
+}
+
 export function getUserByUsername(username, callback) {
 	_db.collection(USERS_COLLECTION).findOne({login: username}, callback);
 }
@@ -92,7 +102,7 @@ export async function insertUser(username, name, passwordHash) {
 		name,
 		password: passwordHash,
 	});
-	_db.collection(DECKS_COLLECTION).insertMany([
+	await _db.collection(DECKS_COLLECTION).insertMany([
 		{
 			...CALD_DECK,
 			name: `${name}'s Cald Deck`,
