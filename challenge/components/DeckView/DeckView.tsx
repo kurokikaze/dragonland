@@ -10,6 +10,7 @@ import './style.css';
 
 type Props = {
 	ourCards: string[]
+	addToDeck: (card: string) => void
 	removeFromDeck: (card: string) => void
 	onMagiEditor: (place: number) => void
 	magiEditor: number | null
