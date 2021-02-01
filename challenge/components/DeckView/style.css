@@ -21,6 +21,43 @@
 .magiHolder {
     display: flex;
     justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.magiCard {
+    position: relative;
+}
+
+.magiCard .startingEnergy {
+    position: absolute;
+    border-radius: 50px;
+    background-color: orange;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    top: 112px;
+    user-select: none;
+}
+
+.magiCard .energizeRate {
+    position: absolute;
+    border-radius: 50px;
+    background-color: orange;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    top: 112px;
+    right: 1px;
+    user-select: none;
+}
+
+.magiCard .cardViewHolder {
+    font-size: 1.2em;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
 }
 
 .magiVignette {

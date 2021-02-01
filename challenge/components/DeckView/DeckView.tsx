@@ -16,6 +16,21 @@ type Props = {
 	magiEditor: number | null
 }
 
+function MagiView({name, id, chosenMagi, onMagiEditor}) {
+	const magi = cards.find(card => card.name === name);
+	return (<div className='magiCard'>
+		<div
+			onClick={() => onMagiEditor(!chosenMagi ? id : null)}
+			className={cn('magiVignette', {'chosenMagi': chosenMagi})}
+			style={{backgroundImage: `url(/images/cards/${camelCase(name)}.jpg)`}}
+		>
+		</div>
+		<CardView name={magi.name} className='deckView' top={false} />
+		{magi && <div className='startingEnergy'>{magi.data.startingEnergy}</div>}
+		{magi && <div className='energizeRate'>+{magi.data.energize}</div>}
+	</div>);
+}
+
 export default function DeckView({ourCards, addToDeck, removeFromDeck, onMagiEditor, magiEditor}: Props) {
 	const magiOne = ourCards[0];
 	const magiTwo = ourCards[1];
@@ -31,21 +46,9 @@ export default function DeckView({ourCards, addToDeck, removeFromDeck, onMagiEdi
 		<div>
 			<div>Cards: {ourCards.length}</div>
 			<div className='magiHolder'>
-				<div
-					onClick={() => onMagiEditor((magiEditor === null) ? 0 : null)}
-					className={cn('magiVignette', {'chosenMagi': magiEditor === 0})}
-					style={{backgroundImage: `url(/images/cards/${camelCase(magiOne)}.jpg)`}}
-				>&nbsp;</div>
-				<div
-					onClick={() => onMagiEditor((magiEditor === null) ? 1 : null)}
-					className={cn('magiVignette', {'chosenMagi': magiEditor === 1})}
-					style={{'backgroundImage': `url(/images/cards/${camelCase(magiTwo)}.jpg)`}}
-				>&nbsp;</div>
-				<div
-					onClick={() => onMagiEditor((magiEditor === null) ? 2 : null)}
-					className={cn('magiVignette', {'chosenMagi': magiEditor === 2})}
-					style={{'backgroundImage': `url(/images/cards/${camelCase(magiThree)}.jpg)`}}
-				>&nbsp;</div>
+				<MagiView name={magiOne} id={0} onMagiEditor={onMagiEditor} chosenMagi={magiEditor === 0} />
+				<MagiView name={magiTwo} id={1} onMagiEditor={onMagiEditor} chosenMagi={magiEditor === 1} />
+				<MagiView name={magiThree} id={2} onMagiEditor={onMagiEditor} chosenMagi={magiEditor === 2} />
 			</div>
 			<div className='deckView'>
 				<ul>
