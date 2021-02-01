@@ -1,11 +1,11 @@
 /* global fetch */
 import React, {useEffect, useState, useCallback} from 'react';
 import {useDispatch} from 'react-redux';
-import { Row, Col, Input, Spin, Button } from 'antd';
+import { Row, Col, Input, Spin, Button, Space } from 'antd';
 import { cards } from 'moonlands/dist/cards';
 import cn from 'classnames';
 import { TYPE_MAGI } from 'moonlands/dist/const';
-import { saveDeck } from '../../actions';
+import { saveDeck, saveNewDeck } from '../../actions';
 import Add from '../icons/Add.jsx';
 import CardFilter, {defaultFilter} from '../CardFilter/CardFilter.jsx';
 import DeckView from '../DeckView/DeckView.tsx';
@@ -16,6 +16,7 @@ import './style.css';
 const DeckEditor = ({deckId}) => {
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
+	const [savingNew, setSavingNew] = useState(false);
 	const [deck, setDeck] = useState(null);
 	const [filter, setFilter] = useState(defaultFilter);
 	const [search, setSearch] = useState('');
@@ -47,6 +48,23 @@ const DeckEditor = ({deckId}) => {
 		}).catch(() => {
 			setSaving(false);
 		});
+	}, [deck]);
+
+	const handleSaveAsNew = useCallback(() => {
+		setSavingNew(true);
+		fetch('/api/deck/new', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(deck),
+		}).then(data => data.json())
+			.then(newDeck => {
+				dispatch(saveNewDeck(newDeck));
+				setSavingNew(false);
+			}).catch(() => {
+				setSavingNew(false);
+			});
 	}, [deck]);
 
 	const removeFromDeck = useCallback(name => {
@@ -105,14 +123,14 @@ const DeckEditor = ({deckId}) => {
 		{loading ? <Spin size='large' /> :
 			<>
 				<Row>
-					<Col span={24}><Input onChange={e => setName(e.target.value)} defaultValue={deck.name} /></Col>
+					<Col span={24}><Input className='deckName' onChange={e => setName(e.target.value)} defaultValue={deck.name} /></Col>
 				</Row>
 				<Row>
 					<Col span={16}>
 						<div>
 							<section>
 								<CardFilter onFilterChange={setFilter} magiMode={!(magiEditor === null)} />
-								<Input placeholder='Card Search' onChange={e => setSearch(e.target.value)} />
+								<div className='cardSearch'><Input placeholder='Card Search' onChange={e => setSearch(e.target.value)} /></div>
 							</section>
 							{magiEditor === null && <div className='allCardsContainer'>
 								<div className='allCards'>
@@ -141,7 +159,10 @@ const DeckEditor = ({deckId}) => {
 							<DeckView ourCards={deck.cards} addToDeck={addToDeck} removeFromDeck={removeFromDeck} onMagiEditor={setMagiEditor} magiEditor={magiEditor} />
 						</div>
 						<div>
-							<Button disabled={!isDeckReadyForSaving} loading={saving} type="primary" onClick={() => handleSave()}>Save deck</Button>
+							<Space>
+								<Button disabled={!isDeckReadyForSaving} loading={saving} type="primary" onClick={() => handleSave()}>Save deck</Button>
+								<Button disabled={!isDeckReadyForSaving} loading={savingNew} type="default" onClick={() => handleSaveAsNew()}>Save as new deck</Button>
+							</Space>
 						</div>
 					</Col>
 				</Row>

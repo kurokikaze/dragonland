@@ -50,7 +50,7 @@ export default function DeckView({ourCards, addToDeck, removeFromDeck, onMagiEdi
 			<div className='deckView'>
 				<ul>
 					{distinctCards.map(card => <li key={card}>
-						<CardView name={card} className={cn('deckView', {'startingCard': startingCards.has(card)})} />
+						<CardView name={card} className={cn('deckView', {'startingCard': startingCards.has(card)})} top={false} />
 						<div className='cardCount'>[{deckCards.filter(c => c === card).length}]</div>
 						<div onClick={() => removeFromDeck(card)}><Remove size={20} color={'red'} /></div>
 						{deckCards.filter(c => c === card).length < 3 && ourCards.length < 43 && <div onClick={() => addToDeck(card)}><Add size={20} color='green' /></div>}

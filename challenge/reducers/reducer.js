@@ -3,6 +3,7 @@ import {
 	CHANGE_CURRENT_DECK,
 	FETCH_DECK_SUCCESS,
 	SAVE_DECK,
+	SAVE_NEW_DECK,
 } from '../actions/index.js';
 
 const defaultState = {
@@ -33,13 +34,20 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				decks: state.decks.map(d => d._id === action.deck._id ? action.deck : d),
-				deck: state.deck._id === action.deck._id ? action.deck : state.deck,
+				currentDeck: action.deck._id,
+			};
+		}
+		case SAVE_NEW_DECK: {
+			return {
+				...state,
+				decks: [...state.decks, action.deck],
+				currentDeck: action.deck._id,
 			};
 		}
 		case FETCH_DECK_SUCCESS: {
 			return {
 				...state,
-				deck: action.deck,
+				decks: [...state.decks, action.deck],
 			};
 		}
 		default: {

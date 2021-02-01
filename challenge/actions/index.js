@@ -12,6 +12,7 @@ export const FETCH_DECK_SUCCESS = 'actions/fetch_deck_success';
 export const FETCH_DECK_FAILURE = 'actions/fetch_deck_failure';
 
 export const SAVE_DECK = 'actions/deck_saved';
+export const SAVE_NEW_DECK = 'actions/new_deck_saved';
 
 export const changeCurrentDeck = (deck) => ({type: CHANGE_CURRENT_DECK, deck});
 export const startChallenge = (deck) => ({type: START_CHALLENGE, deck});
@@ -22,6 +23,7 @@ export const fetchDeckStart = () => ({type: FETCH_DECK_START});
 export const fetchDeckSuccess = (deck) => ({type: FETCH_DECK_SUCCESS, deck});
 export const fetchDeckFailure = () => ({type: FETCH_DECK_FAILURE});
 export const saveDeck = (deck) => ({type: SAVE_DECK, deck});
+export const saveNewDeck = (deck) => ({type: SAVE_NEW_DECK, deck});
 
 const toJSON = response => response.json();
 

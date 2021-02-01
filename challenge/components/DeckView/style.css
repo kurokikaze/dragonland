@@ -1,11 +1,13 @@
 .deckView {
     display: inline-block;
+    font-size: 1.1em;
 }
 
 .deckView li {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 5px;
 }
 
 .deckView .cardViewHolder {

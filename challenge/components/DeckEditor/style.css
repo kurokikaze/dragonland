@@ -1,5 +1,13 @@
+.ant-input.deckName {
+    font-size: 2em;
+}
+
 .startingCard {
     color: green;
+}
+
+.cardSearch {
+    margin-top: 30px;
 }
 
 .allCards {

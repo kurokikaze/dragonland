@@ -38,7 +38,7 @@ function DeckContent({deck}) {
 
 function mapStateToProps(state) {
 	return {
-		deck: state.deck,
+		deck: state.decks.find(deck => deck._id == state.currentDeck),
 	};
 }
 

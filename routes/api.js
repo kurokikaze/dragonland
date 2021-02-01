@@ -1,12 +1,12 @@
 import express from 'express';
 import nanoid from 'nanoid';
-import {open, write, close} from 'fs';
-import {join as joinPath} from 'path';
-import {State} from 'moonlands';
+import { open, write, close } from 'fs';
+import { join as joinPath } from 'path';
+import { State } from 'moonlands';
 import ensure from 'connect-ensure-login';
 
-import {getDeckById, saveDeckById} from '../utils/database.js';
-import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
+import { getDeckById, saveDeckById, saveNewDeck } from '../utils/database.js';
+import { getChallenges, addChallenge, removeByName } from '../utils/challenge.js';
 import config from '../config.js';
 import { ACTION_PLAYER_WINS } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
@@ -131,18 +131,30 @@ router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 		const deckId = req.params[0];
 		const gameId = req.user.gameId;
 
-		const deck = await getDeckById(deckId);
+		if (deckId === 'new') {
+			const insertedId = await saveNewDeck({
+				...newDeck,
+				playerId: gameId,
+			});
+			
+			res.json({...newDeck, _id: insertedId});
+		} else {
+			const deck = await getDeckById(deckId);
 
-		if (deck && deck.cards && deck.playerId === gameId) {
-			if (newDeck._id) {
-				await saveDeckById({
+			if (deck && deck.cards && deck.playerId === gameId) {
+				if (newDeck._id) {
+					await saveDeckById({
+						...newDeck,
+						playerId: gameId,
+					});
+				}
+				res.json({
 					...newDeck,
 					playerId: gameId,
 				});
+			} else {
+				res.sendStatus(404);
 			}
-			res.json(deck);
-		} else {
-			res.sendStatus(404);
 		}
 	});
 
