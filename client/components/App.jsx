@@ -43,11 +43,12 @@ import {
 
 const EnhancedPowerMessage = withSingleCardData(PowerMessage);
 
-function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded, cardsInOurDiscard, cardsInOpponentDiscard, cardsInOurDeck, cardsInOpponentDeck}) {
+function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded, cardsInOurDiscard, cardsInOpponentDiscard, cardsInOurDeck, cardsInOpponentDeck, timer, timerSeconds}) {
 	const [discardShown, setDiscardShown] = useState(false);
 	const [opponentDiscardShown, setOpponentDiscardShown] = useState(false);
 	return (
 		<div className='gameContainer'>
+			{timer && <div className="turnTimer">00:{timerSeconds.toString().padStart(2, '0')}</div>}
 			<div className="game">
 				<DndProvider backend={Backend}>
 					{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
@@ -58,7 +59,7 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 					<div className='middleZones'>
 						<div className='zone-placeholder'>
 							<div className='libraryCounter'>{cardsInOpponentDeck}</div>
-							<div className='discardCounter' onClick={() => {setDiscardShown(false); setOpponentDiscardShown(true);}}>{cardsInOpponentDiscard}</div>
+							<div className='discardCounter' onClick={() => { setDiscardShown(false); setOpponentDiscardShown(true); }}>{cardsInOpponentDiscard}</div>
 						</div>
 						<ZoneOpponentActiveMagi zoneId='opponentActiveMagi' name='Opponent Active Magi' />
 						<ZonePlayerRelics  zoneId='opponentRelics' name='Opponent Relics' />
@@ -69,13 +70,13 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 						<ZonePlayerRelics  zoneId='playerRelics' name='Player Relics' />
 						<ZonePlayerActiveMagi zoneId='playerActiveMagi' name='Player Active Magi' />
 						<div className='zone-placeholder'>
-							<div className='discardCounter' onClick={() => {setDiscardShown(true); setOpponentDiscardShown(false);}}>{cardsInOurDiscard}</div>
+							<div className='discardCounter' onClick={() => { setDiscardShown(true); setOpponentDiscardShown(false); }}>{cardsInOurDiscard}</div>
 							<div className='libraryCounter'>{cardsInOurDeck}</div>
 						</div>
 					</div>
 					<ZoneHand zoneId='playerHand' name='Player hand' onCardClick={onPlay} />
 					<StepBoard />
-					{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={() => onPass()}>Pass</button>}
+					{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={onPass}>Pass</button>}
 					{!isOurTurn && <div>Opponent&apos;s turn</div>}
 					{discardShown && <div className='discardOverlay'>
 						<h2>Discard</h2>
@@ -100,6 +101,8 @@ function mapStateToProps(state) {
 	return {
 		prompt: isPromptActive(state),
 		isOurTurn: isOurTurn(state),
+		timer: state.turnTimer,
+		timerSeconds: state.turnSecondsLeft,
 		currentStep: state.step,
 		message: state.message,
 		gameEnded: state.gameEnded,

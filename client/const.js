@@ -10,3 +10,4 @@ export const MESSAGE_TYPE_RELIC = 'messages/relic';
 export const MESSAGE_TYPE_SPELL = 'messages/spell';
 export const MESSAGE_TYPE_PROMPT_RESOLUTION = 'messages/prompt_resolution';
 
+export const ACTION_TIMER_TICK = 'actions/timer_tick';

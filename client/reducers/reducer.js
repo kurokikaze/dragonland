@@ -8,6 +8,7 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
 	ACTION_POWER,
+	ACTION_TIME_NOTIFICATION,
 
 	TYPE_CREATURE,
 	TYPE_MAGI,
@@ -21,6 +22,7 @@ import {
 	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
 	EFFECT_TYPE_START_OF_TURN,
+	EFFECT_TYPE_END_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY,
@@ -74,13 +76,14 @@ import {
 } from '../actions';
 
 import {
+	ACTION_TIMER_TICK,
 	MESSAGE_TYPE_POWER,
 	MESSAGE_TYPE_RELIC,
 	MESSAGE_TYPE_SPELL,
 	MESSAGE_TYPE_PROMPT_RESOLUTION,
 } from '../const.js';
 
-import {byName} from 'moonlands/dist/cards';
+import { byName } from 'moonlands/dist/cards';
 
 const defaultState = {
 	zones: {
@@ -109,6 +112,8 @@ const defaultState = {
 		},
 	},
 	log: [],
+	turnTimer: false,
+	turnSecondsLeft: null,
 	gameEnded: false,
 	winner: null,
 };
@@ -150,7 +155,21 @@ const findInPlay = (state, id) => {
 };
 
 export default (state = defaultState, action) => {
+	console.dir(action);
 	switch (action.type) {
+		case ACTION_TIME_NOTIFICATION: {
+			return {
+				...state,
+				turnTimer: true,
+				turnSecondsLeft: 20,
+			};
+		}
+		case ACTION_TIMER_TICK: {
+			return {
+				...state,
+				turnSecondsLeft: Math.max(state.turnSecondsLeft - 1, 0),
+			};
+		}
 		case ACTION_PLAY: {
 
 			newLogEntry = {
@@ -519,6 +538,12 @@ export default (state = defaultState, action) => {
 							activePlayer: action.player,
 						};
 					}
+				}
+				case EFFECT_TYPE_END_OF_TURN: {
+					return {
+						...state,
+						turnTimer: false, 
+					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {
 					const targetBaseCard = byName(action.target.card);

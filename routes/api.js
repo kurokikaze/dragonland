@@ -53,6 +53,7 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 		deckTwo,
 	);
 
+	gameState.enableTurnTimer(100);
 	runningGames[gameId] = gameState;
 
 	return [gameId, playerOneHash, playerTwoHash];

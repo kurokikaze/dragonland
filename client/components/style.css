@@ -142,6 +142,7 @@
 }
 
 .gameContainer {
+    position: relative;
     display: flex;
 }
 
@@ -199,4 +200,12 @@
 .fadeInDown {
     -webkit-animation-name: fadeInDown;
     animation-name: fadeInDown;
+}
+
+.turnTimer {
+    position: absolute;
+    top: 300px;
+    right: 450px;
+    font-weight: bold;
+    font-family: "Lato";
 }
