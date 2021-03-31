@@ -5,7 +5,7 @@ html
     link(rel='stylesheet', href='/stylesheets/game.css')
     link(rel='stylesheet', href='/javascripts/game.css')
     link(rel='shortcut icon', href='/images/favicon.png', type='image/png')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js')
+    script(src='/javascripts/socket.io.dev.js')
     script(src='/javascripts/game.js')
     script.
        window.initialState = JSON.parse('!{JSON.stringify(initialState).replace(/\'/g, "\\\'")}');

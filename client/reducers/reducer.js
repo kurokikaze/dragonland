@@ -9,6 +9,7 @@ import {
 	ACTION_PLAYER_WINS,
 	ACTION_POWER,
 	ACTION_TIME_NOTIFICATION,
+	// ACTION_EXIT_PROMPTS,
 
 	TYPE_CREATURE,
 	TYPE_MAGI,
@@ -310,6 +311,15 @@ export default (state = defaultState, action) => {
 				log: card ? [...state.log, newLogEntry] : state.log,
 			};
 		}
+		// case ACTION_EXIT_PROMPTS: {
+		// 	return {
+		// 		...state,
+		// 		prompt: false,
+		// 		promptType: null,
+		// 		promptParams: {},
+		// 		actions: [],
+		// 	};
+		// }
 		case ACTION_ENTER_PROMPT: {
 			var promptParams = action.promptParams;
 			switch (action.promptType) {

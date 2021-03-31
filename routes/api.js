@@ -14,6 +14,8 @@ import convertServerCommand from '../utils/convertServerCommand.js';
 
 var router = express.Router();
 
+var gamesCounter = 0;
+
 const runningGames = {};
 // Player ID (Mongo) to player Id (game)
 const gamePlayers = {};
@@ -55,6 +57,7 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 
 	gameState.enableTurnTimer(100);
 	runningGames[gameId] = gameState;
+	gamesCounter++;
 
 	return [gameId, playerOneHash, playerTwoHash];
 }
@@ -158,6 +161,15 @@ router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 			}
 		}
 	});
+
+router.get('/stats',
+	function(req, res) {
+		res.render('stats', {
+			runningGames,
+			gamesCounter,
+		});
+	}
+);
 
 router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 	function(req, res) {
