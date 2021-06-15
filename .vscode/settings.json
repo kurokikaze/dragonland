@@ -1,3 +1,4 @@
 {
-    "editor.useTabStops": false
+    "editor.useTabStops": false,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

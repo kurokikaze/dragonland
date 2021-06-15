@@ -1,5 +1,3 @@
-import React from 'react';
-  
 import ChallengeList from './ChallengeList.jsx';
 import DeckSelector from  './DeckSelector.jsx';
 

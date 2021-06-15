@@ -1,4 +1,3 @@
-import React from 'react';
 import {camelCase} from '../utils.js';
 
 // eslint-disable-next-line react/display-name

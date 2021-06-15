@@ -1,6 +1,6 @@
-import React from 'react';
 import {connect} from 'react-redux';
-import {Select, Space} from 'antd';
+import Select from 'antd/es/select';
+import Space from 'antd/es/space';
 import {A} from 'hookrouter';
 import {DeckContent} from './DeckContent/index';
 import Edit from './icons/Edit.jsx';

@@ -1,8 +1,7 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import App from '../components/ChallengeApp.jsx';
 import {fetchChallenges} from '../actions/index.js';
-
 
 export default function ChallengePage() {
 	const dispatch = useDispatch();

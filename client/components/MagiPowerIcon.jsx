@@ -1,4 +1,4 @@
-import React from 'react';
+import {cloneElement} from 'react';
 import Power from './icons/Power.tsx';
 
 function MagiPowerIcon({active = false, number = null, icon = null}) {
@@ -6,7 +6,7 @@ function MagiPowerIcon({active = false, number = null, icon = null}) {
 
 	return (
 		<div className="magiPowerIcon">
-			{icon && React.cloneElement(icon, {fillColor, size: 40})}
+			{icon && cloneElement(icon, {fillColor, size: 40})}
 			{!icon && <Power size={40} fillColor={fillColor} />}
 			{number && <div className='iconNumber'>{number}</div>}
 		</div>

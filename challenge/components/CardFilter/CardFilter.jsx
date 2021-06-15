@@ -1,5 +1,5 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import {Checkbox} from 'antd';
+import { useCallback, useState, useEffect } from 'react';
+import Checkbox from 'antd/es/checkbox';
 import {
 	REGION_ARDERIAL,
 	REGION_NAROOM,

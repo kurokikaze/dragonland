@@ -1,4 +1,3 @@
-import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
 import Power from '../icons/Power.tsx';
 import Spell from '../icons/Spell.tsx';

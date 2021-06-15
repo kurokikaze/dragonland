@@ -1,5 +1,5 @@
 /* global window */
-import {pathOr} from 'ramda';
+import pathOr from 'ramda/src/pathOr';
 import {
 	STEP_PRS_FIRST,
 	STEP_PRS_SECOND,

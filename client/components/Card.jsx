@@ -1,7 +1,7 @@
 /* global window, document */
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import {identity} from 'ramda';
+import identity from 'ramda/src/identity';
 import {branch, compose} from 'recompose';
 import cn from 'classnames';
 import {

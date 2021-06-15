@@ -15,6 +15,8 @@ module.exports = {
     ],
     "rules": {
         "react/prop-types": 0,
+        "react/jsx-uses-react": "off",
+        "react/react-in-jsx-scope": "off",
         "indent": [
             "error",
             "tab",

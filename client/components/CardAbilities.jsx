@@ -1,5 +1,4 @@
 /* globals window */
-import React from 'react';
 import CreaturePowerIcon from './CreaturePowerIcon.jsx';
 import MagiPowerIcon from './MagiPowerIcon.jsx';
 import Ability from './icons/Ability.tsx';

@@ -1,4 +1,3 @@
-import React from 'react';
 import {IconProps} from './types';
 
 function Creature({fillColor, size = 50}: IconProps) {

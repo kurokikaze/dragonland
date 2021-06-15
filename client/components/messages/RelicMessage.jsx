@@ -1,4 +1,3 @@
-import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
 import Relic from '../icons/Relic.tsx';
 

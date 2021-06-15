@@ -1,9 +1,9 @@
-import React from 'react';
+import {cloneElement} from 'react';
 
 function MagiPowerIcon({icon}) {
 	return (
 		<div className="messageIcon">
-			{React.cloneElement(icon, {fillColor: 'lightgray'})}
+			{cloneElement(icon, {fillColor: 'lightgray'})}
 		</div>
 	);
 }

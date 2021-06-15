@@ -1,4 +1,3 @@
-import React from 'react';
 import {camelCase} from '../../../common/utils.js';
 import cn from 'classnames';
 

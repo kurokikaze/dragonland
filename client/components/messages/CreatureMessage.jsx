@@ -1,4 +1,3 @@
-import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
 import Creature from '../icons/Creature.tsx';
 

@@ -1,5 +1,5 @@
 {
 	"transformIgnorePatterns": [
-		"node_modules/(?!(moonlands)/)"
+		"node_modules/(?!(moonlands|rxjs)/)"
 	]
 }

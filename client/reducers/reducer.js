@@ -156,7 +156,6 @@ const findInPlay = (state, id) => {
 };
 
 export default (state = defaultState, action) => {
-	console.dir(action);
 	switch (action.type) {
 		case ACTION_TIME_NOTIFICATION: {
 			return {

@@ -1,5 +1,4 @@
 /* global window */
-import React from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers} from 'recompose';
 

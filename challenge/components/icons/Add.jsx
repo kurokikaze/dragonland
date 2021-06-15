@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Add({size = 200, color = '#000'}) {
 	return (
 		<svg t="1612118658923" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill={color} width={size} height={size}>

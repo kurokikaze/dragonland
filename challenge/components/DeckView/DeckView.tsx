@@ -1,4 +1,3 @@
-import React from 'react';
 import { cards } from 'moonlands/dist/cards';
 import cn from 'classnames';
 import {camelCase} from '../../../common/utils.js';

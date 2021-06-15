@@ -1,4 +1,3 @@
-import React from 'react';
 import {compose} from 'recompose';
 
 import Card from '../Card.jsx';

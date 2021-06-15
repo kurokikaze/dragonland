@@ -1,5 +1,5 @@
 /* global window */
-import React, {useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import cn from 'classnames';
 import {connect} from 'react-redux';
 import {
@@ -22,7 +22,7 @@ import { LogEntryType } from 'moonlands/src/types';
 
 import './style.css';
 
-const mapEntryToText = (entry: LogEntryType) => {
+const mapEntryToText = (entry: any) => {
 	switch (entry.type) {
 		case LOG_ENTRY_PLAY:
 			return `Player ${entry.player} plays ${entry.card}`;

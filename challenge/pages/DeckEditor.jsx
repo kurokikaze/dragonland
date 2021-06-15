@@ -1,4 +1,3 @@
-import React from 'react';
 import {A} from 'hookrouter';
 import {default as DeckEditorComponent} from '../components/DeckEditor/DeckEditor.jsx';
 

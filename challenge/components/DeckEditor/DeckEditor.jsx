@@ -1,7 +1,13 @@
 /* global fetch */
-import React, {useEffect, useState, useCallback} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {useDispatch} from 'react-redux';
-import { Row, Col, Input, Spin, Button, Space } from 'antd';
+
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import Input from 'antd/es/input';
+import Spin from 'antd/es/spin';
+import Button from 'antd/es/button';
+import Space from 'antd/es/space';
 import { cards } from 'moonlands/dist/cards';
 import cn from 'classnames';
 import { TYPE_MAGI } from 'moonlands/dist/const';

@@ -1,5 +1,5 @@
 /* global window */
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {compose, mapProps} from 'recompose';
 import cn from 'classnames';

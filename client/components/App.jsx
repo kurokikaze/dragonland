@@ -1,5 +1,5 @@
 /* global window */
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {connect} from 'react-redux';
 import {compose, withHandlers} from 'recompose';
 import Backend from 'react-dnd-html5-backend';
