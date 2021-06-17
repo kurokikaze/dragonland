@@ -1,7 +1,7 @@
 /* global window */
 import {useEffect, useRef} from 'react';
 import cn from 'classnames';
-import {connect} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {
 	LOG_ENTRY_PLAY,
 	LOG_ENTRY_DRAW,
@@ -21,6 +21,10 @@ import {
 import { LogEntryType } from 'moonlands/src/types';
 
 import './style.css';
+
+const SHOW_CLASS = 'show';
+
+const getLogEntries = (state: AppState) => state.log;
 
 const mapEntryToText = (entry: any) => {
 	switch (entry.type) {
@@ -61,9 +65,10 @@ type LogEntryProps = {
 // @ts-ignore
 const LogEntry = ({entry}: LogEntryProps) => <div className={cn('logEntry', {'ours': ('player' in entry && entry.player === window.playerId), 'theirs': ('player' in entry && entry.player !== window.playerId)})}>{mapEntryToText(entry)}</div>;
 
-const Log = ({entries = []}) => {
+const Log = () => {
 	const listRef = useRef<HTMLDivElement>(null);
 
+	const entries = useSelector(getLogEntries);
 	useEffect(() => {
 		const listElement = listRef.current;
 		if (listElement && listElement.children.length) {
@@ -72,8 +77,8 @@ const Log = ({entries = []}) => {
 		setTimeout(() => {
 			if (listElement) {
 				[].forEach.call(listElement.children, (child: HTMLElement) => {
-					if (!child.classList.contains('show')) { 
-						child.classList.add('show');
+					if (!child.classList.contains(SHOW_CLASS)) { 
+						child.classList.add(SHOW_CLASS);
 					}
 				});
 			}
@@ -87,12 +92,4 @@ type AppState = {
 	log: LogEntryType[];
 }
 
-const mapStateToProps = (state: AppState) => ({
-	entries: state.log,
-});
-
-const enhance = connect(mapStateToProps);
-
-export {Log as Base};
-
-export default enhance(Log);
+export default Log;

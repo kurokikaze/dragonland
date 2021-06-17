@@ -81,7 +81,7 @@
     display: block;
 }
 
-.cardAbilityHolder:hover .cardAbilities + .abilityIconHolder > .dragging {
+.zone-player-creatures.zone-active .cardAbilityHolder:hover .cardAbilities {
     display: none;
 }
 

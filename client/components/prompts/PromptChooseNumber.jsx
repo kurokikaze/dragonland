@@ -1,15 +1,32 @@
 /* global window */
-import {connect} from 'react-redux';
-import {compose, withHandlers, withStateHandlers} from 'recompose';
+import {useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_NUMBER
 } from 'moonlands/dist/const';
+import {getPromptMin, getPromptMax, getPromptGeneratedBy} from '../../selectors';
 
 const makeArray = (min, max) => Array.apply(null, {length: max + 1}).map(Number.call, Number).slice(min);
 
-function PromptChooseCards({min, max, options, onSend, setValue}) {
+function PromptChooseCards() {
+	const min = useSelector(getPromptMin);
+	const max = useSelector(getPromptMax);
+	const generatedBy = useSelector(getPromptGeneratedBy);
+	const [value, setValue] = useState(min);
+	const options = makeArray(min, max);
+
+	const onSend = () => {
+		window.socket.emit('clientAction', {
+			type: ACTION_RESOLVE_PROMPT,
+			promptType: PROMPT_TYPE_NUMBER,
+			number: value,
+			generatedBy: generatedBy,
+			player: window.playerId,
+		});
+	};
+
 	return (
 		<div className="promptWindow promptChooseCards">
 			<h1>Choose number from {min} to {max}</h1>
@@ -25,34 +42,4 @@ function PromptChooseCards({min, max, options, onSend, setValue}) {
 	);
 }
 
-const mapStateToProps = (state) => ({
-	min: state.promptParams.min || 1,
-	max: state.promptParams.max,
-	options: makeArray(state.promptParams.min, state.promptParams.max),
-	generatedBy: state.promptGeneratedBy,
-});
-
-const enhance  = compose(
-	connect(mapStateToProps),
-	withStateHandlers(
-		({value}) => ({selected: value}),
-		{
-			setValue: () => number => ({
-				selected: number,
-			}),
-		}
-	),
-	withHandlers({
-		onSend: props => () => {
-			window.socket.emit('clientAction', {
-				type: ACTION_RESOLVE_PROMPT,
-				promptType: PROMPT_TYPE_NUMBER,
-				number: props.selected,
-				generatedBy: props.generatedBy,
-				player: window.playerId,
-			});
-		},
-	}),
-);
-
-export default enhance(PromptChooseCards);
+export default PromptChooseCards;

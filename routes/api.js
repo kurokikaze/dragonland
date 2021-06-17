@@ -55,7 +55,7 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 		deckTwo,
 	);
 
-	gameState.enableTurnTimer(100);
+	// gameState.enableTurnTimer(100);
 	runningGames[gameId] = gameState;
 	gamesCounter++;
 

@@ -27,10 +27,6 @@ export function isPromptActive(state) {
 	return state.prompt && state.promptPlayer === window.playerId;
 }
 
-export function getPromptType(state) {
-	return state.prompt ? state.promptType : null;
-}
-
 export function getMagiEnergy(state) {
 	return zoneContent('playerActiveMagi', state).length ? zoneContent('playerActiveMagi', state)[0].data.energy : 0;
 }
@@ -66,3 +62,16 @@ export function getAvailableStartingCards(cards = [], state) {
 }
 
 export const isPRSAvailable = state => state.activePlayer == window.playerId && [STEP_PRS_FIRST, STEP_PRS_SECOND].includes(state.step);
+
+export const getActivePlayerMagi = state => state.zones.playerActiveMagi[0];
+export const getPromptCards = state => state.promptParams.cards;
+export const getAvailableCards = state => state.promptParams.availableCards;
+export const getPromptGeneratedBy = state => state.promptGeneratedBy;
+export const getPromptNumberOfCards = state => state.promptParams.numberOfCards;
+export const getPromptMin = state => state.promptParams.min || 1;
+export const getPromptMax = state => state.promptParams.max;
+export const getCards = state => state.promptParams.cards;
+export const getPromptZone = state => state.promptParams.zone;
+export const getPromptZoneOwner = state => state.promptParams.zoneOwner;
+export const getPromptMessage = state => state.promptParams.message;
+export const getPromptType = (state) => state.prompt ? state.promptType : null;
