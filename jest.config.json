@@ -1,5 +1,9 @@
 {
+	"transform": {
+		"^.+\\.js$": "./testSetup/jestSetup.js"
+	},
 	"transformIgnorePatterns": [
 		"node_modules/(?!(moonlands|rxjs)/)"
-	]
+	],
+	"setupFilesAfterEnv": ["./testSetup/setupTests.js"]
 }
