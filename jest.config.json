@@ -1,6 +1,6 @@
 {
+	"testEnvironment": "jest-environment-jsdom-sixteen",
 	"transform": {
-		"^.+\\.js$": "./testSetup/jestSetup.js"
 	},
 	"transformIgnorePatterns": [
 		"node_modules/(?!(moonlands|rxjs)/)"

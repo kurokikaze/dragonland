@@ -2,8 +2,8 @@ import fs from 'fs';
 import fetch from 'node-fetch';
 
 import config from '../config.js';
-import {cards} from 'moonlands/dist/cards';
-import {TYPE_MAGI}  from 'moonlands/dist/const';
+import {cards} from 'moonlands/dist/cards.js';
+import {TYPE_MAGI}  from 'moonlands/dist/const.js';
 import {camelCase} from '../common/utils.js';
 
 // Fire ball is named inconsistently with other cards,

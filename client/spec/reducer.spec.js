@@ -1,4 +1,4 @@
-/* global describe, it, expect */
+/* global describe, it, expect, window */
 import simpleReducer from '../reducers/reducer.js';
 import {
 	ACTION_EFFECT,
@@ -45,7 +45,7 @@ const defaultState = () => ({
 describe('Separating static abilities into state property', () => {
 	it('Static abilities are added correctly', () => {
 		const ACTIVE_PLAYER = 12;
-		global.window.playerId = ACTIVE_PLAYER;
+		window.playerId = ACTIVE_PLAYER;
 		const state = {
 			...defaultState(),
 			zones: {
@@ -79,7 +79,7 @@ describe('Separating static abilities into state property', () => {
 
 	it('Static abilities are removed correctly', () => {
 		const ACTIVE_PLAYER = 12;
-		global.window.playerId = ACTIVE_PLAYER;
+		window.playerId = ACTIVE_PLAYER;
 		const state = {
 			...defaultState(),
 			zones: {
@@ -133,7 +133,7 @@ describe('Separating static abilities into state property', () => {
 
 	it('Static abilities of relics are added correctly', () => {
 		const ACTIVE_PLAYER = 12;
-		global.window.playerId = ACTIVE_PLAYER;
+		window.playerId = ACTIVE_PLAYER;
 		const state = {
 			...defaultState(),
 			zones: {
@@ -168,7 +168,7 @@ describe('Separating static abilities into state property', () => {
 
 	it('Static abilities are not added if they are not needed', () => {
 		const ACTIVE_PLAYER = 12;
-		global.window.playerId = ACTIVE_PLAYER;
+		window.playerId = ACTIVE_PLAYER;
 		const state = {
 			...defaultState(),
 			zones: {
