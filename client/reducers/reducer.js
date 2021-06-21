@@ -473,9 +473,12 @@ export default (state = defaultState, action) => {
 				case EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY: {
 					const discardTarget = findInPlay(state, action.target.id);
 					
+					if (!discardTarget) {
+						console.error('Target was already discarded in log creation');
+					}
 					const discardLogEntry = {
 						type: LOG_ENTRY_CREATURE_DISCARDED_FROM_PLAY,
-						card: discardTarget.card,
+						card: discardTarget ? discardTarget.card : 'Card',
 						player: action.player,
 					};
 

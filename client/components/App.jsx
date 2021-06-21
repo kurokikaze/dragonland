@@ -1,7 +1,6 @@
 /* global window */
-import {useState} from 'react';
-import {connect} from 'react-redux';
-import {compose, withHandlers} from 'recompose';
+import {useState, useCallback} from 'react';
+import {useSelector} from 'react-redux';
 import Backend from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import {
@@ -28,7 +27,19 @@ import StepBoard from './StepBoard.jsx';
 import EndgameOverlay from './EndgameOverlay.jsx';
 
 import {withSingleCardData} from './common';
-import {isPromptActive, isOurTurn} from '../selectors';
+import {
+	isPromptActive,
+	isOurTurn,
+	getTimer,
+	getCurrentStep,
+	getMessage,
+	getTimerSeconds,
+	getCardsCountInOurDiscard,
+	getCardsCountInOpponentDiscard,
+	getGameEnded,
+	getCardsCountInOurDeck,
+	getCardsCountInOpponentDeck,
+} from '../selectors';
 
 import {
 	MESSAGE_TYPE_POWER,
@@ -43,9 +54,38 @@ import {
 
 const EnhancedPowerMessage = withSingleCardData(PowerMessage);
 
-function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded, cardsInOurDiscard, cardsInOpponentDiscard, cardsInOurDeck, cardsInOpponentDeck, timer, timerSeconds}) {
+function App() {
 	const [discardShown, setDiscardShown] = useState(false);
 	const [opponentDiscardShown, setOpponentDiscardShown] = useState(false);
+
+	const prompt = useSelector(isPromptActive);
+	const ourTurn = useSelector(isOurTurn);
+	const timer = useSelector(getTimer);
+	const currentStep = useSelector(getCurrentStep);
+	const message = useSelector(getMessage);
+	const timerSeconds = useSelector(getTimerSeconds);
+	const gameEnded = useSelector(getGameEnded);
+	const cardsInOpponentDiscard = useSelector(getCardsCountInOpponentDiscard);
+	const cardsInOurDiscard = useSelector(getCardsCountInOurDiscard);
+	const cardsInOurDeck = useSelector(getCardsCountInOurDeck);
+	const cardsInOpponentDeck = useSelector(getCardsCountInOpponentDeck);
+
+	const onPass = useCallback(() => {
+		window.socket.emit('clientAction', {
+			type: ACTION_PASS,
+		});
+	});
+
+	const onPlay = useCallback(cardId => {
+		window.socket.emit('clientAction', {
+			type: ACTION_PLAY,
+			payload: {
+				card: cardId,
+				player: window.playerId,
+			},
+		});
+	});
+
 	return (
 		<div className='gameContainer'>
 			{timer && <div className="turnTimer">00:{timerSeconds.toString().padStart(2, '0')}</div>}
@@ -76,8 +116,8 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 					</div>
 					<ZoneHand zoneId='playerHand' name='Player hand' onCardClick={onPlay} />
 					<StepBoard />
-					{isOurTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={onPass}>Pass</button>}
-					{!isOurTurn && <div>Opponent&apos;s turn</div>}
+					{ourTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={onPass}>Pass</button>}
+					{!ourTurn && <div>Opponent&apos;s turn</div>}
 					{discardShown && <div className='discardOverlay'>
 						<h2>Discard</h2>
 						<div className='closeIcon' onClick={() => setDiscardShown(false)}>&times;</div>
@@ -97,40 +137,4 @@ function App({prompt, message, isOurTurn, currentStep, onPass, onPlay, gameEnded
 	);
 }
 
-function mapStateToProps(state) {
-	return {
-		prompt: isPromptActive(state),
-		isOurTurn: isOurTurn(state),
-		timer: state.turnTimer,
-		timerSeconds: state.turnSecondsLeft,
-		currentStep: state.step,
-		message: state.message,
-		gameEnded: state.gameEnded,
-		cardsInOurDiscard: state.zones.playerDiscard.length,
-		cardsInOpponentDiscard: state.zones.opponentDiscard.length,
-		cardsInOurDeck: state.zones.playerDeck.length,
-		cardsInOpponentDeck: state.zones.opponentDeck.length,
-	};
-}
-
-const enhance = compose(
-	connect(mapStateToProps),
-	withHandlers({
-		onPass: () => () => {
-			window.socket.emit('clientAction', {
-				type: ACTION_PASS,
-			});
-		},
-		onPlay: () => cardId => {
-			window.socket.emit('clientAction', {
-				type: ACTION_PLAY,
-				payload: {
-					card: cardId,
-					player: window.playerId,
-				},
-			});
-		},
-	}),
-);
-
-export default enhance(App);
+export default App;

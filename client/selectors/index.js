@@ -73,5 +73,16 @@ export const getPromptMax = state => state.promptParams.max;
 export const getCards = state => state.promptParams.cards;
 export const getPromptZone = state => state.promptParams.zone;
 export const getPromptZoneOwner = state => state.promptParams.zoneOwner;
-export const getPromptMessage = state => state.promptParams.message;
+export const getPromptMessage = state => state.promptMessage;
 export const getPromptType = (state) => state.prompt ? state.promptType : null;
+export const getMessage = (state) => state.message;
+export const getTimer = (state) => state.turnTimer;
+export const getTimerSeconds = (state) => state.turnSecondsLeft;
+export const getCurrentStep = (state) => state.step;
+export const getGameEnded = (state) => state.gameEnded;
+
+export const getCardsCountInOurDiscard = (state) => state.zones.playerDiscard.length;
+export const getCardsCountInOpponentDiscard = (state) => state.zones.opponentDiscard.length;
+export const getCardsCountInOurDeck = (state) => state.zones.playerDeck.length;
+export const getCardsCountInOpponentDeck = (state) => state.zones.opponentDeck.length;
+

@@ -19,7 +19,6 @@ import {
 } from '../../selectors';
 
 function PromptChooseCards() {
-	const CardDisplay = (cards.length > 4) ? withView(Card) : Card;
 	const cards = useSelector(getPromptCards);
 	const zone = useSelector(getPromptZone);
 	const message = useSelector(getPromptMessage);
@@ -27,8 +26,10 @@ function PromptChooseCards() {
 	const numberOfCards = useSelector(getPromptNumberOfCards);
 	const generatedBy = useSelector(getPromptGeneratedBy);
 	const availableCards = useSelector(getAvailableCards);
-
+	
 	const [selected, setSelected] = useState([]);
+
+	const CardDisplay = (cards.length > 4) ? withView(Card) : Card;
 
 	const handleSend = () => {
 		window.socket.emit('clientAction', {
