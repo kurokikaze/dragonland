@@ -15,7 +15,6 @@ import {
 	getPromptNumberOfCards,
 	getPromptZoneOwner,
 	getPromptGeneratedBy,
-	getAvailableCards,
 } from '../../selectors';
 
 function PromptChooseCards() {
@@ -25,7 +24,6 @@ function PromptChooseCards() {
 	const zoneOwner = useSelector(getPromptZoneOwner);
 	const numberOfCards = useSelector(getPromptNumberOfCards);
 	const generatedBy = useSelector(getPromptGeneratedBy);
-	const availableCards = useSelector(getAvailableCards);
 	
 	const [selected, setSelected] = useState([]);
 
@@ -44,7 +42,7 @@ function PromptChooseCards() {
 	};
 
 	const triggerElement = cardName =>
-		availableCards.includes(cardName) && setSelected(selected => selected.includes(cardName) ? selected.filter(e => e !== cardName): [...selected, cardName]);
+		setSelected(selected => selected.includes(cardName) ? selected.filter(e => e !== cardName): [...selected, cardName]);
 
 	return (
 		<div className="promptWindow promptChooseCards">
