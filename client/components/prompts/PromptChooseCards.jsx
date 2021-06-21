@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_CHOOSE_CARDS,
-} from 'moonlands/dist/const';
+} from 'moonlands/src/const.ts';
 import cn from 'classnames';
 import Card from '../Card.jsx';
 import {getPromptCards, getPromptGeneratedBy, getActivePlayerMagi, getAvailableCards} from '../../selectors';

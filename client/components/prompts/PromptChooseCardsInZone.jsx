@@ -7,7 +7,7 @@ import {withView} from '../CardView.jsx';
 import {
 	ACTION_RESOLVE_PROMPT,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
-} from 'moonlands/dist/const';
+} from 'moonlands/src/const.ts';
 import {
 	getPromptCards,
 	getPromptZone,

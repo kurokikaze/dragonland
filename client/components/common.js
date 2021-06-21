@@ -1,6 +1,5 @@
 /* global window */
-// import {mapProps} from 'recompose';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 import {byName} from 'moonlands/dist/cards';
 
 import {
@@ -41,7 +40,7 @@ import {
 	PROPERTY_POWER_COST,
 } from 'moonlands/dist/const';
 
-import {zoneContent} from '../selectors';
+import {zoneContent, getZoneContent} from '../selectors';
 
 const cardMatchesSelector = (card, selector, source) => {
 	switch (selector) {
@@ -99,68 +98,74 @@ const performCalculation = (operator, operandOne, operandTwo) => {
 	return result;
 };
 
+const transformCard = staticAbilityCards => cardData => {
+	const card = cardData.card ? byName(cardData.card) : null;
+
+	if (card) {
+		const result = {
+			...cardData,
+			card,
+			modifiedData: {...card.data},
+		};
+
+		staticAbilityCards.forEach(staticAbilityCard => {
+			staticAbilityCard.card.data.staticAbilities.forEach(staticAbility => {
+				if (cardMatchesSelector(result, staticAbility.selector, staticAbilityCard)) {
+					const modifierFunction = initialValue => {
+						const {operator, operandOne} = staticAbility.modifier;
+					
+						// For specifying value to substract in modifiers as positive ("CALCULATION_SUBSTRACT, 1")
+						if (operator === CALCULATION_SUBTRACT || operator === CALCULATION_SUBTRACT_TO_MINIMUM_OF_ONE) {
+							return performCalculation(operator, initialValue, operandOne);
+						} else {
+							return performCalculation(operator, operandOne, initialValue);
+						}
+					};
+
+					switch(staticAbility.property) {
+						case PROPERTY_POWER_COST: {
+							if ('powers' in result.modifiedData) {
+								result.modifiedData.powers = result.modifiedData.powers.map(power => ({...power, cost: modifierFunction(power.cost)}));
+							}
+							break;
+						}
+						case PROPERTY_ATTACKS_PER_TURN: {
+							result.modifiedData.attacksPerTurn = modifierFunction(result.modifiedData.attacksPerTurn);
+							break;
+						}
+						case PROPERTY_ENERGIZE: {
+							result.modifiedData.energize = modifierFunction(result.modifiedData.energize || 0);
+							break;
+						}
+					}
+				}
+			});
+		});
+		return result;
+	}
+
+	return {
+		...cardData,
+		card,
+	};
+};
+
 export const cardDataTransformer = (state, props) => {
 	const staticAbilityCards = state.staticAbilities || [];
 
-	const transformCard = cardData => {
-		const card = cardData.card ? byName(cardData.card) : null;
-
-		if (card) {
-			const result = {
-				...cardData,
-				card,
-				modifiedData: {...card.data},
-			};
-
-			staticAbilityCards.forEach(staticAbilityCard => {
-				staticAbilityCard.card.data.staticAbilities.forEach(staticAbility => {
-					if (cardMatchesSelector(result, staticAbility.selector, staticAbilityCard)) {
-						const modifierFunction = initialValue => {
-							const {operator, operandOne} = staticAbility.modifier;
-						
-							// For specifying value to substract in modifiers as positive ("CALCULATION_SUBSTRACT, 1")
-							if (operator === CALCULATION_SUBTRACT || operator === CALCULATION_SUBTRACT_TO_MINIMUM_OF_ONE) {
-								return performCalculation(operator, initialValue, operandOne);
-							} else {
-								return performCalculation(operator, operandOne, initialValue);
-							}
-						};
-
-						switch(staticAbility.property) {
-							case PROPERTY_POWER_COST: {
-								if ('powers' in result.modifiedData) {
-									result.modifiedData.powers = result.modifiedData.powers.map(power => ({...power, cost: modifierFunction(power.cost)}));
-								}
-								break;
-							}
-							case PROPERTY_ATTACKS_PER_TURN: {
-								result.modifiedData.attacksPerTurn = modifierFunction(result.modifiedData.attacksPerTurn);
-								break;
-							}
-							case PROPERTY_ENERGIZE: {
-								result.modifiedData.energize = modifierFunction(result.modifiedData.energize || 0);
-								break;
-							}
-						}
-					}
-				});
-			});
-			return result;
-		}
-
-		return {
-			...cardData,
-			card,
-		};
-	};
-
 	return {
 		...props,
-		content: props.content.map(transformCard),
+		content: props.content.map(transformCard(staticAbilityCards)),
 	};
 };
 
 export const withCardData = connect(cardDataTransformer);
+
+export const useCardData = (content) => {
+	const staticAbilities = useSelector(state => state.staticAbilities) || [];
+
+	return content.map(transformCard(staticAbilities));
+};
 
 export function mapCardDataFromProps(state, {id}) {
 	const filter = card => card.id === id;
@@ -179,6 +184,8 @@ function mapStateToProps(state, {zoneId}) {
 }
 
 export const withZoneContent = connect(mapStateToProps);
+
+export const useZoneContent = zoneId => useSelector(getZoneContent(zoneId));
 
 export const UNFILTERED_CREATURE_PROMPTS = [
 	PROMPT_TYPE_SINGLE_CREATURE,

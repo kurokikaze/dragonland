@@ -5,7 +5,7 @@ import {
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_MAY_ABILITY,
-} from 'moonlands/dist/const';
+} from 'moonlands/src/const.ts';
 
 import PromptChooseCards from './PromptChooseCards.jsx';
 import PromptChooseCardsInZone from './PromptChooseCardsInZone.jsx';

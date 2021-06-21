@@ -54,6 +54,26 @@ export function zoneContent(zoneId, state) {
 	}
 }
 
+export const  getZoneContent = (zoneId) => (state) => {
+	switch (zoneId) {
+		case 'playerRelics': {
+			return pathOr([], ['zones', 'playerInPlay'], state).filter(isRelic);
+		}
+		case 'playerInPlay': {
+			return pathOr([], ['zones', 'playerInPlay'], state).filter(isNotRelic);
+		}
+		case 'opponentRelics': {
+			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isRelic);
+		}
+		case 'opponentInPlay': {
+			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isNotRelic);
+		}
+		default: {
+			return pathOr([], ['zones', zoneId], state);
+		}
+	}
+};
+
 export function getAvailableStartingCards(cards = [], state) {
 	const discardCards = state.zones.playerDiscard.map(card => card.card);
 	const libraryCards = state.zones.playerDeck.map(card => card.card);
