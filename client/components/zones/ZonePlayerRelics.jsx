@@ -3,7 +3,6 @@ import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
 	ACTION_POWER,
-	TYPE_RELIC,
 	ACTION_RESOLVE_PROMPT,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
