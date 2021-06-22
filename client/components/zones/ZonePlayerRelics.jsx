@@ -1,6 +1,5 @@
 /* global window */
-import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
 	ACTION_POWER,
@@ -9,12 +8,18 @@ import {
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 
-import {isPRSAvailable} from '../../selectors';
 import {
-	withCardData, 
-	withZoneContent,
+	isPRSAvailable,
+	isPromptActive,
+	getPromptGeneratedBy,
+	getPromptType,
+} from '../../selectors';
+import {
+	useCardData,
+	useZoneContent,
 	UNFILTERED_RELIC_PROMPTS,
 } from '../common.js';
+import {CLIENT_ACTION} from '../../const';
 import {withAbilities} from '../CardAbilities.jsx';
 import {withView} from '../CardView.jsx';
 
@@ -24,13 +29,29 @@ const CardWithView = withView(Card);
 function ZonePlayerRelics({
 	name,
 	zoneId,
-	content, 
-	active, 
-	cardClickHandler, 
-	abilityUseHandler, 
-	prsAvailable,
-	isOnUnfilteredPrompt,
 }) {
+	const rawContent = useZoneContent(zoneId);
+	const content = useCardData(rawContent);
+	const isOnPrompt = useSelector(isPromptActive);
+	const promptType = useSelector(getPromptType);
+	const isOnUnfilteredPrompt = isOnPrompt && UNFILTERED_RELIC_PROMPTS.includes(promptType);
+	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
+	const prsAvailable = useSelector(isPRSAvailable);
+
+	const cardClickHandler = isOnPrompt ? cardId => {
+		window.socket.emit(CLIENT_ACTION, {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: promptGeneratedBy,
+		});
+	} : () => {};
+
+	const abilityUseHandler = (id, powerName) => window.socket.emit(CLIENT_ACTION, {
+		type: ACTION_POWER,
+		source: id,
+		power: powerName,
+	});
+
 	return (
 		<div className={cn('zone', 'zone-relics', zoneId)} data-zone-name={name}>
 			{content.length ? content.map(cardData => {
@@ -43,7 +64,6 @@ function ZonePlayerRelics({
 					onClick={cardClickHandler}
 					isOnPrompt={isOnUnfilteredPrompt}
 					actionsAvailable={prsAvailable}
-					available={active && cardData.card.type === TYPE_RELIC && prsAvailable}
 					onAbilityUse={abilityUseHandler}
 					useLocket={true}
 				/>;
@@ -52,40 +72,4 @@ function ZonePlayerRelics({
 	);
 }
 
-const propsTransformer = props => ({
-	...props,
-	cardClickHandler: props.isOnPrompt ? cardId => {
-		window.socket.emit('clientAction', {
-			type: ACTION_RESOLVE_PROMPT,
-			target: cardId,
-			generatedBy: props.promptGeneratedBy,
-		});
-	} : () => {},
-	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
-		type: ACTION_POWER,
-		source: id,
-		power: powerName,
-	}),
-	isOnUnfilteredPrompt: props.isOnPrompt && UNFILTERED_RELIC_PROMPTS.includes(props.promptType),
-});
-
-function mapStateToProps(state) {
-	return {
-		prsAvailable: isPRSAvailable(state),
-		active: false,
-		isOnPrompt: state.prompt,
-		promptType: state.promptType,
-		promptParams: state.promptParams,
-		promptGeneratedBy: state.promptGeneratedBy,
-		animation: state.animation,
-	};
-}
-
-const enhance = compose(
-	withZoneContent,
-	connect(mapStateToProps),
-	mapProps(propsTransformer),
-	withCardData,
-);
-
-export default enhance(ZonePlayerRelics);
+export default ZonePlayerRelics;

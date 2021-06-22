@@ -1,23 +1,41 @@
 /* global window */
-import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {useCallback} from 'react';
+import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
-	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
-	PROMPT_TYPE_SINGLE_MAGI,
-
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
-
-import {isPRSAvailable} from '../../selectors';
+import {CLIENT_ACTION} from '../../const';
+import {isPRSAvailable, getIsOnMagiPrompt, getAnimation, getPromptGeneratedBy} from '../../selectors';
 import {withAbilities} from '../CardAbilities.jsx';
-import {withCardData, withZoneContent} from '../common';
+import {useZoneContent, useCardData} from '../common';
 
 const CardWithAbilities = withAbilities(Card);
 
-function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClickHandler, abilityUseHandler, animation }) {
+function ZonePlayerActiveMagi({ name, zoneId }) {
+	const rawContent = useZoneContent(zoneId);
+	const content = useCardData(rawContent);
+	const active = useSelector(isPRSAvailable);
+	const isOnMagiPrompt = useSelector(getIsOnMagiPrompt);
+	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
+	const animation = useSelector(getAnimation);
+
+	const cardClickHandler = isOnMagiPrompt ? cardId => {
+		window.socket.emit(CLIENT_ACTION, {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: promptGeneratedBy,
+		});
+	} : () => {};
+
+	const abilityUseHandler = useCallback((id, powerName) => window.socket.emit(CLIENT_ACTION, {
+		type: ACTION_POWER,
+		source: id,
+		power: powerName,
+	}), []);
+
 	return (
 		<div className={cn('zone', 'zone-magi', {'zone-active': active})} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
@@ -39,35 +57,4 @@ function ZonePlayerActiveMagi({ name, content, active, isOnMagiPrompt, cardClick
 	);
 }
 
-const propsTransformer = props => ({
-	...props,
-	cardClickHandler: props.isOnMagiPrompt ? cardId => {
-		window.socket.emit('clientAction', {
-			type: ACTION_RESOLVE_PROMPT,
-			target: cardId,
-			generatedBy: props.promptGeneratedBy,
-		});
-	} : () => {},
-	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
-		type: ACTION_POWER,
-		source: id,
-		power: powerName,
-	}),
-});
-
-function mapStateToProps(state) {
-	return {
-		active: isPRSAvailable(state),
-		isOnMagiPrompt: state.prompt && [PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, PROMPT_TYPE_SINGLE_MAGI].includes(state.promptType),
-		animation: state.animation,
-	};
-}
-
-const enhance = compose(
-	withZoneContent,
-	connect(mapStateToProps),
-	mapProps(propsTransformer),
-	withCardData,
-);
-
-export default enhance(ZonePlayerActiveMagi);
+export default ZonePlayerActiveMagi;

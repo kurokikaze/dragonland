@@ -1,7 +1,6 @@
 /* global window */
-import {useState, useEffect} from 'react';
-import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {useState, useEffect, useCallback} from 'react';
+import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
 	ACTION_RESOLVE_PROMPT,
@@ -11,11 +10,21 @@ import {
 import Card from '../Card.jsx';
 import {
 	STEP_ATTACK,
+	CLIENT_ACTION,
 } from '../../const';
-import {isPRSAvailable} from '../../selectors';
 import {
-	withCardData, 
-	withZoneContent,
+	isPRSAvailable,
+	getAnimation,
+	isOurTurn,
+	isPromptActive,
+	getCurrentStep,
+	getPromptType,
+	getPromptParams,
+	getPromptGeneratedBy,
+} from '../../selectors';
+import {
+	useZoneContent,
+	useCardData,
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
@@ -30,26 +39,32 @@ const CardWithAbilities = withAbilities(Card);
 const packHuntFilter = cardData => cardData.card.data && cardData.card.data.canPackHunt;
 
 function ZonePlayerInPlay({
-	name, 
-	content = [], 
-	active, 
-	cardClickHandler, 
-	abilityUseHandler, 
-	isOnUnfilteredPrompt,
-	isOnFilteredPrompt,
-	promptFilter,
-	prsAvailable,
-	animation,
+	name,
+	zoneId,
 }) {
 	const SelectedCard = CardWithAbilities;
 
 	const [packs, setPacks] = useState([]);
+	const rawContent = useZoneContent(zoneId);
+	const content = useCardData(rawContent);
+	const prsAvailable = useSelector(isPRSAvailable);
+	const animation = useSelector(getAnimation);
+	const ourTurn = useSelector(isOurTurn);
+	const currentStep = useSelector(getCurrentStep);
+	const active = ourTurn && currentStep === STEP_ATTACK;
+	const isOnPrompt = useSelector(isPromptActive);
+	const promptType = useSelector(getPromptType);
+	const promptParams = useSelector(getPromptParams);
+	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
 
 	const hasPackHunters = content.some(packHuntFilter);
 	const packHuntersList = content.filter(packHuntFilter).map(({id}) => id);
 
+	const isOnUnfilteredPrompt = isOnPrompt && UNFILTERED_CREATURE_PROMPTS.includes(promptType);
+	const isOnFilteredPrompt = isOnPrompt && FILTERED_CREATURE_PROMPTS.includes(promptType);
+	const promptFilter = useCallback(getPromptFilter(promptType, promptParams), [promptType, promptParams]);
+
 	const onAddToPack = (newLeader, newHunter) => {
-		console.log('Creating pack ', newLeader, newHunter);
 		const pack = packs.find(p => p.leader === newLeader);
 		if (pack) {
 			setPacks(packs.map(({leader, hunters}) => leader === newLeader ? {leader, hunters: [...hunters, newHunter]} : {leader, hunters}));
@@ -66,6 +81,20 @@ function ZonePlayerInPlay({
 	const onRemovePack = (leaderId) => {
 		setPacks(packs.filter(({leader}) => leader !== leaderId));
 	};
+
+	const cardClickHandler = isOnPrompt ? cardId => {
+		window.socket.emit(CLIENT_ACTION, {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: promptGeneratedBy,
+		});
+	} : () => {};
+
+	const abilityUseHandler = (id, powerName) => window.socket.emit(CLIENT_ACTION, {
+		type: ACTION_POWER,
+		source: id,
+		power: powerName,
+	});
 
 	return (
 		<div className={cn('zone', 'zone-player-creatures', 'zone-creatures', {'zone-active' : active})} data-zone-name={name}>
@@ -97,42 +126,4 @@ function ZonePlayerInPlay({
 	);
 }
 
-const propsTransformer = props => ({
-	...props,
-	cardClickHandler: props.isOnCreaturePrompt ? cardId => {
-		window.socket.emit('clientAction', {
-			type: ACTION_RESOLVE_PROMPT,
-			target: cardId,
-			generatedBy: props.promptGeneratedBy,
-		});
-	} : () => {},
-	abilityUseHandler: (id, powerName) => window.socket.emit('clientAction', {
-		type: ACTION_POWER,
-		source: id,
-		power: powerName,
-	}),
-	isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	isOnFilteredPrompt:  props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	promptFilter: getPromptFilter(props.promptType, props.promptParams),
-});
-
-function mapStateToProps(state) {
-	return {
-		prsAvailable: isPRSAvailable(state),
-		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt,
-		promptType: state.promptType,
-		promptParams: state.promptParams,
-		promptGeneratedBy: state.promptGeneratedBy,
-		animation: state.animation,
-	};
-}
-
-const enhance = compose(
-	withZoneContent,
-	connect(mapStateToProps),
-	mapProps(propsTransformer),
-	withCardData,
-);
-
-export default enhance(ZonePlayerInPlay);
+export default ZonePlayerInPlay;

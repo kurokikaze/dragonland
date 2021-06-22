@@ -9,6 +9,8 @@ import {cards} from 'moonlands/dist/cards';
 
 import {
 	TYPE_RELIC,
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
+	PROMPT_TYPE_SINGLE_MAGI,
 } from 'moonlands/dist/const';
 
 const relicsHash = {};
@@ -91,6 +93,7 @@ export const getPromptNumberOfCards = state => state.promptParams.numberOfCards;
 export const getPromptMin = state => state.promptParams.min || 1;
 export const getPromptMax = state => state.promptParams.max;
 export const getCards = state => state.promptParams.cards;
+export const getPromptParams = state => state.promptParams;
 export const getPromptZone = state => state.promptParams.zone;
 export const getPromptZoneOwner = state => state.promptParams.zoneOwner;
 export const getPromptMessage = state => state.promptMessage;
@@ -105,4 +108,6 @@ export const getCardsCountInOurDiscard = (state) => state.zones.playerDiscard.le
 export const getCardsCountInOpponentDiscard = (state) => state.zones.opponentDiscard.length;
 export const getCardsCountInOurDeck = (state) => state.zones.playerDeck.length;
 export const getCardsCountInOpponentDeck = (state) => state.zones.opponentDeck.length;
-
+export const getAnimation = state => state.animation;
+export const getIsOnMagiPrompt = state => state.prompt &&
+	(state.promptType === PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI || state.promptType === PROMPT_TYPE_SINGLE_MAGI);

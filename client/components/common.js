@@ -40,7 +40,7 @@ import {
 	PROPERTY_POWER_COST,
 } from 'moonlands/dist/const';
 
-import {zoneContent, getZoneContent} from '../selectors';
+import {getZoneContent} from '../selectors';
 
 const cardMatchesSelector = (card, selector, source) => {
 	switch (selector) {
@@ -150,17 +150,6 @@ const transformCard = staticAbilityCards => cardData => {
 	};
 };
 
-export const cardDataTransformer = (state, props) => {
-	const staticAbilityCards = state.staticAbilities || [];
-
-	return {
-		...props,
-		content: props.content.map(transformCard(staticAbilityCards)),
-	};
-};
-
-export const withCardData = connect(cardDataTransformer);
-
 export const useCardData = (content) => {
 	const staticAbilities = useSelector(state => state.staticAbilities) || [];
 
@@ -176,14 +165,6 @@ export function mapCardDataFromProps(state, {id}) {
 }
 
 export const withSingleCardData = connect(mapCardDataFromProps);
-
-function mapStateToProps(state, {zoneId}) {
-	return {
-		content: zoneContent(zoneId, state),
-	};
-}
-
-export const withZoneContent = connect(mapStateToProps);
 
 export const useZoneContent = zoneId => useSelector(getZoneContent(zoneId));
 
@@ -202,6 +183,7 @@ export const FILTERED_CREATURE_PROMPTS = [
 export const UNFILTERED_RELIC_PROMPTS = [
 	PROMPT_TYPE_RELIC,
 ];
+
 const getRestrictionFilter = (restriction, value) => {
 	switch(restriction) {
 		case RESTRICTION_TYPE:
