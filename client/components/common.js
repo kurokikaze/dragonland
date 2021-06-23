@@ -98,7 +98,7 @@ const performCalculation = (operator, operandOne, operandTwo) => {
 	return result;
 };
 
-const transformCard = staticAbilityCards => cardData => {
+export const transformCard = staticAbilityCards => cardData => {
 	const card = cardData.card ? byName(cardData.card) : null;
 
 	if (card) {

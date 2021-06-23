@@ -40,6 +40,7 @@ const defaultState = () => ({
 	},
 	gameEnded: false,
 	winner: null,
+	packs: [],
 });
 
 describe('Separating static abilities into state property', () => {
