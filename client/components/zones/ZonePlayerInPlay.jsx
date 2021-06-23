@@ -1,6 +1,6 @@
 /* global window */
-import {useState, useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import {useCallback} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import cn from 'classnames';
 import {
 	ACTION_RESOLVE_PROMPT,
@@ -12,6 +12,10 @@ import {
 	STEP_ATTACK,
 	CLIENT_ACTION,
 } from '../../const';
+import {
+	addToPack,
+	dismissPack,
+} from '../../actions';
 import {
 	isPRSAvailable,
 	getAnimation,
@@ -38,13 +42,15 @@ const CardWithAbilities = withAbilities(Card);
 
 const packHuntFilter = cardData => cardData.card.data && cardData.card.data.canPackHunt;
 
+const getPacks = state => state.packs;
+
 function ZonePlayerInPlay({
 	name,
 	zoneId,
 }) {
 	const SelectedCard = CardWithAbilities;
 
-	const [packs, setPacks] = useState([]);
+	const packs = useSelector(getPacks);
 	const rawContent = useZoneContent(zoneId);
 	const content = useCardData(rawContent);
 	const prsAvailable = useSelector(isPRSAvailable);
@@ -57,6 +63,8 @@ function ZonePlayerInPlay({
 	const promptParams = useSelector(getPromptParams);
 	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
 
+	const dispatch = useDispatch();
+
 	const hasPackHunters = content.some(packHuntFilter);
 	const packHuntersList = content.filter(packHuntFilter).map(({id}) => id);
 
@@ -64,22 +72,12 @@ function ZonePlayerInPlay({
 	const isOnFilteredPrompt = isOnPrompt && FILTERED_CREATURE_PROMPTS.includes(promptType);
 	const promptFilter = useCallback(getPromptFilter(promptType, promptParams), [promptType, promptParams]);
 
-	const onAddToPack = (newLeader, newHunter) => {
-		const pack = packs.find(p => p.leader === newLeader);
-		if (pack) {
-			setPacks(packs.map(({leader, hunters}) => leader === newLeader ? {leader, hunters: [...hunters, newHunter]} : {leader, hunters}));
-		} else {
-			setPacks([...packs, {leader: newLeader, hunters: [newHunter]}]);
-		}
+	const onAddToPack = (leader, hunter) => {
+		dispatch(addToPack(leader, hunter));
 	};
 
-	/* useEffect(() => {
-		const ids = new Set(content.map(({id}) => id));
-		setPacks(packs => active ? packs.filter(({leader}) => ids.has(leader)) : []);
-	}, [content, active]); */
-
-	const onRemovePack = (leaderId) => {
-		setPacks(packs.filter(({leader}) => leader !== leaderId));
+	const onRemovePack = (leader) => {
+		dispatch(dismissPack(leader));
 	};
 
 	const cardClickHandler = isOnPrompt ? cardId => {
@@ -109,7 +107,7 @@ function ZonePlayerInPlay({
 						isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
 						target={active && hasPackHunters && cardData.data.attacked < cardData.modifiedData.attacksPerTurn && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
-						pack={packs.find(({leader}) => leader === cardData.id)}
+						pack={packs.find(({ leader }) => leader === cardData.id)}
 						droppable={active && hasPackHunters && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
 						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
 						actionsAvailable={prsAvailable}

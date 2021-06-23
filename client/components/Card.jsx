@@ -66,6 +66,8 @@ function Card({
 	isOnPrompt,
 	className,
 	attacker,
+	target,
+	onPackHunt,
 	useLocket = false,
 }) {
 	useEffect(() => {
@@ -105,11 +107,11 @@ function Card({
 		type: DraggableTypes.CARD,
 		// The collect function utilizes a "monitor" instance (see the Overview for what this is)
 		// to pull important pieces of state from the DnD system.
-		item: () => ({ card, data, id }),
+		item: () => ({ card, data, id, pack }),
 		collect: (monitor) => ({
 			isDragging: monitor.isDragging()
 		})
-	}));
+	}), [card, data, id, pack]);
 
 	const [{ isDragging }, drop] = useDrop(() => ({
 		// The type (or types) to accept - strings or symbols
@@ -120,36 +122,24 @@ function Card({
 			canDrop: monitor.canDrop()
 		}),
 		drop: (item) => {
-			console.log('drop');
-			// When dropped on a compatible target, do something
-
 			const dropTarget = { card, data, id, guarded };
-			console.dir(item);
-			console.dir(dropTarget);
+
 			const canAttack = canFirstAttackSecond(item, dropTarget);
 
 			const canPackHunt = canPackHuntWith(item, dropTarget);
 
 			if (canAttack) {
-				console.log('onAttack');
-				let additionalAttackers = [];
-
-				if (pack) {
-					additionalAttackers = pack.hunters;
-				}
-
 				window.socket.emit('clientAction', {
 					type: 'actions/attack',
 					source: item.id,
 					target: id,
-					additionalAttackers,
+					additionalAttackers: item.pack ? item.pack.hunters : [],
 				});
 			} else if (canPackHunt) {
-				console.log('onPackHunt');
-				// onPackHunt(dropResult.id, item.id);
+				onPackHunt(id, item.id);
 			}
 		}
-	}));
+	}), [card, data, id, guarded]);
 
 	if (droppable) {
 		drop(ref);
@@ -157,14 +147,14 @@ function Card({
 	if (draggable) {
 		drag(ref);
 	}
-
+	
 	const classes = cn(
 		'cardHolder',
 		card ? typeClass[card.type] : null,
 		{
 			'dragging': isDragging,
 			'available': available,
-			'target': droppable,
+			'target': target,
 			'onPrompt': isOnPrompt,
 			'canPackHunt': (card && modifiedData) ? (card.data.canPackHunt && data.attacked < modifiedData.attacksPerTurn && !pack) : null,
 		},

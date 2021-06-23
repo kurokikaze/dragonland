@@ -23,8 +23,8 @@ export function enrichState(state) {
 			...state.zones.opponentInPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
 			...state.zones.opponentActiveMagi.filter(onlyCardsWithStaticAbilities).map(addCardData),
 		],
+		packs: [],
 	};
 
-	console.dir(result.staticAbilities);
 	return result;
 }

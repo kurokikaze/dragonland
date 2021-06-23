@@ -74,6 +74,8 @@ import {
 	END_SPELL_ANIMATION,
 	START_PROMPT_RESOLUTION_ANIMATION,
 	END_PROMPT_RESOLUTION_ANIMATION,
+	ADD_TO_PACK,
+	DISMISS_PACK,
 } from '../actions';
 
 import {
@@ -117,6 +119,7 @@ const defaultState = {
 	turnSecondsLeft: null,
 	gameEnded: false,
 	winner: null,
+	packs: [],
 };
 
 const clientZoneNames = {
@@ -194,6 +197,7 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				step: action.newStep,
+				packs: [],
 			};
 		}
 		/* Animations */
@@ -266,6 +270,20 @@ export default (state = defaultState, action) => {
 			};
 		}
 		/* End Animations */
+		case ADD_TO_PACK: {
+			return {
+				...state,
+				packs: state.packs.some(pack => pack.leader === action.leader) ? 
+					state.packs.map(pack => pack.leader === action.leader ? { ...pack, hunters: [ ...pack.hunters, pack.hunter ] } : pack) :
+					[ ...state.packs, {leader: action.leader, hunters: [ action.hunter ] } ],
+			};
+		}
+		case DISMISS_PACK: {
+			return {
+				...state,
+				packs: state.packs.filter(pack => pack.leader !== action.leader),
+			};
+		}
 		case ACTION_POWER: {
 			const sourceId = action.source.id;
 			const sourceName = action.power;
@@ -429,7 +447,6 @@ export default (state = defaultState, action) => {
 		}
 		case ACTION_ATTACK: {
 			const attackerIds = [action.source.id, ...(action.additionalAttackers || []).map(({id}) => id)];
-
 			return {
 				...state,
 				zones: {
@@ -512,6 +529,7 @@ export default (state = defaultState, action) => {
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
 					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
 
+					var packs = [ ...state.packs];
 					var staticAbilities = state.staticAbilities || [];
 
 					if (zonesToConsiderForStaticAbilities.has(sourceZone)) {
@@ -523,6 +541,9 @@ export default (state = defaultState, action) => {
 							card: byName(action.destinationCard.card),
 						});
 					}
+					if (sourceZone === 'playerInPlay') {
+						packs = packs.filter(({ leader }) => leader !== action.sourceCard.id);
+					}
 					return {
 						...state,
 						staticAbilities,
@@ -531,6 +552,7 @@ export default (state = defaultState, action) => {
 							[sourceZone]: state.zones[sourceZone].filter(card => card.id !== action.sourceCard.id),
 							[destinationZone]: [...state.zones[destinationZone], action.destinationCard],
 						},
+						packs,
 					};
 				}
 				case EFFECT_TYPE_START_OF_TURN: {
