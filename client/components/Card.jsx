@@ -1,8 +1,6 @@
 /* global window, document */
-import {useEffect} from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import identity from 'ramda/src/identity';
-import {branch, compose} from 'recompose';
+import {useEffect, useRef} from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import cn from 'classnames';
 import {
 	TYPE_CREATURE,
@@ -60,13 +58,11 @@ function Card({
 	data,
 	onClick,
 	draggable,
-	isDragging,
+	droppable,
+	guarded,
 	available,
 	modifiedData,
 	pack,
-	target,
-	connectDragSource,
-	connectDropTarget,
 	isOnPrompt,
 	className,
 	attacker,
@@ -102,17 +98,64 @@ function Card({
 			}
 		}
 	}, [attacker]);
-	let connector = identity;
 
-	if (draggable && connectDragSource && target && connectDropTarget) {
-		connector = compose(
-			connectDragSource,
-			connectDropTarget,
-		);
-	} else if (draggable && connectDragSource) {
-		connector = connectDragSource;
-	} else if (target && connectDropTarget) {
-		connector = connectDropTarget;
+	const ref = useRef(null);
+	const [, drag] = useDrag(() => ({
+		// "type" is required. It is used by the "accept" specification of drop targets.
+		type: DraggableTypes.CARD,
+		// The collect function utilizes a "monitor" instance (see the Overview for what this is)
+		// to pull important pieces of state from the DnD system.
+		item: () => ({ card, data, id }),
+		collect: (monitor) => ({
+			isDragging: monitor.isDragging()
+		})
+	}));
+
+	const [{ isDragging }, drop] = useDrop(() => ({
+		// The type (or types) to accept - strings or symbols
+		accept: DraggableTypes.CARD,
+		// Props to collect
+		collect: (monitor) => ({
+			isOver: monitor.isOver(),
+			canDrop: monitor.canDrop()
+		}),
+		drop: (item) => {
+			console.log('drop');
+			// When dropped on a compatible target, do something
+
+			const dropTarget = { card, data, id, guarded };
+			console.dir(item);
+			console.dir(dropTarget);
+			const canAttack = canFirstAttackSecond(item, dropTarget);
+
+			const canPackHunt = canPackHuntWith(item, dropTarget);
+
+			if (canAttack) {
+				console.log('onAttack');
+				let additionalAttackers = [];
+
+				if (pack) {
+					additionalAttackers = pack.hunters;
+				}
+
+				window.socket.emit('clientAction', {
+					type: 'actions/attack',
+					source: item.id,
+					target: id,
+					additionalAttackers,
+				});
+			} else if (canPackHunt) {
+				console.log('onPackHunt');
+				// onPackHunt(dropResult.id, item.id);
+			}
+		}
+	}));
+
+	if (droppable) {
+		drop(ref);
+	}
+	if (draggable) {
+		drag(ref);
 	}
 
 	const classes = cn(
@@ -121,18 +164,19 @@ function Card({
 		{
 			'dragging': isDragging,
 			'available': available,
-			'target': target,
+			'target': droppable,
 			'onPrompt': isOnPrompt,
 			'canPackHunt': (card && modifiedData) ? (card.data.canPackHunt && data.attacked < modifiedData.attacksPerTurn && !pack) : null,
 		},
 		className
 	);
 
-	return connector(
+	return (
 		<div
 			className={classes}
 			data-id={id}
 			onClick={() => onClick && onClick(id)}
+			ref={ref}
 		>
 			<img src={getCardUrl(card, useLocket)} alt={card ? card.name : null} />
 			{data && <>
@@ -147,67 +191,4 @@ function Card({
 	);
 }
 
-const cardSource = {
-	beginDrag(props) {
-		return props;
-	},
-
-	endDrag(props, monitor) {
-		if (!monitor.didDrop()) {
-			return;
-		}
-
-		// When dropped on a compatible target, do something
-		const item = monitor.getItem();
-		const dropResult = monitor.getDropResult();
-
-		const canAttack = canFirstAttackSecond(item, dropResult);
-
-		const canPackHunt = canPackHuntWith(item, dropResult);
-
-		if (canAttack) {
-			let additionalAttackers = [];
-
-			if (props.pack) {
-				additionalAttackers = props.pack.hunters;
-			}
-
-			window.socket.emit('clientAction', {
-				type: 'actions/attack',
-				source: item.id,
-				target: dropResult.id,
-				additionalAttackers,
-			});
-		} else if (canPackHunt) {
-			props.onPackHunt(dropResult.id, item.id);
-		}
-	},
-};
-
-function collect(connect, monitor) {
-	return {
-		// Call this function inside render()
-		// to let React DnD handle the drag events:
-		connectDragSource: connect.dragSource(),
-		// You can ask the monitor about the current drag state:
-		isDragging: monitor.isDragging(),
-	};
-}
-
-const cardTarget = {
-	drop(card) {
-		return card;
-	},
-};
-
-const collectDrop = (connect, monitor) => ({
-	connectDropTarget: connect.dropTarget(),
-	canDrop: !!monitor.canDrop(),
-});
-
-const enhance = compose(
-	branch(({droppable}) => droppable, DropTarget(DraggableTypes.CARD, cardTarget, collectDrop)),
-	branch(({draggable}) => draggable, DragSource(DraggableTypes.CARD, cardSource, collect)),
-);
-
-export default enhance(Card);
+export default Card;

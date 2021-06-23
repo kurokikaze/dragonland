@@ -1,7 +1,7 @@
 /* global window */
 import {useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
-import Backend from 'react-dnd-html5-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import {
 	ACTION_PASS,
@@ -90,7 +90,7 @@ function App() {
 		<div className='gameContainer'>
 			{timer && <div className="turnTimer">00:{timerSeconds.toString().padStart(2, '0')}</div>}
 			<div className="game">
-				<DndProvider backend={Backend}>
+				<DndProvider backend={HTML5Backend}>
 					{message && message.type == MESSAGE_TYPE_POWER && <EnhancedPowerMessage id={message.source} power={message.power} display={message.source && message.source.owner !== window.playerId} />}
 					{message && message.type == MESSAGE_TYPE_RELIC && <RelicMessage card={message.card} display={message.card.owner !== window.playerId} />}
 					{message && message.type == MESSAGE_TYPE_SPELL && <SpellMessage card={message.card} display={message.card.owner !== window.playerId} />}

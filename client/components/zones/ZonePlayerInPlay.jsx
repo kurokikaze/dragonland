@@ -1,5 +1,5 @@
 /* global window */
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
@@ -73,10 +73,10 @@ function ZonePlayerInPlay({
 		}
 	};
 
-	useEffect(() => {
+	/* useEffect(() => {
 		const ids = new Set(content.map(({id}) => id));
 		setPacks(packs => active ? packs.filter(({leader}) => ids.has(leader)) : []);
-	}, [content, active]);
+	}, [content, active]); */
 
 	const onRemovePack = (leaderId) => {
 		setPacks(packs.filter(({leader}) => leader !== leaderId));
