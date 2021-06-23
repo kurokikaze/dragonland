@@ -54,3 +54,8 @@ a {
   border-radius: 3px;
   font-weight: bold;
 }
+
+.startConfig fieldset {
+  display: flex;
+  justify-content: space-between;
+}
