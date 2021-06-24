@@ -39,6 +39,9 @@ const PROMPT_RESOLUTION_TIMEOUT = 600;
 const STEP_TIMEOUT = 500;
 
 const convertAction = action => {
+	if (!('type' in action)) {
+		return action;
+	}
 	switch(action.type) {
 		case ACTION_RESOLVE_PROMPT:
 			return  (action.player !== window.playerId) ? [
