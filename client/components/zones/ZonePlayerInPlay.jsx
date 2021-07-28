@@ -27,11 +27,10 @@ import {
 	getPromptGeneratedBy,
 } from '../../selectors';
 import {
-	useZoneContent,
-	useCardData,
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
+	getCardDetails,
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
 import Velociraptor from '../icons/Velociraptor.tsx';
@@ -46,13 +45,13 @@ const getPacks = state => state.packs;
 
 function ZonePlayerInPlay({
 	name,
-	zoneId,
 }) {
 	const SelectedCard = CardWithAbilities;
 
 	const packs = useSelector(getPacks);
-	const rawContent = useZoneContent(zoneId);
-	const content = useCardData(rawContent);
+	const rawContent = useSelector(getCardDetails);
+	const content = rawContent.inPlay.filter(card => card.card.type === TYPE_CREATURE && card.data.controller === window.playerId);
+	//	const content = useCardData(rawContent);
 	const prsAvailable = useSelector(isPRSAvailable);
 	const animation = useSelector(getAnimation);
 	const ourTurn = useSelector(isOurTurn);
@@ -100,16 +99,16 @@ function ZonePlayerInPlay({
 				<div key={cardData.id} className='packHolder'>
 					<SelectedCard
 						id={cardData.id}
-						card={cardData.card}
+						card={cardData.originalCard}
 						data={cardData.data}
-						modifiedData={cardData.modifiedData}
+						modifiedData={cardData.card.data}
 						onClick={cardClickHandler}
 						isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
-						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
-						target={active && hasPackHunters && cardData.data.attacked < cardData.modifiedData.attacksPerTurn && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
+						draggable={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
+						target={active && hasPackHunters && cardData.data.attacked < cardData.card.data.attacksPerTurn && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
 						pack={packs.find(({ leader }) => leader === cardData.id)}
 						droppable={active && hasPackHunters && !packs.some(({leader}) => leader === cardData.id) && packHuntersList.some(id => id !== cardData.id)}
-						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.modifiedData.attacksPerTurn}
+						available={active && cardData.card.type === TYPE_CREATURE && cardData.data.attacked < cardData.card.data.attacksPerTurn}
 						actionsAvailable={prsAvailable}
 						onAbilityUse={abilityUseHandler}
 						onPackHunt={onAddToPack}

@@ -10,7 +10,7 @@ async function login(server, username, password) {
 	await server.post('/users/login')
 		.send(`username=${username}`)
 		.send(`password=${password}`)
-		.expect(302)
+		.expect(200)
 		.then(res => {
 			console.dir(res.headers);
 			console.dir(res.headers['set-cookie'].length);
@@ -31,15 +31,18 @@ describe.skip('challenges', () => {
 	
 			const server = request.agent(app);
 	
-			const cookie = await login(server, 'tester', 'testing');	
-	
+			const cookie = await login(server, 'tester', 'tester');	
+
+			console.log('COOKIE');
+			console.dir(cookie);
+
 			server
-				.get('/api/challenges')
 				.set('Cookie', cookie)
+				.get('/api/challenges')
 				.expect(200)
 				.expect('Content-Type', /json/)
 				.end(function(err, res) {
-					expect(res.body).toEqual([]);
+					expect(res.body).toEqual({});
 					if (err) return done(err);
 
 					const close = getClose();

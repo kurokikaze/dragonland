@@ -14,16 +14,16 @@ export function camelCase(str){
 const onlyCardsWithStaticAbilities = card => byName(card.card).data.staticAbilities;
 const addCardData = card => ({...card, card: byName(card.card)});
 
-export function enrichState(state) {
+export function enrichState(state, playerId) {
 	const result = {
 		...state,
 		staticAbilities: [
-			...state.zones.playerInPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
+			...state.zones.inPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
 			...state.zones.playerActiveMagi.filter(onlyCardsWithStaticAbilities).map(addCardData),
-			...state.zones.opponentInPlay.filter(onlyCardsWithStaticAbilities).map(addCardData),
 			...state.zones.opponentActiveMagi.filter(onlyCardsWithStaticAbilities).map(addCardData),
 		],
 		packs: [],
+		playerId,
 	};
 
 	return result;

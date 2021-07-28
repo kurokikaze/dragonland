@@ -14,6 +14,8 @@ import {
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_MAGI_WITHOUT_CREATURES,
 
+	PROPERTY_CONTROLLER,
+
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
@@ -101,9 +103,11 @@ function convertClientCommands(action, game) {
 			}
 
 			if (!expandedAction.target) {
-				const opponentId = game.getOpponent(expandedAction.source.data.controller);
+				const controller = game.modifyByStaticAbilities(expandedAction.source, PROPERTY_CONTROLLER);
+				const opponentId = game.getOpponent(controller);
 				expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, opponentId).byId(action.target);
 			}
+
 			break;
 		}
 		case ACTION_PLAY: {

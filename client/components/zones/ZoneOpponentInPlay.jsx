@@ -12,8 +12,7 @@ import {
 	CLIENT_ACTION,
 } from '../../const';
 import {
-	useCardData,
-	useZoneContent,
+	getCardDetails,
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
@@ -32,11 +31,11 @@ import { useCallback } from 'react';
 const CardWithAbilities = withAbilities(Card);
 
 function ZoneOpponentInPlay({
-	zoneId,
 	name,
 }) {
-	const rawContent = useZoneContent(zoneId);
-	const content = useCardData(rawContent);
+	const rawContent = useSelector(getCardDetails);
+	const content = rawContent.inPlay.filter(card => card.card.type === TYPE_CREATURE && card.data.controller !== window.playerId);
+	
 	const currentStep = useSelector(getCurrentStep);
 	const ourTurn = useSelector(isOurTurn);
 	const active = ourTurn && currentStep === STEP_ATTACK;

@@ -70,8 +70,7 @@ export async function saveDeckById(deck) {
 export async function saveNewDeck(deck) {
 	delete deck._id;
 	const res = await _db.collection(DECKS_COLLECTION).insertOne(deck);
-	console.dir(res);
-	console.log('insertedId', res.insertedId);
+	return res;
 }
 
 export function getUserByUsername(username, callback) {

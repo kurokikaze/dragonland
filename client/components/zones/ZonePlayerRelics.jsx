@@ -4,6 +4,8 @@ import cn from 'classnames';
 import {
 	ACTION_POWER,
 	ACTION_RESOLVE_PROMPT,
+
+	TYPE_RELIC,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 
@@ -14,8 +16,7 @@ import {
 	getPromptType,
 } from '../../selectors';
 import {
-	useCardData,
-	useZoneContent,
+	getCardDetails,
 	UNFILTERED_RELIC_PROMPTS,
 } from '../common.js';
 import {CLIENT_ACTION} from '../../const';
@@ -29,8 +30,11 @@ function ZonePlayerRelics({
 	name,
 	zoneId,
 }) {
-	const rawContent = useZoneContent(zoneId);
-	const content = useCardData(rawContent);
+	const rawContent = useSelector(getCardDetails);
+	const content = rawContent.inPlay.filter(card =>
+		card.card.type === TYPE_RELIC &&
+		((zoneId === 'playerRelics') ? card.data.controller === window.playerId : card.data.controller !== window.playerId)
+	);
 	const isOnPrompt = useSelector(isPromptActive);
 	const promptType = useSelector(getPromptType);
 	const isOnUnfilteredPrompt = isOnPrompt && UNFILTERED_RELIC_PROMPTS.includes(promptType);

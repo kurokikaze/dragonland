@@ -129,6 +129,12 @@ function Card({
 			const canPackHunt = canPackHuntWith(item, dropTarget);
 
 			if (canAttack) {
+				console.dir({
+					type: 'actions/attack',
+					source: item.id,
+					target: id,
+					additionalAttackers: item.pack ? item.pack.hunters : [],
+				});
 				window.socket.emit('clientAction', {
 					type: 'actions/attack',
 					source: item.id,
@@ -137,6 +143,8 @@ function Card({
 				});
 			} else if (canPackHunt) {
 				onPackHunt(id, item.id);
+			} else {
+				console.dir('Problem, capn');
 			}
 		}
 	}), [card, data, id, guarded]);

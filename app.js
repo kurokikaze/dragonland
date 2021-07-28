@@ -34,7 +34,7 @@ const initApp = (mainCallback) => {
 					const hashedPassword = getPasswordHash(password);
 					console.log('hashedPassword', hashedPassword);
 					console.log('user.password', user.password);
-					if (user.password != hashedPassword) { return cb(null, false); }
+					if (user.password !== hashedPassword) { return cb(null, false); }
 					return cb(null, user);
 				});
 			}));

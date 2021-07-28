@@ -31,6 +31,7 @@ import {
 	EFFECT_TYPE_DRAW,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
+	EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
@@ -87,6 +88,7 @@ import {
 } from '../const.js';
 
 import { byName } from 'moonlands/dist/cards';
+import nanoid from 'nanoid';
 
 const defaultState = {
 	zones: {
@@ -96,15 +98,15 @@ const defaultState = {
 		playerActiveMagi: [],
 		playerMagiPile: [],
 		playerDefeatedMagi: [],
-		playerInPlay: [],
+		inPlay: [],
 		opponentHand: [],
 		opponentDeck: [],
 		opponentDiscard: [],
 		opponentActiveMagi: [],
 		opponentMagiPile: [],
 		opponentDefeatedMagi: [],
-		opponentInPlay: [],
 	},
+	continuousEffects: [],
 	staticAbilities: [],
 	animation: null,
 	message: {
@@ -133,6 +135,8 @@ const clientZoneNames = {
 };
 
 const getZoneName = (serverZoneType, source) => {
+	if (serverZoneType === ZONE_TYPE_IN_PLAY) return 'inPlay';
+
 	if (!clientZoneNames[serverZoneType]) {
 		throw new Error(`Unknown zone: ${serverZoneType}`);
 	}
@@ -143,11 +147,8 @@ const getZoneName = (serverZoneType, source) => {
 };
 
 const findInPlay = (state, id) => {
-	const cardPlayerInPlay = state.zones.playerInPlay.find(card => card.id === id);
-	if (cardPlayerInPlay) return cardPlayerInPlay;
-
-	const cardOpponentInPlay = state.zones.opponentInPlay.find(card => card.id === id);
-	if (cardOpponentInPlay) return cardOpponentInPlay;
+	const cardInPlay = state.zones.inPlay.find(card => card.id === id);
+	if (cardInPlay) return cardInPlay;
 
 	const cardPlayerMagi = state.zones.playerActiveMagi.find(card => card.id === id);
 	if (cardPlayerMagi) return cardPlayerMagi;
@@ -304,12 +305,7 @@ export default (state = defaultState, action) => {
 				...state,
 				zones: {
 					...state.zones,
-					playerInPlay: state.zones.playerInPlay.map(
-						card => card.id === sourceId
-							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
-							: card
-					),
-					opponentInPlay: state.zones.opponentInPlay.map(
+					inPlay: state.zones.inPlay.map(
 						card => card.id === sourceId
 							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
 							: card
@@ -451,17 +447,7 @@ export default (state = defaultState, action) => {
 				...state,
 				zones: {
 					...state.zones,
-					playerInPlay: state.zones.playerInPlay.map(card =>
-						attackerIds.includes(card.id) ? ({
-							...card,
-							data: {
-								...card.data,
-								attacked: card.data.attacked + 1,
-								hasAttacked: true,
-							},
-						}) : card,
-					),
-					opponentInPlay: state.zones.opponentInPlay.map(card =>
+					inPlay: state.zones.inPlay.map(card =>
 						attackerIds.includes(card.id) ? ({
 							...card,
 							data: {
@@ -525,7 +511,7 @@ export default (state = defaultState, action) => {
 					return state;					
 				}
 				case EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES: {
-					const zonesToConsiderForStaticAbilities = new Set(['playerInPlay', 'opponentInPlay', 'playerActiveMagi', 'opponentActiveMagi']);
+					const zonesToConsiderForStaticAbilities = new Set(['inPlay', 'playerActiveMagi', 'opponentActiveMagi']);
 					const sourceZone = getZoneName(action.sourceZone, action.sourceCard);
 					const destinationZone = getZoneName(action.destinationZone, action.destinationCard);
 
@@ -541,7 +527,7 @@ export default (state = defaultState, action) => {
 							card: byName(action.destinationCard.card),
 						});
 					}
-					if (sourceZone === 'playerInPlay') {
+					if (sourceZone === 'inPlay' && action.sourceCard.data.controller === window.playerId) {
 						packs = packs.filter(({ leader }) => leader !== action.sourceCard.id);
 					}
 					return {
@@ -561,7 +547,7 @@ export default (state = defaultState, action) => {
 							...state,
 							zones: {
 								...state.zones,
-								playerInPlay: state.zones.playerInPlay.map(card => ({...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false, actionsUsed: []}})),
+								inPlay: state.zones.inPlay.map(card => card.data.controller === state.playerId ? ({...card, data: {...card.data, attacked: 0, hasAttacked: false, wasAttacked: false, actionsUsed: []}}) : card),
 								playerActiveMagi: state.zones.playerActiveMagi.map(card => ({...card, data: {...card.data, wasAttacked: false, actionsUsed: []}})),
 							},
 							activePlayer: action.player,
@@ -672,22 +658,17 @@ export default (state = defaultState, action) => {
 					};
 				}
 				case EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE: {
-					const playerInPlay = [...state.zones.playerInPlay].map(
+					const inPlay = [...state.zones.inPlay].map(
 						card => card.id === action.target.id ?
 							{...card, data: {...card.data, attacked: Infinity}} :
 							card,
 					);
-					const opponentInPlay = [...state.zones.opponentInPlay].map(
-						card => card.id === action.target.id ?
-							{...card, data: {...card.data, attacked: Infinity}} :
-							card,
-					);
+
 					return {
 						...state,
 						zones: {
 							...state.zones,
-							playerInPlay,
-							opponentInPlay,
+							inPlay,
 						},
 					};
 				}
@@ -696,20 +677,17 @@ export default (state = defaultState, action) => {
 
 					const newLogEntries = idsToFind.map(id => findInPlay(state, id)).filter(Boolean).map(card => ({type: LOG_ENTRY_CREATURE_ENERGY_LOSS, card: card.card, amount: action.amount}));
 
-					const playerInPlay = [...state.zones.playerInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
-					const opponentInPlay = [...state.zones.opponentInPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
+					const inPlay = [...state.zones.inPlay].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 
 					return {
 						...state,
 						zones: {
 							...state.zones,
-							playerInPlay,
-							opponentInPlay,
+							inPlay,
 						},
 						log: [...state.log, ...newLogEntries],
 					};                    
 				}
-                
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
 					const magiFound = findInPlay(state, action.target.id);
 					const newLogEntry = {
@@ -740,11 +718,7 @@ export default (state = defaultState, action) => {
 						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
 						.map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
 
-					const playerInPlay = [...(state.zones.playerInPlay || [])]
-						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
-						.map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-
-					const opponentInPlay = [...(state.zones.opponentInPlay || [])]
+					const inPlay = [...(state.zones.inPlay || [])]
 						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card)
 						.map(card => card.id == action.source.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
 
@@ -754,8 +728,7 @@ export default (state = defaultState, action) => {
 							...state.zones,
 							playerActiveMagi,
 							opponentActiveMagi,
-							playerInPlay,
-							opponentInPlay,
+							inPlay,
 						},
 					};
 				}
@@ -775,15 +748,13 @@ export default (state = defaultState, action) => {
 
 					const newLogEntries = idsToFind.map(id => findInPlay(state, id)).filter(Boolean).map(card => ({type: LOG_ENTRY_CREATURE_ENERGY_GAIN, card: card.card, amount: action.amount}));
 
-					const playerInPlay = [...(state.zones.playerInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
-					const opponentInPlay = [...(state.zones.opponentInPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
+					const inPlay = [...(state.zones.inPlay || [])].map(card => idsToFind.includes(card.id) ? {...card, data: {...card.data, energy: card.data.energy + action.amount}} : card);
 
 					return {
 						...state,
 						zones: {
 							...state.zones,
-							playerInPlay,
-							opponentInPlay,
+							inPlay,
 						},
 						log: [...state.log, ...newLogEntries],
 					};
@@ -809,6 +780,23 @@ export default (state = defaultState, action) => {
 						},
 						log: newLogEntry ? [...state.log, newLogEntry] : state.log,
 					};
+				}
+				case EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT: {
+					return {
+						...state,
+						continuousEffects: [
+							...state.continuousEffects,
+							{
+								generatedBy: action.generatedBy,
+								expiration: action.expiration,
+								staticAbilities: action.staticAbilities || [],
+								triggerEffects: action.triggerEffects || [],
+								player: action.player,
+								id: nanoid(),
+							},
+						],
+					};
+
 				}
 			}
 			return state;

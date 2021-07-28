@@ -1,17 +1,17 @@
 /* global window */
 import pathOr from 'ramda/src/pathOr';
-import {
-	STEP_PRS_FIRST,
-	STEP_PRS_SECOND,
-} from '../const.js';
-
-import {cards} from 'moonlands/dist/cards';
+import { cards } from 'moonlands/dist/cards';
 
 import {
 	TYPE_RELIC,
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_SINGLE_MAGI,
 } from 'moonlands/dist/const';
+
+import {
+	STEP_PRS_FIRST,
+	STEP_PRS_SECOND,
+} from '../const.js';
 
 const relicsHash = {};
 
@@ -39,16 +39,16 @@ const isNotRelic = card => !relicsHash[card.card];
 export function zoneContent(zoneId, state) {
 	switch (zoneId) {
 		case 'playerRelics': {
-			return pathOr([], ['zones', 'playerInPlay'], state).filter(isRelic);
+			return pathOr([], ['zones', 'inPlay'], state).filter(isRelic);
 		}
 		case 'playerInPlay': {
-			return pathOr([], ['zones', 'playerInPlay'], state).filter(isNotRelic);
+			return pathOr([], ['zones', 'inPlay'], state).filter(isNotRelic);
 		}
 		case 'opponentRelics': {
-			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isRelic);
+			return pathOr([], ['zones', 'inPlay'], state).filter(isRelic);
 		}
 		case 'opponentInPlay': {
-			return pathOr([], ['zones', 'opponentInPlay'], state).filter(isNotRelic);
+			return pathOr([], ['zones', 'inPlay'], state).filter(isNotRelic);
 		}
 		default: {
 			return pathOr([], ['zones', zoneId], state);

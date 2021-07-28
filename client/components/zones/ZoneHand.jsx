@@ -30,7 +30,7 @@ const relicsHash = cards
 
 const CardWithView = withView(Card);
 
-const getRelics = state => state.zones.playerInPlay.filter(cardData => relicsHash[cardData.card]).map(cardData => cardData.card);
+const getRelics = state => state.zones.inPlay.filter(cardData => cardData.data.controller === state.playerId && relicsHash[cardData.card]).map(cardData => cardData.card);
 
 function ZoneHand({ name, zoneId, onCardClick }) {
 	const rawContent = useZoneContent(zoneId);

@@ -19,7 +19,7 @@ function startGame() {
 
 	const store = createStore(
 		rootReducer,
-		enrichState(window.initialState),
+		enrichState(window.initialState, window.playerId),
 		composeEnhancers(
 			applyMiddleware(thunk),
 			applyMiddleware(epicMiddleware),
@@ -38,7 +38,7 @@ function startGame() {
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io(`/?playerHash=${window.playerHash}`);
 		window.socket.on('action', function(action) {
-			// console.dir(action);
+			console.dir(action);
 			observer.next(action);
 		});
 
