@@ -31,6 +31,7 @@ import {
 	EFFECT_TYPE_DRAW,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
+	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 	EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT,
 
 	PROMPT_TYPE_NUMBER,
@@ -41,6 +42,8 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_MAGI,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_MAGI_PILE,
@@ -77,6 +80,8 @@ import {
 	END_PROMPT_RESOLUTION_ANIMATION,
 	ADD_TO_PACK,
 	DISMISS_PACK,
+	PLUS_ENERGY_ON_CREATURE,
+	MINUS_ENERGY_ON_CREATURE,
 } from '../actions';
 
 import {
@@ -122,6 +127,7 @@ const defaultState = {
 	gameEnded: false,
 	winner: null,
 	packs: [],
+	energyPrompt: {},
 };
 
 const clientZoneNames = {
@@ -335,6 +341,8 @@ export default (state = defaultState, action) => {
 		// }
 		case ACTION_ENTER_PROMPT: {
 			var promptParams = action.promptParams;
+			var energyPrompt = state.energyPrompt;
+
 			switch (action.promptType) {
 				case PROMPT_TYPE_NUMBER: {
 					promptParams = {
@@ -367,6 +375,19 @@ export default (state = defaultState, action) => {
 					};
 					break;
 				}
+				case PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					energyPrompt = {
+						freeEnergy: 0,
+						cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id, data }) => [id, data.energy])),
+					};
+					break;
+				}
+				case PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					energyPrompt = {
+						freeEnergy: action.amount,
+						cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
+					};
+				}
 			}
 
 			return {
@@ -378,6 +399,7 @@ export default (state = defaultState, action) => {
 				promptParams,
 				promptGeneratedBy: action.generatedBy,
 				promptAvailableCards: action.availableCards || [],
+				energyPrompt,
 			};
 		}
 		case START_PROMPT_RESOLUTION_ANIMATION: {
@@ -781,6 +803,16 @@ export default (state = defaultState, action) => {
 						log: newLogEntry ? [...state.log, newLogEntry] : state.log,
 					};
 				}
+				case EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					const ids = Object.keys(action.energyOnCreatures);
+					return {
+						...state,
+						zones: {
+							...state.zones,
+							inPlay: state.zones.inPlay.map(cardInPlay => ids.includes(cardInPlay.id) ? { ...cardInPlay, data: { ...cardInPlay.data, energy: action.energyOnCreatures[cardInPlay.id]}}: cardInPlay)
+						},
+					};
+				}
 				case EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT: {
 					return {
 						...state,
@@ -800,6 +832,30 @@ export default (state = defaultState, action) => {
 				}
 			}
 			return state;
+		}
+		case PLUS_ENERGY_ON_CREATURE: {
+			return {
+				...state,
+				energyPrompt: {
+					freeEnergy: state.energyPrompt.freeEnergy - 1,
+					cards: { 
+						...state.energyPrompt.cards,
+						[action.cardId]: state.energyPrompt.cards[action.cardId] + 1, 
+					},
+				},
+			};
+		}
+		case MINUS_ENERGY_ON_CREATURE: {
+			return {
+				...state,
+				energyPrompt: {
+					freeEnergy: state.energyPrompt.freeEnergy + 1,
+					cards: {
+						...state.energyPrompt.cards,
+						[action.cardId]: state.energyPrompt.cards[action.cardId] - 1, 
+					},
+				},
+			};
 		}
 		default: {
 			return state;

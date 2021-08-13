@@ -16,6 +16,9 @@ export const END_ANIMATION = 'actions/end_animation';
 export const ADD_TO_PACK = 'actions/add_to_pack';
 export const DISMISS_PACK = 'actions/dismiss_pack';
 
+export const MINUS_ENERGY_ON_CREATURE = 'actions/minus_energy_on_creature';
+export const PLUS_ENERGY_ON_CREATURE = 'actions/plus_energy_on_creature';
+
 export const showPowerName = (id, powerName) => ({type: SHOW_POWER_NAME, id, powerName});
 export const hidePowerName = (id, powerName) => ({type: HIDE_POWER_NAME, id, powerName});
 export const startPowerAnimation = (source, power, player) => ({type: START_POWER_ANIMATION, source, power, player});
@@ -33,3 +36,6 @@ export const endAnimation = () => ({type: END_ANIMATION, endAnimation: true});
 
 export const addToPack = (leader, hunter) => ({ type: ADD_TO_PACK, leader, hunter });
 export const dismissPack = (leader) => ({ type: DISMISS_PACK, leader });
+
+export const plusEnergy = (cardId) => ({ type: PLUS_ENERGY_ON_CREATURE, cardId });
+export const minusEnergy = (cardId) => ({ type: MINUS_ENERGY_ON_CREATURE, cardId });

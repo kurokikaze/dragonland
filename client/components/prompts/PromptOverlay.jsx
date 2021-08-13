@@ -5,12 +5,14 @@ import {
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_MAY_ABILITY,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 } from 'moonlands/src/const.ts';
 
 import PromptChooseCards from './PromptChooseCards.jsx';
 import PromptChooseCardsInZone from './PromptChooseCardsInZone.jsx';
 import PromptChooseNumber from './PromptChooseNumber.jsx';
 import PromptMayEffect from './PromptMayEffect.jsx';
+import PromptEnergyManipulation from './PromptEnergyManipulation.jsx';
 
 import {getPromptType, getPromptMessage} from '../../selectors/index.js'; 
 
@@ -28,6 +30,7 @@ function PromptOverlay() {
 			{promptType === PROMPT_TYPE_NUMBER && <PromptChooseNumber />}
 			{promptType === PROMPT_TYPE_MAY_ABILITY && <PromptMayEffect />}
 			{promptType === PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE && <PromptChooseCardsInZone />}
+			{promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES && <PromptEnergyManipulation />}
 		</div>
 	);
 }

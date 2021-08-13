@@ -209,3 +209,14 @@
     font-weight: bold;
     font-family: "Lato";
 }
+
+.energyManipulation {
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    position: relative;
+    border: 6px;
+    border-radius: 7px;
+    padding: 0 10px;
+}

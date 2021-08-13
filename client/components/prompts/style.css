@@ -133,3 +133,8 @@
     display: flex;
     justify-content: space-around;
 }
+
+.promptWindow.promptEnergyManipulation {
+    top: 64%;
+    min-height: 100px;
+}

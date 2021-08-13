@@ -6,6 +6,8 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_POWER,
 	TYPE_CREATURE,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {
@@ -33,11 +35,13 @@ import {
 	getCardDetails,
 } from '../common.js';
 import {withAbilities} from '../CardAbilities.jsx';
+import {withEnergyManipulation} from '../CardEnergyManipulation.jsx';
 import Velociraptor from '../icons/Velociraptor.tsx';
 
 import './style.css';
 
 const CardWithAbilities = withAbilities(Card);
+const CardWithEnergyManipulation = withEnergyManipulation(Card);
 
 const packHuntFilter = cardData => cardData.card.data && cardData.card.data.canPackHunt;
 
@@ -46,12 +50,10 @@ const getPacks = state => state.packs;
 function ZonePlayerInPlay({
 	name,
 }) {
-	const SelectedCard = CardWithAbilities;
-
 	const packs = useSelector(getPacks);
 	const rawContent = useSelector(getCardDetails);
 	const content = rawContent.inPlay.filter(card => card.card.type === TYPE_CREATURE && card.data.controller === window.playerId);
-	//	const content = useCardData(rawContent);
+
 	const prsAvailable = useSelector(isPRSAvailable);
 	const animation = useSelector(getAnimation);
 	const ourTurn = useSelector(isOurTurn);
@@ -61,6 +63,8 @@ function ZonePlayerInPlay({
 	const promptType = useSelector(getPromptType);
 	const promptParams = useSelector(getPromptParams);
 	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
+
+	const SelectedCard = (promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES || PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES ) ? CardWithEnergyManipulation: CardWithAbilities;
 
 	const dispatch = useDispatch();
 

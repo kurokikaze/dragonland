@@ -21,10 +21,12 @@ import {
 	EFFECT_TYPE_CREATURE_ATTACKS,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
+	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 } from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
@@ -116,6 +118,11 @@ function convertServerCommand(initialAction, game, playerId) {
 
 					break;
 				}
+				case PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					action.amount = game.getMetaValue(action.amount, action.generatedBy);
+
+					break;
+				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
 					const restrictions = action.restrictions || (action.restriction ? [
 						{
@@ -200,6 +207,13 @@ function convertServerCommand(initialAction, game, playerId) {
 					return {
 						...action,
 						target: convertCard(action.target),
+					};
+				}
+				case EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					const energyOnCreatures = game.getMetaValue(action.energyOnCreatures, action.generatedBy) || {};
+					return {
+						...action,
+						energyOnCreatures,
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
