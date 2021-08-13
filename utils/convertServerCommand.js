@@ -22,6 +22,7 @@ import {
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
 	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
@@ -213,6 +214,15 @@ function convertServerCommand(initialAction, game, playerId) {
 					const energyOnCreatures = game.getMetaValue(action.energyOnCreatures, action.generatedBy) || {};
 					return {
 						...action,
+						source: convertCard(action.source),
+						energyOnCreatures,
+					};
+				}
+				case EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					const energyOnCreatures = game.getMetaValue(action.energyOnCreatures, action.generatedBy) || {};
+					return {
+						...action,
+						source: convertCard(action.source),
 						energyOnCreatures,
 					};
 				}

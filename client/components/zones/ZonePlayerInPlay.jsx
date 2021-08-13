@@ -64,7 +64,11 @@ function ZonePlayerInPlay({
 	const promptParams = useSelector(getPromptParams);
 	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
 
-	const SelectedCard = (promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES || PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES ) ? CardWithEnergyManipulation: CardWithAbilities;
+	const SelectedCard = (
+		promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES ||
+		promptType === PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES )
+		? CardWithEnergyManipulation
+		: CardWithAbilities;
 
 	const dispatch = useDispatch();
 
