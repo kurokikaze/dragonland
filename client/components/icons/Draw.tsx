@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {IconProps} from './types';
 
 function Draw({fillColor, size = 50}: IconProps) {

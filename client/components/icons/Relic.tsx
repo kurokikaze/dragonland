@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {IconProps} from './types';
 
 function Energize({fillColor, size = 50}: IconProps) {

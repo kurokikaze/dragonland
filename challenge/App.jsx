@@ -1,4 +1,4 @@
-import {useRoutes} from 'hookrouter';
+import { useRoutes } from 'hookrouter';
 import routes from './router.js';
 
 export default function App() {

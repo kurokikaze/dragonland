@@ -1,5 +1,5 @@
 /* global fetch */
-import {useEffect, useState, useCallback} from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {useDispatch} from 'react-redux';
 
 import Row from 'antd/es/row';
