@@ -27,7 +27,6 @@ function PromptChooseCards() {
 
 	return (
 		<div className="promptWindow promptEnergyManipulation">
-			{message && <div>{message}</div>}
 			{(freeEnergy > 0) && <div>Free energy left to distribute: {freeEnergy}</div>}
 			<div className="buttonHolder">
 				<button onClick={handleSend} disabled={freeEnergy > 0}>OK</button>

@@ -3,12 +3,25 @@ import nanoid from 'nanoid';
 import { open, write, close } from 'fs';
 import { join as joinPath } from 'path';
 import { State } from 'moonlands';
+import { byName } from 'moonlands/dist/cards';
+import CardInGame from 'moonlands/dist/classes/CardInGame'
+import Zone from 'moonlands/dist/classes/Zone'
 import ensure from 'connect-ensure-login';
 
 import { getDeckById, saveDeckById, saveNewDeck } from '../utils/database.js';
 import { getChallenges, addChallenge, removeByName } from '../utils/challenge.js';
 import config from '../config.js';
-import { ACTION_PLAYER_WINS } from 'moonlands/dist/const.js';
+import {
+	ACTION_PLAYER_WINS,
+	ZONE_TYPE_ACTIVE_MAGI,
+	ZONE_TYPE_HAND,
+	ZONE_TYPE_MAGI_PILE,
+	ZONE_TYPE_IN_PLAY,
+	ZONE_TYPE_DECK,
+	ZONE_TYPE_DEFEATED_MAGI,
+	ZONE_TYPE_DISCARD,
+	ACTION_POWER,
+} from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
 
@@ -23,6 +36,8 @@ const gamePlayers = {};
 const keyHash = {};
 // Player id (Mongo) to player hash
 const participants = {};
+
+const STEP_PRS_FIRST = 1;
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 	const gameId = nanoid();
@@ -163,7 +178,7 @@ router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 	});
 
 router.get('/stats',
-	function(req, res) {
+	function(_req, res) {
 		res.render('stats', {
 			runningGames,
 			gamesCounter,
@@ -374,5 +389,64 @@ router.post('/accept',
 		
 	}
 );
+
+export const createZones = (player1, player2, creatures = [], activeMagi = []) => [
+	new Zone('Player 1 hand', ZONE_TYPE_HAND, player1),
+	new Zone('Player 2 hand', ZONE_TYPE_HAND, player2),
+	new Zone('Player 1 deck', ZONE_TYPE_DECK, player1),
+	new Zone('Player 2 deck', ZONE_TYPE_DECK, player2),
+	new Zone('Player 1 discard', ZONE_TYPE_DISCARD, player1),
+	new Zone('Player 2 discard', ZONE_TYPE_DISCARD, player2),
+	new Zone('Player 1 active magi', ZONE_TYPE_ACTIVE_MAGI, player1).add(activeMagi),
+	new Zone('Player 2 active magi', ZONE_TYPE_ACTIVE_MAGI, player2),
+	new Zone('Player 1 Magi pile', ZONE_TYPE_MAGI_PILE, player1),
+	new Zone('Player 2 Magi pile', ZONE_TYPE_MAGI_PILE, player2),
+	new Zone('Player 1 defeated Magi', ZONE_TYPE_DEFEATED_MAGI, player1),
+	new Zone('Player 2 defeated Magi', ZONE_TYPE_DEFEATED_MAGI, player2),
+	new Zone('In play', ZONE_TYPE_IN_PLAY, null).add(creatures),
+];
+
+router.get('/test-state',
+	async (_req, res) => {
+		console.log('Starting state construction')
+		const ACTIVE_PLAYER = 212;
+		const NON_ACTIVE_PLAYER = 510;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(15);
+		const arbolit = new CardInGame(byName('Arbolit'), ACTIVE_PLAYER).addEnergy(5);
+		const fireGrag = new CardInGame(byName('Fire Grag'), ACTIVE_PLAYER).addEnergy(4);
+		const quorPup = new CardInGame(byName('Quor Pup'), ACTIVE_PLAYER).addEnergy(6);
+		const diobor = new CardInGame(byName('Diobor'), ACTIVE_PLAYER).addEnergy(10);
+		const flameHyren = new CardInGame(byName('Flame Hyren'), ACTIVE_PLAYER).addEnergy(15);
+
+		const adis = new CardInGame(byName('Adis'), NON_ACTIVE_PLAYER).addEnergy(3);
+
+		const zones = createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [arbolit, fireGrag, quorPup, diobor, flameHyren], [grega]);
+
+		const gameState = new State({
+			zones,
+			step: STEP_PRS_FIRST,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, NON_ACTIVE_PLAYER).add([adis]);
+
+		const powerAction = {
+			type: ACTION_POWER,
+			source: flameHyren,
+			power: flameHyren.card.data.powers[0],
+			player: ACTIVE_PLAYER,
+		};
+
+		gameState.update(powerAction);
+
+		console.dir(gameState.serializeData(ACTIVE_PLAYER))
+		res.render('game', {
+			gameId: 'testGameId',
+			playerId: ACTIVE_PLAYER,
+			playerHash: 'playerHash',
+			initialState: gameState.serializeData(ACTIVE_PLAYER),
+		});
+});
 
 export default router;

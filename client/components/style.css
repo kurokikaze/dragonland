@@ -207,7 +207,7 @@
     top: 300px;
     right: 450px;
     font-weight: bold;
-    font-family: "Lato";
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }
 
 .energyManipulation {
@@ -219,4 +219,8 @@
     border: 6px;
     border-radius: 7px;
     padding: 0 10px;
+}
+
+.currentEnergy {
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }

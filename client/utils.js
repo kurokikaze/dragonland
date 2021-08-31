@@ -1,6 +1,6 @@
 /* global window */
 import { byName } from 'moonlands/dist/cards.js';
-import { PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES, TYPE_CREATURE } from 'moonlands/dist/const';
+import { PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES, PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES, TYPE_CREATURE } from 'moonlands/dist/const';
 
 export function camelCase(str){
 	return str.replace(/'/g, '').split(' ').map(function(word, index){
@@ -17,7 +17,6 @@ const onlyCardsWithStaticAbilities = card => byName(card.card).data.staticAbilit
 const addCardData = card => ({...card, card: byName(card.card)});
 
 export function enrichState(state, playerId) {
-	const isOnEnergyPrompt = state.prompt && state.promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES;
 
 	const result = {
 		...state,
@@ -30,12 +29,18 @@ export function enrichState(state, playerId) {
 		playerId,
 	};
 
-	console.dir(Object.fromEntries(state.zones.inPlay.map(({ id, data }) => [id, data.energy])));
-	if (isOnEnergyPrompt) {
-		console.dir(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id, data }) => [id, data.energy]));
+	const isOnRearrangeEnergyPrompt = state.prompt && state.promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES;
+	if (isOnRearrangeEnergyPrompt) {
 		result.energyPrompt = {
 			freeEnergy: 0,
 			cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id, data }) => [id, data.energy])),
+		};
+	}
+	const isOnDistributeEnergyPrompt = state.prompt && state.promptType === PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES;
+	if (isOnDistributeEnergyPrompt) {
+		result.energyPrompt = {
+			freeEnergy: state.promptParams.amount,
+			cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
 		};
 	}
 	return result;

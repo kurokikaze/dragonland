@@ -11,12 +11,12 @@ const router = express.Router();
 /* GET users listing. */
 router.get('/login', 
 	function(req, res) {
-		res.render('login');
+		res.render('login', req.query);
 	});
 
 router.post('/login',
 	passport.authenticate('local', { failureRedirect: '/users/login?loginError=true', successRedirect: '/' }),
-	function(req, res) {
+	function(_req, res) {
 		res.redirect('/');
 	});
 

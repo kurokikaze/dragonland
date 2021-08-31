@@ -10,14 +10,14 @@
 .promptMessage {
     color: #ddd;
     margin-top: 43px;
-    font: Lato, "Helvetica Neue", Helvetica, Arial;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
     width: 100%;
     text-align: center;
 }
 
 .promptWindow {
     width: 80%;
-    font: Lato, "Helvetica Neue", Helvetica, Arial;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
     position: absolute;
     top: 10%;
     left: 10%;
