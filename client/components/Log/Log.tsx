@@ -1,4 +1,5 @@
 /* global window */
+import React from 'react';
 import {useEffect, useRef} from 'react';
 import cn from 'classnames';
 import {useSelector} from 'react-redux';
