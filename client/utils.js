@@ -47,7 +47,7 @@ export function enrichState(state, playerId) {
 	if (isOnDistributeDamagePrompt) {
 		result.energyPrompt = {
 			freeEnergy: state.promptParams.amount,
-			cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
+			cards: Object.fromEntries(state.zones.inPlay.filter(({ card }) => byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
 		};
 	}
 	return result;
