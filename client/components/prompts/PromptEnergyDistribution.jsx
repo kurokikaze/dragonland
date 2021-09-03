@@ -10,7 +10,6 @@ function PromptChooseCards() {
 
 	const freeEnergy = useSelector(state => state.energyPrompt.freeEnergy);
 	const cards = useSelector(state => state.energyPrompt.cards);
-	const message = useSelector(getPromptMessage);
 	const promptType = useSelector(getPromptType);
 
 	const handleSend = () => {

@@ -8,7 +8,7 @@ import Input from 'antd/es/input';
 import Spin from 'antd/es/spin';
 import Button from 'antd/es/button';
 import Space from 'antd/es/space';
-import { cards } from 'moonlands/dist/cards';
+import { cards } from 'moonlands/src/cards';
 import cn from 'classnames';
 import { TYPE_MAGI } from 'moonlands/dist/const';
 import { saveDeck, saveNewDeck } from '../../actions';
