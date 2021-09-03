@@ -6,6 +6,8 @@ import {cards} from 'moonlands/dist/cards.js';
 import {TYPE_MAGI}  from 'moonlands/dist/const.js';
 import {camelCase} from '../common/utils.js';
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 // Fire ball is named inconsistently with other cards,
 // it's fixed in Moonlands, but we still have to download file by old URL
 

@@ -8,6 +8,7 @@ import {
 	TYPE_CREATURE,
 	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {
@@ -66,7 +67,8 @@ function ZonePlayerInPlay({
 
 	const SelectedCard = (
 		promptType === PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES ||
-		promptType === PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES )
+		promptType === PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES ||
+		promptType === PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES)
 		? CardWithEnergyManipulation
 		: CardWithAbilities;
 

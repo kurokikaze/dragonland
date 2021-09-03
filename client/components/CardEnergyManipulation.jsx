@@ -30,7 +30,7 @@ export const withEnergyManipulation = Component => ({ id, data, ...props }) => {
 		}
 	};
 	
-	return <>
+	return <div>
 		<Component
 			id={id}
 			data={data}
@@ -41,5 +41,5 @@ export const withEnergyManipulation = Component => ({ id, data, ...props }) => {
 			<div className="currentEnergy">{currentEnergy}</div>
 			<SimpleButton name="+" style={{ color: currentEnergy === 0 ? '#ccc': '#000', cursor: 'pointer' }} onClick={handlePlusEnergy} disabled={freeEnergy === 0} />
 		</div>}
-	</>;
+	</div>;
 };

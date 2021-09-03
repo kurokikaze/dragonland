@@ -12,6 +12,7 @@ import { getDeckById, saveDeckById, saveNewDeck } from '../utils/database.js';
 import { getChallenges, addChallenge, removeByName } from '../utils/challenge.js';
 import config from '../config.js';
 import {
+	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_HAND,
@@ -20,7 +21,7 @@ import {
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_DISCARD,
-	ACTION_POWER,
+	ACTION_PLAY,
 } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
@@ -412,16 +413,17 @@ router.get('/test-state',
 		const ACTIVE_PLAYER = 212;
 		const NON_ACTIVE_PLAYER = 510;
 
-		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(15);
+		const ulk = new CardInGame(byName('Ulk'), ACTIVE_PLAYER).addEnergy(15);
 		const arbolit = new CardInGame(byName('Arbolit'), ACTIVE_PLAYER).addEnergy(5);
+		const thunderquake = new CardInGame(byName('Thunderquake'), ACTIVE_PLAYER);
 		const fireGrag = new CardInGame(byName('Fire Grag'), ACTIVE_PLAYER).addEnergy(4);
-		const quorPup = new CardInGame(byName('Quor Pup'), ACTIVE_PLAYER).addEnergy(6);
-		const diobor = new CardInGame(byName('Diobor'), ACTIVE_PLAYER).addEnergy(10);
 		const flameHyren = new CardInGame(byName('Flame Hyren'), ACTIVE_PLAYER).addEnergy(15);
 
 		const adis = new CardInGame(byName('Adis'), NON_ACTIVE_PLAYER).addEnergy(3);
+		const quorPup = new CardInGame(byName('Quor Pup'), NON_ACTIVE_PLAYER).addEnergy(6);
+		const diobor = new CardInGame(byName('Diobor'), NON_ACTIVE_PLAYER).addEnergy(10);
 
-		const zones = createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [arbolit, fireGrag, quorPup, diobor, flameHyren], [grega]);
+		const zones = createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [arbolit, fireGrag, quorPup, diobor, flameHyren], [ulk]);
 
 		const gameState = new State({
 			zones,
@@ -429,18 +431,29 @@ router.get('/test-state',
 			activePlayer: ACTIVE_PLAYER,
 		});
 
+		gameState.getZone(ZONE_TYPE_HAND, ACTIVE_PLAYER).add([thunderquake]);
+
 		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, NON_ACTIVE_PLAYER).add([adis]);
 
-		const powerAction = {
-			type: ACTION_POWER,
-			source: flameHyren,
-			power: flameHyren.card.data.powers[0],
-			player: ACTIVE_PLAYER,
+		const spellAction = {
+			type: ACTION_PLAY,
+			payload: {
+				player: ACTIVE_PLAYER,
+				card: thunderquake,
+			},
 		};
 
-		gameState.update(powerAction);
+		gameState.enableDebug();
+		gameState.update(spellAction);
 
-		console.dir(gameState.serializeData(ACTIVE_PLAYER))
+		const choosingCostAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			number: 5,
+			generatedBy: thunderquake.id,            
+		};
+
+		gameState.update(choosingCostAction);
+
 		res.render('game', {
 			gameId: 'testGameId',
 			playerId: ACTIVE_PLAYER,

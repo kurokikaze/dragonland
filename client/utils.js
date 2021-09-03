@@ -1,6 +1,6 @@
 /* global window */
 import { byName } from 'moonlands/dist/cards.js';
-import { PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES, PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES, TYPE_CREATURE } from 'moonlands/dist/const';
+import { PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES, PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES, PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES, TYPE_CREATURE } from 'moonlands/dist/const';
 
 export function camelCase(str){
 	return str.replace(/'/g, '').split(' ').map(function(word, index){
@@ -41,6 +41,13 @@ export function enrichState(state, playerId) {
 		result.energyPrompt = {
 			freeEnergy: state.promptParams.amount,
 			cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
+		};
+	}
+	const isOnDistributeDamagePrompt = state.prompt && state.promptType === PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES;
+	if (isOnDistributeDamagePrompt) {
+		result.energyPrompt = {
+			freeEnergy: state.promptParams.amount,
+			cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
 		};
 	}
 	return result;

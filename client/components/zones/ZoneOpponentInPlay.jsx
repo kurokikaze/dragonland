@@ -4,6 +4,7 @@ import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	ACTION_RESOLVE_PROMPT,
+	PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES,
 } from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {withAbilities} from '../CardAbilities.jsx';
@@ -26,9 +27,11 @@ import {
 	getPromptParams,
 	getAnimation,
 } from '../../selectors';
+import {withEnergyManipulation} from '../CardEnergyManipulation.jsx';
 import { useCallback } from 'react';
 
 const CardWithAbilities = withAbilities(Card);
+const CardWithEnergyManipulation = withEnergyManipulation(Card);
 
 function ZoneOpponentInPlay({
 	name,
@@ -48,6 +51,10 @@ function ZoneOpponentInPlay({
 	const isOnFilteredPrompt = isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(promptType);
 	const animation = useSelector(getAnimation);
 
+	const SelectedCard = (promptType === PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES)
+		? CardWithEnergyManipulation
+		: CardWithAbilities;
+
 	const cardClickHandler = isOnCreaturePrompt ? cardId => {
 		window.socket.emit(CLIENT_ACTION, {
 			type: ACTION_RESOLVE_PROMPT,
@@ -59,7 +66,7 @@ function ZoneOpponentInPlay({
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name} data-items={content.length}>
 			{content.length ? content.map(cardData =>
-				<CardWithAbilities
+				<SelectedCard
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
