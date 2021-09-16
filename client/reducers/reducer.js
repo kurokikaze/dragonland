@@ -9,7 +9,6 @@ import {
 	ACTION_PLAYER_WINS,
 	ACTION_POWER,
 	ACTION_TIME_NOTIFICATION,
-	// ACTION_EXIT_PROMPTS,
 
 	TYPE_CREATURE,
 	TYPE_MAGI,
@@ -330,15 +329,6 @@ export default (state = defaultState, action) => {
 				log: card ? [...state.log, newLogEntry] : state.log,
 			};
 		}
-		// case ACTION_EXIT_PROMPTS: {
-		// 	return {
-		// 		...state,
-		// 		prompt: false,
-		// 		promptType: null,
-		// 		promptParams: {},
-		// 		actions: [],
-		// 	};
-		// }
 		case ACTION_ENTER_PROMPT: {
 			var promptParams = action.promptParams;
 			var energyPrompt = state.energyPrompt;
@@ -379,6 +369,9 @@ export default (state = defaultState, action) => {
 					energyPrompt = {
 						freeEnergy: 0,
 						cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id, data }) => [id, data.energy])),
+					};
+					promptParams = promptParams || {
+						restriction: false,
 					};
 					break;
 				}

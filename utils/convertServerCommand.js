@@ -7,6 +7,8 @@ import {
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
@@ -27,7 +29,6 @@ import {
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
-	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 } from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
@@ -52,7 +53,7 @@ const index = (obj, is, value) => {
 };
 
 const templateMessage = (message, metadata) => {
-	return message.replace(/\$\{(.+?)\}/g, (match, p1) => index(metadata, p1));
+	return message.replace(/\$\{(.+?)\}/g, (_match, p1) => index(metadata, p1));
 };
 
 const convertCard = cardInGame => ({
@@ -120,6 +121,11 @@ function convertServerCommand(initialAction, game, playerId) {
 					break;
 				}
 				case PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					action.amount = game.getMetaValue(action.amount, action.generatedBy);
+
+					break;
+				}
+				case PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
 					action.amount = game.getMetaValue(action.amount, action.generatedBy);
 
 					break;

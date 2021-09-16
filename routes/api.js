@@ -4,8 +4,8 @@ import { open, write, close } from 'fs';
 import { join as joinPath } from 'path';
 import { State } from 'moonlands';
 import { byName } from 'moonlands/dist/cards';
-import CardInGame from 'moonlands/dist/classes/CardInGame'
-import Zone from 'moonlands/dist/classes/Zone'
+import CardInGame from 'moonlands/dist/classes/CardInGame';
+import Zone from 'moonlands/dist/classes/Zone';
 import ensure from 'connect-ensure-login';
 
 import { getDeckById, saveDeckById, saveNewDeck } from '../utils/database.js';
@@ -409,7 +409,6 @@ export const createZones = (player1, player2, creatures = [], activeMagi = []) =
 
 router.get('/test-state',
 	async (_req, res) => {
-		console.log('Starting state construction')
 		const ACTIVE_PLAYER = 212;
 		const NON_ACTIVE_PLAYER = 510;
 
@@ -443,7 +442,6 @@ router.get('/test-state',
 			},
 		};
 
-		gameState.enableDebug();
 		gameState.update(spellAction);
 
 		const choosingCostAction = {
@@ -460,6 +458,6 @@ router.get('/test-state',
 			playerHash: 'playerHash',
 			initialState: gameState.serializeData(ACTIVE_PLAYER),
 		});
-});
+	});
 
 export default router;

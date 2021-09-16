@@ -2,6 +2,7 @@
 import simpleReducer from '../reducers/reducer.js';
 import {
 	ACTION_EFFECT,
+	ACTION_ENTER_PROMPT,
 
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 
@@ -10,6 +11,7 @@ import {
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES
 } from 'moonlands/dist/const';
 
 const defaultState = () => ({
@@ -197,5 +199,45 @@ describe('Separating static abilities into state property', () => {
 
 		const resultingState = simpleReducer(state, action);
 		expect(resultingState.staticAbilities.length).toEqual(0, 'No static abilities added if the card doesnt have them');
+	});
+
+	it('Rearrange energy reducer', () => {
+		const ACTIVE_PLAYER = 2;
+
+		const action = {
+			source: {
+				id: 'pZKaZ_NLYfgIIsPFdv1wr',
+				owner: ACTIVE_PLAYER,
+				card: 'Flame Control',
+				data: {
+					energy: 0,
+					controller: ACTIVE_PLAYER,
+					attacked: 0,
+					actionsUsed: [],
+					energyLostThisTurn: 0,
+					defeatedCreature: false,
+					hasAttacked: false,
+					wasAttacked: false
+				}
+			},
+			player: ACTIVE_PLAYER,
+			type: ACTION_ENTER_PROMPT,
+			promptType: PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+			message: 'Rearrange the energy on your creatures as you wish',
+			spell: true,
+			generatedBy: 'pZKaZ_NLYfgIIsPFdv1wr'
+		};
+
+		const state = {
+			...defaultState(),
+			activePlayer: ACTIVE_PLAYER,
+		};
+
+		const resultingState = simpleReducer(state, action);
+
+		expect(resultingState.promptType).toEqual(PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES);
+		expect(resultingState.promptPlayer).toEqual(ACTIVE_PLAYER);
+		expect(resultingState.prompt).toEqual(true);
+		expect(resultingState.promptParams).toEqual({ restriction: false });
 	});
 });

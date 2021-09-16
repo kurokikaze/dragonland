@@ -17,7 +17,7 @@ import {useZoneContent, useCardData} from '../common';
 
 const CardWithAbilities = withAbilities(Card);
 
-const playerHasCreatures = state => state.zones.playerInPlay.some(card => byName(card.card).type === TYPE_CREATURE);
+const playerHasCreatures = state => state.zones.inPlay.some(card => byName(card.card).type === TYPE_CREATURE && card.data.controller === window.playerId);
 
 const isOnFilteredMagiPrompt = (state) => {
 	const isOnMWCPrompt = state.prompt && state.promptType === PROMPT_TYPE_MAGI_WITHOUT_CREATURES;
