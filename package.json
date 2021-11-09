@@ -20,6 +20,7 @@
     "build-storybook": "build-storybook -s ./public/"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@types/classnames": "^2.2.11",
     "@types/nanoid": "^2.1.0",

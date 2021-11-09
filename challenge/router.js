@@ -1,4 +1,3 @@
-import React from 'react';
 import ChallengePage from './pages/Challenge.jsx';
 import DeckEditor from './pages/DeckEditor.jsx';
 

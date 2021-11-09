@@ -26,8 +26,8 @@ function MagiView({name, id, chosenMagi, onMagiEditor}) {
 		>
 		</div>
 		<CardView name={magi.name} className='deckView' top={false} />
-		{magi && <div className='startingEnergy'>{magi.data.startingEnergy}</div>}
-		{magi && <div className='energizeRate'>+{magi.data.energize}</div>}
+		{magi && <div className='startingEnergy'>{magi.data?.startingEnergy}</div>}
+		{magi && <div className='energizeRate'>+{magi.data?.energize}</div>}
 	</div>);
 }
 
@@ -44,7 +44,7 @@ export default function DeckView({ourCards, addToDeck, removeFromDeck, onMagiEdi
 
 	return (
 		<div>
-			<div>Cards: {ourCards.length}</div>
+			<div>Cards: <span style={{ color: ourCards.length === 43 ? 'green' : '#333'}}>{ourCards.length}</span></div>
 			<div className='magiHolder'>
 				<MagiView name={magiOne} id={0} onMagiEditor={onMagiEditor} chosenMagi={magiEditor === 0} />
 				<MagiView name={magiTwo} id={1} onMagiEditor={onMagiEditor} chosenMagi={magiEditor === 1} />

@@ -30,7 +30,7 @@ function DeckContent({deck}) {
 		</Row>
 		<Row>
 			<Col span={24} className='cardList'>
-				{restOfCards.map((card, i) => <div key={i} className='cardLink'>{<CardView name={card} />}</div>)}
+				{[...new Set(restOfCards)].map((card, i) => <div key={i} className='cardLink'>{<CardView name={card} quantity={restOfCards.filter(c => c === card).length} />}</div>)}
 			</Col>
 		</Row>
 	</div>;

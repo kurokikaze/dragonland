@@ -1,5 +1,5 @@
 .ant-input.deckName {
-    font-size: 2em;
+    font-size: 1.2em;
 }
 
 .startingCard {
@@ -12,10 +12,22 @@
 
 .allCards {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
     grid-column-gap: 10px;
     grid-row-gap: 30px;
+}
+
+@media only screen and (min-width: 1200px) {
+    .allCardsContainer .allCards {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media only screen and (min-width: 1700px) {
+    .allCardsContainer .allCards {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
 }
 
 .allCardsContainer {
@@ -49,4 +61,8 @@
 
 .cardSlot .addIcon svg {
     filter: drop-shadow(2px 4px 6px black);
+}
+
+.deckHolder {
+    background-color: #eee;    
 }

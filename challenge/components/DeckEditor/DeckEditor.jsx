@@ -8,6 +8,7 @@ import Input from 'antd/es/input';
 import Spin from 'antd/es/spin';
 import Button from 'antd/es/button';
 import Space from 'antd/es/space';
+import WarningOutlined from '@ant-design/icons/es/icons/WarningOutlined';
 import { cards } from 'moonlands/dist/cards';
 import cn from 'classnames';
 import { TYPE_MAGI } from 'moonlands/dist/const';
@@ -76,19 +77,19 @@ const DeckEditor = ({deckId}) => {
 	const removeFromDeck = useCallback(name => {
 		const id = deck.cards.lastIndexOf(name);
 		if (id > -1) {
-			setDeck({
-				...deck,
-				cards: deck.cards.filter((card, i) => i !== id),
-			});
+			setDeck(oldDeck => ({
+				...oldDeck,
+				cards: oldDeck.cards.filter((card, i) => i !== id),
+			}));
 		}
 	}, [deck]);
 
 	const addToDeck = useCallback(card => {
-		setDeck({
-			...deck,
-			cards: [...deck.cards, card],
-		});
-	}, [deck]);
+		setDeck(oldDeck => ({
+			...oldDeck,
+			cards: [...oldDeck.cards, card],
+		}));
+	}, []);
 
 	const setMagi = useCallback(card => {
 		const cards = [...deck.cards];
@@ -129,7 +130,11 @@ const DeckEditor = ({deckId}) => {
 		{loading ? <Spin size='large' /> :
 			<>
 				<Row>
-					<Col span={24}><Input className='deckName' onChange={e => setName(e.target.value)} defaultValue={deck.name} /></Col>
+					<Col span={24}>
+						<label>
+							Deck name
+							<Input className='deckName' onChange={e => setName(e.target.value)} value={deck.name} style={{ maxWidth: 500 }} />
+						</label></Col>
 				</Row>
 				<Row>
 					<Col span={16}>
@@ -164,6 +169,10 @@ const DeckEditor = ({deckId}) => {
 						<div className='deckHolder'>
 							<DeckView ourCards={deck.cards} addToDeck={addToDeck} removeFromDeck={removeFromDeck} onMagiEditor={setMagiEditor} magiEditor={magiEditor} />
 						</div>
+						{!isDeckReadyForSaving && <div>
+							{!deck || !deck.name && <div><WarningOutlined style={{ color: 'red', paddingRight: 10 }} />Deck should have a name</div>}
+							{!deck || deck.cards.length !== 43 && <div><WarningOutlined style={{ color: 'red', paddingRight: 10 }} />Deck should have 43 cards (40 cards + 3 Magi). This deck has {deck.cards.length}.</div>}
+						</div>}
 						<div>
 							<Space>
 								<Button disabled={!isDeckReadyForSaving} loading={saving} type="primary" onClick={() => handleSave()}>Save deck</Button>
