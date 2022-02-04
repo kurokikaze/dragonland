@@ -42,7 +42,7 @@
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^0.20.0",
     "mongodb": "^3.6.2",
-    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.8.5.tar.gz",
+    "moonlands": "https://github.com/kurokikaze/moonlands/archive/v0.8.6.tar.gz",
     "morgan": "~1.9.1",
     "nanoid": "^2.1.9",
     "node-fetch": "^2.6.1",
