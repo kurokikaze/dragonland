@@ -1,41 +1,72 @@
 /* global window */
-import React from 'react';
-import {connect} from 'react-redux';
-import {compose, mapProps} from 'recompose';
+import {useSelector} from 'react-redux';
 import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const.js';
+	PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES,
+} from 'moonlands/dist/const';
 import Card from '../Card.jsx';
 import {withAbilities} from '../CardAbilities.jsx';
 import {
 	STEP_ATTACK,
+	CLIENT_ACTION,
 } from '../../const';
 import {
-	withCardData,
-	withZoneContent,
+	getCardDetails,
 	UNFILTERED_CREATURE_PROMPTS,
 	FILTERED_CREATURE_PROMPTS,
 	getPromptFilter,
 } from '../common';
+import {
+	getCurrentStep,
+	isOurTurn,
+	getPromptGeneratedBy,
+	isPromptActive,
+	getPromptType,
+	getPromptParams,
+	getAnimation,
+} from '../../selectors';
+import {withEnergyManipulation} from '../CardEnergyManipulation.jsx';
+import { useCallback } from 'react';
 
 const CardWithAbilities = withAbilities(Card);
+const CardWithEnergyManipulation = withEnergyManipulation(Card);
 
 function ZoneOpponentInPlay({
 	name,
-	content,
-	active,
-	cardClickHandler,
-	isOnUnfilteredPrompt,
-	isOnFilteredPrompt,
-	promptFilter,
-	animation,
 }) {
+	const rawContent = useSelector(getCardDetails);
+	const content = rawContent.inPlay.filter(card => card.card.type === TYPE_CREATURE && card.data.controller !== window.playerId);
+	
+	const currentStep = useSelector(getCurrentStep);
+	const ourTurn = useSelector(isOurTurn);
+	const active = ourTurn && currentStep === STEP_ATTACK;
+	const promptGeneratedBy = useSelector(getPromptGeneratedBy);
+	const isOnCreaturePrompt = useSelector(isPromptActive);
+	const promptType = useSelector(getPromptType);
+	const promptParams = useSelector(getPromptParams);
+	const promptFilter = useCallback(getPromptFilter(promptType, promptParams), [promptType, promptParams]);
+	const isOnUnfilteredPrompt = isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(promptType);
+	const isOnFilteredPrompt = isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(promptType);
+	const animation = useSelector(getAnimation);
+
+	const SelectedCard = (promptType === PROMPT_TYPE_DISTRIBUTE_DAMAGE_ON_CREATURES)
+		? CardWithEnergyManipulation
+		: CardWithAbilities;
+
+	const cardClickHandler = isOnCreaturePrompt ? cardId => {
+		window.socket.emit(CLIENT_ACTION, {
+			type: ACTION_RESOLVE_PROMPT,
+			target: cardId,
+			generatedBy: promptGeneratedBy,
+		});
+	} : () => {};
+
 	return (
 		<div className={cn('zone', 'zone-creatures', {'zone-active' : active})} data-zone-name={name} data-items={content.length}>
 			{content.length ? content.map(cardData =>
-				<CardWithAbilities
+				<SelectedCard
 					key={cardData.id}
 					id={cardData.id}
 					card={cardData.card}
@@ -53,36 +84,4 @@ function ZoneOpponentInPlay({
 	);
 }
 
-const propsTransformer = props => ({
-	...props,
-	cardClickHandler: props.isOnCreaturePrompt ? cardId => {
-		window.socket.emit('clientAction', {
-			type: ACTION_RESOLVE_PROMPT,
-			target: cardId,
-			generatedBy: props.promptGeneratedBy,
-		});
-	} : () => {},
-	isOnUnfilteredPrompt: props.isOnCreaturePrompt && UNFILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	isOnFilteredPrompt: props.isOnCreaturePrompt && FILTERED_CREATURE_PROMPTS.includes(props.promptType),
-	promptFilter: getPromptFilter(props.promptType, props.promptParams),
-});
-
-function mapStateToProps(state) {
-	return {
-		active: state.activePlayer == window.playerId && state.step === STEP_ATTACK,
-		isOnCreaturePrompt: state.prompt,
-		promptType: state.promptType,
-		promptParams: state.promptParams,
-		promptGeneratedBy: state.promptGeneratedBy,
-		animation: state.animation,
-	};
-}
-
-const enhance = compose(
-	withZoneContent,
-	connect(mapStateToProps),
-	mapProps(propsTransformer),
-	withCardData,
-);
-
-export default enhance(ZoneOpponentInPlay);
+export default ZoneOpponentInPlay;

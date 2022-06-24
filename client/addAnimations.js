@@ -11,7 +11,7 @@ import {
 	EFFECT_TYPE_PLAY_SPELL,
 	ACTION_ENTER_PROMPT,
 	ACTION_RESOLVE_PROMPT,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 import { 
 	startPowerAnimation,
@@ -41,6 +41,9 @@ const PROMPT_RESOLUTION_TIMEOUT = 600;
 const STEP_TIMEOUT = 500;
 
 const convertAction = action => {
+	if (!('type' in action)) {
+		return action;
+	}
 	switch(action.type) {
 		case ACTION_RESOLVE_PROMPT:
 			return  (action.player !== window.playerId) ? [

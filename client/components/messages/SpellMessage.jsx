@@ -1,6 +1,5 @@
-import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
-import Spell from '../icons/Spell.jsx';
+import Spell from '../icons/Spell.tsx';
 
 export default function SpellMessage ({card, display}) {
 	return ((card && display) ?

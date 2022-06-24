@@ -1,22 +1,21 @@
 /* global window, document */
-import React, {useEffect} from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import {identity} from 'ramda';
-import {branch, compose} from 'recompose';
+import {useEffect, useRef} from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import cn from 'classnames';
 import {
 	TYPE_CREATURE,
 	TYPE_RELIC,
 	TYPE_SPELL,
 	TYPE_MAGI,
-} from 'moonlands/src/const.js';
-
-import {camelCase} from '../utils';
+} from 'moonlands/dist/const.js';
+import {canFirstAttackSecond, canPackHuntWith} from './helpers.js';
+import {camelCase} from '../utils.js';
 
 const DraggableTypes = {
 	CARD: 'card',
 };
 
+// type ClassTypesType = Record<CardType, string>
 const typeClass = {
 	[TYPE_CREATURE]: 'creature',
 	[TYPE_RELIC]: 'relic',
@@ -28,11 +27,30 @@ const getCardUrl = (card, useLocket) => {
 	if (!card) {
 		return '/images/cards/cardBack.jpg';
 	} else if (useLocket) {
-		return `/images/masked/${camelCase(card.name)}.jpg`;
+		return `/images/masked/${camelCase(card.name)}.png`;
 	} else {
 		return `/images/cards/${camelCase(card.name)}.jpg`;
 	}
 };
+
+/*type CardProps = {
+	id: string;
+	card: MoonlandsCard;
+	data: CardData;
+	onClick: () => void;
+	draggable: boolean;
+	isDragging: boolean;
+	available: boolean;
+	useLocket: boolean;
+	modifiedData: MoonlandsCard;
+	pack: string[];
+	target: boolean;
+	connectDragSource: () => void;
+	connectDropTarget: () => void;
+	isOnPrompt: boolean;
+	className: string;
+	attacker: boolean;
+}*/
 
 function Card({
 	id,
@@ -40,14 +58,16 @@ function Card({
 	data,
 	onClick,
 	draggable,
-	isDragging,
+	droppable,
+	guarded,
 	available,
-	target,
-	connectDragSource,
-	connectDropTarget,
+	modifiedData,
+	pack,
 	isOnPrompt,
 	className,
 	attacker,
+	target,
+	onPackHunt,
 	useLocket = false,
 }) {
 	useEffect(() => {
@@ -69,16 +89,73 @@ function Card({
 				// if (parentNode.contains(attacker)) {
 				// 	parentNode.replaceChild(newAttacker, attacker);
 				// }
+				// @ts-ignore
 				parentNode.closest('.zone').classList.add('animated');
 				setTimeout(() => {
+					// @ts-ignore
 					parentNode.closest('.zone').classList.remove('animated');
+					// @ts-ignore
 					newAttacker.classList.remove('attackSource');
 				}, 600);
 			}
 		}
 	}, [attacker]);
 
-	const connector = (draggable && connectDragSource) ? connectDragSource : (target && connectDropTarget ? connectDropTarget : identity);
+	const ref = useRef(null);
+	const [, drag] = useDrag(() => ({
+		// "type" is required. It is used by the "accept" specification of drop targets.
+		type: DraggableTypes.CARD,
+		// The collect function utilizes a "monitor" instance (see the Overview for what this is)
+		// to pull important pieces of state from the DnD system.
+		item: () => ({ card, data, id, pack }),
+		collect: (monitor) => ({
+			isDragging: monitor.isDragging()
+		})
+	}), [card, data, id, pack]);
+
+	const [{ isDragging }, drop] = useDrop(() => ({
+		// The type (or types) to accept - strings or symbols
+		accept: DraggableTypes.CARD,
+		// Props to collect
+		collect: (monitor) => ({
+			isOver: monitor.isOver(),
+			canDrop: monitor.canDrop()
+		}),
+		drop: (item) => {
+			const dropTarget = { card, data, id, guarded };
+
+			const canAttack = canFirstAttackSecond(item, dropTarget);
+
+			const canPackHunt = canPackHuntWith(item, dropTarget);
+
+			if (canAttack) {
+				console.dir({
+					type: 'actions/attack',
+					source: item.id,
+					target: id,
+					additionalAttackers: item.pack ? item.pack.hunters : [],
+				});
+				window.socket.emit('clientAction', {
+					type: 'actions/attack',
+					source: item.id,
+					target: id,
+					additionalAttackers: item.pack ? item.pack.hunters : [],
+				});
+			} else if (canPackHunt) {
+				onPackHunt(id, item.id);
+			} else {
+				console.dir('Problem, capn');
+			}
+		}
+	}), [card, data, id, guarded]);
+
+	if (droppable) {
+		drop(ref);
+	}
+	if (draggable) {
+		drag(ref);
+	}
+	
 	const classes = cn(
 		'cardHolder',
 		card ? typeClass[card.type] : null,
@@ -87,15 +164,17 @@ function Card({
 			'available': available,
 			'target': target,
 			'onPrompt': isOnPrompt,
+			'canPackHunt': (card && modifiedData) ? (card.data.canPackHunt && data.attacked < modifiedData.attacksPerTurn && !pack) : null,
 		},
 		className
 	);
 
-	return connector(
+	return (
 		<div
 			className={classes}
 			data-id={id}
 			onClick={() => onClick && onClick(id)}
+			ref={ref}
 		>
 			<img src={getCardUrl(card, useLocket)} alt={card ? card.name : null} />
 			{data && <>
@@ -110,59 +189,4 @@ function Card({
 	);
 }
 
-const cardSource = {
-	beginDrag(props) {
-		// Return the data describing the dragged item
-		return props;
-	},
-
-	endDrag(props, monitor) {
-		if (!monitor.didDrop()) {
-			return;
-		}
-
-		// When dropped on a compatible target, do something
-		const item = monitor.getItem();
-		const dropResult = monitor.getDropResult();
-
-		const canAttack = dropResult.card.type === TYPE_CREATURE ||
-			(dropResult.card.type === TYPE_MAGI && !dropResult.guarded) ||
-			(dropResult.card.type === TYPE_MAGI && item.card.data.canAttackMagiDirectly);
-
-		if (canAttack) {
-			window.socket.emit('clientAction', {
-				type: 'actions/attack',
-				source: item.id,
-				target: dropResult.id,
-			});
-		}
-	},
-};
-
-function collect(connect, monitor) {
-	return {
-		// Call this function inside render()
-		// to let React DnD handle the drag events:
-		connectDragSource: connect.dragSource(),
-		// You can ask the monitor about the current drag state:
-		isDragging: monitor.isDragging(),
-	};
-}
-
-const cardTarget = {
-	drop(card) {
-		return card;
-	},
-};
-
-const collectDrop = (connect, monitor) => ({
-	connectDropTarget: connect.dropTarget(),
-	canDrop: !!monitor.canDrop(),
-});
-
-const enhance = compose(
-	branch(({draggable}) => draggable, DragSource(DraggableTypes.CARD, cardSource, collect)),
-	branch(({droppable}) => droppable, DropTarget(DraggableTypes.CARD, cardTarget, collectDrop)),
-);
-
-export default enhance(Card);
+export default Card;

@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h2 Games from last restart: #{gamesCounter}
+    h2 Current games
+    div.games
+        ul
+            each game in runningGames
+                li #{game}

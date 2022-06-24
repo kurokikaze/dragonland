@@ -1,11 +1,13 @@
-import React from 'react';
+/* global window */
 import {connect} from 'react-redux';
+import cn from 'classnames';
+
 import StepIcon from './StepIcon.jsx';
-import Energize from './icons/Energize.jsx';
-import Attack from './icons/Attack.jsx';
-import Power from './icons/Power.jsx';
-import Creature from './icons/Creature.jsx';
-import Draw from './icons/Draw.jsx';
+import Energize from './icons/Energize.tsx';
+import Attack from './icons/Attack.tsx';
+import Power from './icons/Power.tsx';
+import Creature from './icons/Creature.tsx';
+import Draw from './icons/Draw.tsx';
 import {
 	STEP_ENERGIZE,
 	STEP_PRS_FIRST,
@@ -16,15 +18,20 @@ import {
 } from '../const.js';
 import './style.css';
 
-function StepBoard({currentStep}) {
+const OUR_TURN_ACTIVE = '#32bb32';
+const NOT_OUR_TURN_ACTIVE = '#F8E71C';
+
+function StepBoard({currentStep, ourTurn}) {
+	const activeColor = ourTurn ? OUR_TURN_ACTIVE : NOT_OUR_TURN_ACTIVE;
+
 	return (
-		<div className="StepBoard">
-			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} />
-			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} />
-			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} />
-			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} />
-			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} />
+		<div className={cn('StepBoard', {'ourTurn': ourTurn})}>
+			<StepIcon icon={<Energize />} active={currentStep === STEP_ENERGIZE} activeColor={activeColor} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_FIRST} activeColor={activeColor} />
+			<StepIcon icon={<Attack />} active={currentStep === STEP_ATTACK} activeColor={activeColor} />
+			<StepIcon icon={<Creature />} active={currentStep === STEP_CREATURES} activeColor={activeColor} />
+			<StepIcon icon={<Power />} active={currentStep === STEP_PRS_SECOND} activeColor={activeColor} />
+			<StepIcon icon={<Draw />} active={currentStep === STEP_DRAW} activeColor={activeColor} />
 		</div>
 	);
 }
@@ -32,7 +39,7 @@ function StepBoard({currentStep}) {
 function mapStateToProps(state) {
 	return {
 		currentStep: state.step,
-		promptParams: state.promptParams,
+		ourTurn: state.activePlayer == window.playerId,
 	};
 }
 

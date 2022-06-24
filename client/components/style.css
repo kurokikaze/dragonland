@@ -29,6 +29,9 @@
     min-height: 100%;
 }
 
+.zone-magi .cardAbilities {
+    left: -33%;
+}
 .cardAbilities p {
     margin: 0;
 }
@@ -78,7 +81,7 @@
     display: block;
 }
 
-.cardAbilityHolder:hover .cardAbilities + .abilityIconHolder > .dragging {
+.zone-player-creatures.zone-active .cardAbilityHolder:hover .cardAbilities {
     display: none;
 }
 
@@ -103,6 +106,32 @@
     width: 200px;
 }
 
+.abilityIconHolder .cardName {
+    position: absolute;
+    left: -100px;
+    right: -100px;
+
+    bottom: -25px;
+
+    display: none;
+    text-align: center;
+    animation: fadeInDown .2s;
+
+    z-index: 1;
+}
+
+.abilityIconHolder .cardName .innerName {
+    background-color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.abilityIconHolder:hover .cardName {
+    display: block;
+}
+
 .cardViewHolder {
     position: relative;
     font-family: Lato, "Helvetica Neue", Helvetica, Arial;
@@ -113,6 +142,7 @@
 }
 
 .gameContainer {
+    position: relative;
     display: flex;
 }
 
@@ -170,4 +200,27 @@
 .fadeInDown {
     -webkit-animation-name: fadeInDown;
     animation-name: fadeInDown;
+}
+
+.turnTimer {
+    position: absolute;
+    top: 300px;
+    right: 450px;
+    font-weight: bold;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+}
+
+.energyManipulation {
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    position: relative;
+    border: 6px;
+    border-radius: 7px;
+    padding: 0 10px;
+}
+
+.currentEnergy {
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }

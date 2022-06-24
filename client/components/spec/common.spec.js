@@ -1,6 +1,6 @@
 /* global expect, describe, it */
-import {byName} from 'moonlands/src/cards';
-import {mapCardDataFromProps, cardDataTransformer} from '../common.js';
+import {byName} from 'moonlands/dist/cards';
+import {mapCardDataFromProps, transformCard} from '../common.js';
 
 describe('Common code from components', () => {
 	it('Fetches card by id from zones', () => {
@@ -71,18 +71,16 @@ describe('cardDataTransformer', () => {
 	it('Static abilities - Double Strike', () => {
 		const TEST_PLAYER_ONE = 12;
 
-		const testState = {
-			staticAbilities: [
-				{
-					id: 'static1',
-					card: byName('Yaki'),
-					data: {
-						controller: TEST_PLAYER_ONE,
-					},
-					owner: TEST_PLAYER_ONE,
+		const testStaticAbilities = [
+			{
+				id: 'static1',
+				card: byName('Yaki'),
+				data: {
+					controller: TEST_PLAYER_ONE,
 				},
-			],
-		};
+				owner: TEST_PLAYER_ONE,
+			},
+		];
 
 		const testCard = {
 			id: 'card1',
@@ -92,27 +90,24 @@ describe('cardDataTransformer', () => {
 			},
 		};
 
-		const resultingProps = cardDataTransformer(testState, {content: [testCard]});
-		expect(resultingProps.content.length).toEqual(1, 'Only one creature');
-		expect(resultingProps.content[0].card.data.attacksPerTurn).toEqual(1, 'Arbolls original data shows 1 attack per turn');
-		expect(resultingProps.content[0].modifiedData.attacksPerTurn).toEqual(2, 'Arboll now has 2 attacks per turn, modified by Yaki static ability');
+		const resultingCard = transformCard(testStaticAbilities)(testCard);
+		expect(resultingCard.card.data.attacksPerTurn).toEqual(1, 'Arbolls original data shows 1 attack per turn');
+		expect(resultingCard.modifiedData.attacksPerTurn).toEqual(2, 'Arboll now has 2 attacks per turn, modified by Yaki static ability');
 	});
 
 	it('Static abilities - Invigorate', () => {
 		const TEST_PLAYER_ONE = 14;
 
-		const testState = {
-			staticAbilities: [
-				{
-					id: 'static1',
-					card: byName('Water of Life'),
-					data: {
-						controller: TEST_PLAYER_ONE,
-					},
-					owner: TEST_PLAYER_ONE,
+		const testStaticAbilities = [
+			{
+				id: 'static1',
+				card: byName('Water of Life'),
+				data: {
+					controller: TEST_PLAYER_ONE,
 				},
-			],
-		};
+				owner: TEST_PLAYER_ONE,
+			},
+		];
 
 		const testCard = {
 			id: 'card1',
@@ -122,18 +117,16 @@ describe('cardDataTransformer', () => {
 			},
 		};
 
-		const resultingProps = cardDataTransformer(testState, {content: [testCard]});
+		const resultingCard = transformCard(testStaticAbilities)(testCard);
 
-		expect(resultingProps.content[0].modifiedData.energize).toEqual(6, 'Grega energize rate modified by Water of Life is 6');
-		expect(resultingProps.content[0].card.data.energize).toEqual(5, 'Grega original energize rate is still 5');
+		expect(resultingCard.modifiedData.energize).toEqual(6, 'Grega energize rate modified by Water of Life is 6');
+		expect(resultingCard.card.data.energize).toEqual(5, 'Grega original energize rate is still 5');
 	});
 
 	it('Static abilities - none', () => {
 		const TEST_PLAYER_ONE = 12;
 
-		const testState = {
-			staticAbilities: [],
-		};
+		const testStaticAbilities = [];
 
 		const testCard = {
 			id: 'card1',
@@ -143,16 +136,14 @@ describe('cardDataTransformer', () => {
 			},
 		};
 
-		const resultingProps = cardDataTransformer(testState, {content: [testCard]});
-		expect(resultingProps.content[0].modifiedData.attacksPerTurn).toEqual(1, 'Arboll has 1 attack per turn,  not modified by anything');
+		const resultingCard = transformCard(testStaticAbilities)(testCard);
+		expect(resultingCard.modifiedData.attacksPerTurn).toEqual(1, 'Arboll has 1 attack per turn,  not modified by anything');
 	});
 
 	it('Static abilities - none (Stagadan)', () => {
 		const TEST_PLAYER_ONE = 12;
 
-		const testState = {
-			staticAbilities: [],
-		};
+		const testStaticAbilities = [];
 
 		const testCard = {
 			id: 'card1',
@@ -162,8 +153,7 @@ describe('cardDataTransformer', () => {
 			},
 		};
 
-		const resultingProps = cardDataTransformer(testState, {content: [testCard]});
-		expect(resultingProps.content.length).toEqual(1, 'One creature');
-		expect(resultingProps.content[0].modifiedData.attacksPerTurn).toEqual(1, 'Arboll has 1 attack per turn,  not modified by anything');
+		const transformedCard = transformCard(testStaticAbilities)(testCard);
+		expect(transformedCard.modifiedData.attacksPerTurn).toEqual(1, 'Stagadan has 1 attack per turn,  not modified by anything');
 	});
 });

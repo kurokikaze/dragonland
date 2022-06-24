@@ -5,7 +5,7 @@ import {
 	RESTRICTION_ENERGY_LESS_THAN_STARTING,
 	RESTRICTION_REGION,
 	RESTRICTION_CREATURE_TYPE,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 
 const getRestrictionFilter = (restriction, value) => {
 	switch(restriction) {

@@ -11,5 +11,7 @@ block content
       label(for='password') Password
       input(name='password', type='password')
 
+    if loginError
+      .loginError Username or password are incorrect
     .startButton
       button(type='submit',value='Enter') Enter

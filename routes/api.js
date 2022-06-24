@@ -1,18 +1,34 @@
 import express from 'express';
 import nanoid from 'nanoid';
-import {open, write, close} from 'fs';
-import {join as joinPath} from 'path';
-import {State} from 'moonlands';
-
+import { open, write, close } from 'fs';
+import { join as joinPath } from 'path';
+import { State } from 'moonlands';
+import { byName } from 'moonlands/dist/cards';
+import CardInGame from 'moonlands/dist/classes/CardInGame';
+import Zone from 'moonlands/dist/classes/Zone';
 import ensure from 'connect-ensure-login';
-import {getDeckById} from '../utils/database.js';
-import {getChallenges, addChallenge, removeByName} from '../utils/challenge.js';
+
+import { getDeckById, saveDeckById, saveNewDeck } from '../utils/database.js';
+import { getChallenges, addChallenge, removeByName } from '../utils/challenge.js';
 import config from '../config.js';
-import { ACTION_PLAYER_WINS } from 'moonlands/src/const.js';
+import {
+	ACTION_RESOLVE_PROMPT,
+	ACTION_PLAYER_WINS,
+	ZONE_TYPE_ACTIVE_MAGI,
+	ZONE_TYPE_HAND,
+	ZONE_TYPE_MAGI_PILE,
+	ZONE_TYPE_IN_PLAY,
+	ZONE_TYPE_DECK,
+	ZONE_TYPE_DEFEATED_MAGI,
+	ZONE_TYPE_DISCARD,
+	ACTION_PLAY,
+} from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
 
 var router = express.Router();
+
+var gamesCounter = 0;
 
 const runningGames = {};
 // Player ID (Mongo) to player Id (game)
@@ -21,6 +37,8 @@ const gamePlayers = {};
 const keyHash = {};
 // Player id (Mongo) to player hash
 const participants = {};
+
+const STEP_PRS_FIRST = 1;
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 	const gameId = nanoid();
@@ -53,7 +71,9 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 		deckTwo,
 	);
 
+	// gameState.enableTurnTimer(100);
 	runningGames[gameId] = gameState;
+	gamesCounter++;
 
 	return [gameId, playerOneHash, playerTwoHash];
 }
@@ -110,6 +130,62 @@ router.post('/start',
 );
 
 var ioLaunched = false;
+
+router.get(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const deckId = req.params[0];
+		const deck = await getDeckById(deckId);
+
+		if (deck && deck.cards) {
+			res.json(deck);
+		} else {
+			res.sendStatus(404);
+		}
+	});
+
+router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const newDeck = req.body;
+		const deckId = req.params[0];
+		const gameId = req.user.gameId;
+
+		if (deckId === 'new') {
+			const insertedId = await saveNewDeck({
+				...newDeck,
+				playerId: gameId,
+			});
+			
+			res.json({...newDeck, _id: insertedId});
+		} else {
+			const deck = await getDeckById(deckId);
+
+			if (deck && deck.cards && deck.playerId === gameId) {
+				if (newDeck._id) {
+					await saveDeckById({
+						...newDeck,
+						playerId: gameId,
+					});
+				}
+				res.json({
+					...newDeck,
+					playerId: gameId,
+				});
+			} else {
+				res.sendStatus(404);
+			}
+		}
+	});
+
+router.get('/stats',
+	function(_req, res) {
+		res.render('stats', {
+			runningGames,
+			gamesCounter,
+		});
+	}
+);
 
 router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 	function(req, res) {
@@ -314,5 +390,74 @@ router.post('/accept',
 		
 	}
 );
+
+export const createZones = (player1, player2, creatures = [], activeMagi = []) => [
+	new Zone('Player 1 hand', ZONE_TYPE_HAND, player1),
+	new Zone('Player 2 hand', ZONE_TYPE_HAND, player2),
+	new Zone('Player 1 deck', ZONE_TYPE_DECK, player1),
+	new Zone('Player 2 deck', ZONE_TYPE_DECK, player2),
+	new Zone('Player 1 discard', ZONE_TYPE_DISCARD, player1),
+	new Zone('Player 2 discard', ZONE_TYPE_DISCARD, player2),
+	new Zone('Player 1 active magi', ZONE_TYPE_ACTIVE_MAGI, player1).add(activeMagi),
+	new Zone('Player 2 active magi', ZONE_TYPE_ACTIVE_MAGI, player2),
+	new Zone('Player 1 Magi pile', ZONE_TYPE_MAGI_PILE, player1),
+	new Zone('Player 2 Magi pile', ZONE_TYPE_MAGI_PILE, player2),
+	new Zone('Player 1 defeated Magi', ZONE_TYPE_DEFEATED_MAGI, player1),
+	new Zone('Player 2 defeated Magi', ZONE_TYPE_DEFEATED_MAGI, player2),
+	new Zone('In play', ZONE_TYPE_IN_PLAY, null).add(creatures),
+];
+
+router.get('/test-state',
+	async (_req, res) => {
+		const ACTIVE_PLAYER = 212;
+		const NON_ACTIVE_PLAYER = 510;
+
+		const ulk = new CardInGame(byName('Ulk'), ACTIVE_PLAYER).addEnergy(15);
+		const arbolit = new CardInGame(byName('Arbolit'), ACTIVE_PLAYER).addEnergy(5);
+		const thunderquake = new CardInGame(byName('Thunderquake'), ACTIVE_PLAYER);
+		const fireGrag = new CardInGame(byName('Fire Grag'), ACTIVE_PLAYER).addEnergy(4);
+		const flameHyren = new CardInGame(byName('Flame Hyren'), ACTIVE_PLAYER).addEnergy(15);
+
+		const adis = new CardInGame(byName('Adis'), NON_ACTIVE_PLAYER).addEnergy(3);
+		const quorPup = new CardInGame(byName('Quor Pup'), NON_ACTIVE_PLAYER).addEnergy(6);
+		const diobor = new CardInGame(byName('Diobor'), NON_ACTIVE_PLAYER).addEnergy(10);
+
+		const zones = createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [arbolit, fireGrag, quorPup, diobor, flameHyren], [ulk]);
+
+		const gameState = new State({
+			zones,
+			step: STEP_PRS_FIRST,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		gameState.getZone(ZONE_TYPE_HAND, ACTIVE_PLAYER).add([thunderquake]);
+
+		gameState.getZone(ZONE_TYPE_ACTIVE_MAGI, NON_ACTIVE_PLAYER).add([adis]);
+
+		const spellAction = {
+			type: ACTION_PLAY,
+			payload: {
+				player: ACTIVE_PLAYER,
+				card: thunderquake,
+			},
+		};
+
+		gameState.update(spellAction);
+
+		const choosingCostAction = {
+			type: ACTION_RESOLVE_PROMPT,
+			number: 5,
+			generatedBy: thunderquake.id,            
+		};
+
+		gameState.update(choosingCostAction);
+
+		res.render('game', {
+			gameId: 'testGameId',
+			playerId: ACTIVE_PLAYER,
+			playerHash: 'playerHash',
+			initialState: gameState.serializeData(ACTIVE_PLAYER),
+		});
+	});
 
 export default router;

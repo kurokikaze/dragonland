@@ -1,8 +1,8 @@
 /* global expect, describe, it */
 
 import {State} from 'moonlands';
-import CardInGame from 'moonlands/src/classes/CardInGame.js';
-import Zone from 'moonlands/src/classes/Zone.js';
+import CardInGame from 'moonlands/dist/classes/CardInGame';
+import Zone from 'moonlands/dist/classes/Zone';
 
 import {
 	ACTION_PASS,
@@ -16,10 +16,12 @@ import {
 	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
+	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	RESTRICTION_TYPE,
 	RESTRICTION_REGION,
@@ -35,7 +37,7 @@ import {
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_IN_PLAY,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const';
 
 /* eslint-disable no-unused-vars */
 const STEP_ENERGIZE = 0;
@@ -46,7 +48,7 @@ const STEP_PRS_SECOND = 4;
 const STEP_DRAW = 5;
 /* eslint-enable no-unused-vars */
 
-import {byName} from 'moonlands/src/cards.js';
+import {byName} from 'moonlands/dist/cards';
 import convert from '../convertServerCommand';
 
 const createZones = (player1, player2, creatures = [], activeMagi = []) => [
@@ -263,6 +265,52 @@ describe('ACTION_ENTER_PROMPT', () => {
 		expect(convertedAction.source).toEqual(convertedSource, 'Source card is converted correctly');
 		expect(convertedAction.min).toEqual(1, 'Min value is passed correctly');
 		expect(convertedAction.max).toEqual(TEST_MAX_VALUE, 'Max value is passed correctly');
+	});
+
+	it('PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const TEST_AMOUNT = 11;
+
+		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+			spellMetaData: {
+				[weebo.id]: {
+					amountToDistribute: TEST_AMOUNT,
+				},
+			},		
+		});
+
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		const serverAction = {
+			type: ACTION_ENTER_PROMPT,
+			promptType: PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+			source: weebo,
+			amount: '$amountToDistribute',
+			generatedBy: weebo.id,
+		};
+
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
+
+		const convertedSource = {
+			id: weebo.id,
+			owner: weebo.owner,
+			card: 'Weebo',
+			data: {
+				...weebo.data,
+			},
+		};
+		expect(convertedAction.type).toEqual(ACTION_ENTER_PROMPT, 'Type is passed as is');
+		expect(convertedAction.promptType).toEqual(PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES, 'Prompt type is passed as is');
+		expect(convertedAction.source).toEqual(convertedSource, 'Source card is converted correctly');
+		expect(convertedAction.amount).toEqual(TEST_AMOUNT, 'Amount value is passed correctly');
 	});
 
 	it('PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE', () => {
@@ -568,6 +616,54 @@ describe('ACTION_EFFECT', () => {
 		expect(convertedActionForNonActivePlayer.destinationZone).toEqual(ZONE_TYPE_HAND, 'Destination zonee is passed');
 	});
 
+	it('EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const yaki = new CardInGame(byName('Yaki'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const gameState = new State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [yaki]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+			spellMetaData: {
+				[weebo.id]: {
+					energyValues: {
+						TEST_ID: 1,
+						ANOTHER_TEST_ID: 4,
+					},
+				},
+			},		
+		});
+
+		gameState.setPlayers(ACTIVE_PLAYER, NON_ACTIVE_PLAYER);
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+			source: weebo,
+			energyOnCreatures: '$energyValues',
+			generatedBy: weebo.id,
+		};
+
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
+
+		const convertedSource = {
+			id: weebo.id,
+			owner: weebo.owner,
+			card: 'Weebo',
+			data: {
+				...weebo.data,
+			},
+		};
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Type is passed as is');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES, 'Effect type is passed as is');
+		expect(convertedAction.source).toEqual(convertedSource, 'Source card is converted correctly');
+		expect(convertedAction.energyOnCreatures.TEST_ID).toEqual(1, 'Data is retrieved from spellMetaData');
+		expect(convertedAction.energyOnCreatures.ANOTHER_TEST_ID).toEqual(4, 'Data is retrieved from spellMetaData');
+	});
+
 	it('EFFECT_TYPE_PAYING_ENERGY_FOR_POWER (creature)', () => {
 		const ACTIVE_PLAYER = 42;
 		const NON_ACTIVE_PLAYER = 44;
@@ -585,6 +681,7 @@ describe('ACTION_EFFECT', () => {
 			type: ACTION_EFFECT,
 			effectType: EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
 			target: weebo,
+			source: weebo,
 			amount: 1,
 		};
 

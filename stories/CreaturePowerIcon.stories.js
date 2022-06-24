@@ -2,13 +2,14 @@ import React from 'react';
 
 import CreaturePowerIcon from '../client/components/CreaturePowerIcon.jsx';
 
-import Power from '../client/components/icons/Power.jsx';
-import Relic from '../client/components/icons/Relic.jsx';
-import Spell from '../client/components/icons/Spell.jsx';
-import Dagger from '../client/components/icons/Dagger.jsx';
-import Energize from '../client/components/icons/Energize.jsx';
-import Attack from '../client/components/icons/Attack.jsx';
-import Ability from '../client/components/icons/Ability.jsx';
+import Power from '../client/components/icons/Power.tsx';
+import Relic from '../client/components/icons/Relic.tsx';
+import Spell from '../client/components/icons/Spell.tsx';
+import Dagger from '../client/components/icons/Dagger.tsx';
+import Energize from '../client/components/icons/Energize.tsx';
+import Attack from '../client/components/icons/Attack.tsx';
+import Ability from '../client/components/icons/Ability.tsx';
+import Velociraptor from '../client/components/icons/Velociraptor.tsx';
 
 // eslint-disable-next-line no-unused-vars
 import styles from '../public/stylesheets/game.css';
@@ -20,7 +21,7 @@ export default {
 		icon: {
 			control: {
 				type: 'select',
-				options: ['Power', 'Ability', 'Relic', 'Spell', 'Energize', 'Attack', 'Dagger'],
+				options: ['Power', 'Ability', 'Relic', 'Spell', 'Energize', 'Attack', 'Dagger', 'Velociraptor'],
 			},
 		},
 		active: {
@@ -45,6 +46,8 @@ const Template = ({icon, active}) => {
 			return <CreaturePowerIcon icon={<Dagger />} active={active} />;
 		case 'Attack':
 			return <CreaturePowerIcon icon={<Attack />} active={active} number={2} />;
+		case 'Velociraptor':
+			return <CreaturePowerIcon icon={<Velociraptor />} active={active} />;
 	}
 };
 
@@ -54,9 +57,14 @@ PowerIcon.args = {
 	active: true,
 };
 
-
 export const AbilityIcon = Template.bind({});
 AbilityIcon.args = {
 	icon: 'Ability',
+	active: true,
+};
+
+export const VelociraptorIcon = Template.bind({});
+AbilityIcon.args = {
+	icon: 'Velociraptor',
 	active: true,
 };

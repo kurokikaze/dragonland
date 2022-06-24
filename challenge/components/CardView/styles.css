@@ -1,0 +1,29 @@
+.cardViewHolder {
+    position: relative;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial;
+}
+
+.cardViewHolder .cardView {
+    display: none;
+    position: absolute;
+    z-index: 20;
+}
+
+.showOnTop .cardView {
+    top: auto;
+    bottom: 50px;
+}
+
+.cardView {
+    top: 50px;
+    bottom: auto;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.cardViewHolder:hover .cardView {
+    display: block;
+    width: 270px;
+    height: 395px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}

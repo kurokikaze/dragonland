@@ -1,0 +1,74 @@
+.deckView {
+    display: inline-block;
+    font-size: 1.1em;
+}
+
+.deckView li {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.deckView .cardViewHolder {
+    flex-grow: 1;
+}
+
+.cardCount {
+    margin: 0 10px;
+}
+
+.magiHolder {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.magiCard {
+    position: relative;
+}
+
+.magiCard .startingEnergy {
+    position: absolute;
+    border-radius: 50px;
+    background-color: orange;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    top: 112px;
+    user-select: none;
+}
+
+.magiCard .energizeRate {
+    position: absolute;
+    border-radius: 50px;
+    background-color: orange;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    top: 112px;
+    right: 1px;
+    user-select: none;
+}
+
+.magiCard .cardViewHolder {
+    font-size: 1.2em;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+}
+
+.magiVignette {
+    width: 150px;
+    height: 150px;
+    background-position: top -25px left -20px;
+    border-radius: 75px;
+    overflow: hidden;
+    background-size: 130%;
+}
+
+.magiVignette.chosenMagi {
+    box-shadow: 0 0 11px 9px green;
+}

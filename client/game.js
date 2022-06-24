@@ -1,17 +1,17 @@
 /* global document, window, io */
-import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import thunk from 'redux-thunk';
 
 import App from './components/App.jsx';
 import rootReducer from './reducers';
+import rootEpic from './epics';
 import addAnimations from './addAnimations.js';
-import {enrichState} from './utils.js';
+import { enrichState } from './utils.js';
 
 function startGame() {
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -19,12 +19,14 @@ function startGame() {
 
 	const store = createStore(
 		rootReducer,
-		enrichState(window.initialState),
+		enrichState(window.initialState, window.playerId),
 		composeEnhancers(
 			applyMiddleware(thunk),
 			applyMiddleware(epicMiddleware),
 		),
 	);
+
+	epicMiddleware.run(rootEpic);
 
 	ReactDOM.render(
 		<Provider store={store}>
@@ -36,6 +38,7 @@ function startGame() {
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io(`/?playerHash=${window.playerHash}`);
 		window.socket.on('action', function(action) {
+			console.dir(action);
 			observer.next(action);
 		});
 
@@ -54,6 +57,8 @@ function startGame() {
 	const delayedActions = addAnimations(actionsObservable);
 
 	delayedActions.subscribe(transformedAction => store.dispatch(transformedAction));
+
+	window.dispatch = event => store.dispatch(event);
 }
 
 document.onreadystatechange = function() {

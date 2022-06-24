@@ -12,11 +12,14 @@ import {
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_RELIC,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_MAGI_WITHOUT_CREATURES,
+
+	PROPERTY_CONTROLLER,
 
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_IN_PLAY,
 	ZONE_TYPE_ACTIVE_MAGI,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 import {clone} from './index.js';
 
 function convertClientCommands(action, game) {
@@ -61,6 +64,13 @@ function convertClientCommands(action, game) {
 					}
 					break;
 				}
+				case PROMPT_TYPE_MAGI_WITHOUT_CREATURES: {
+					expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[0]).byId(action.target);
+					if (!expandedAction.target) {
+						expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[1]).byId(action.target);
+					}
+					break;
+				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
 					const zone = action.zone === ZONE_TYPE_IN_PLAY ? game.getZone(ZONE_TYPE_IN_PLAY) : game.getZone(action.zone, action.zoneOwner);
 					const zoneContent = zone.cards;
@@ -87,10 +97,17 @@ function convertClientCommands(action, game) {
 		case ACTION_ATTACK: {
 			expandedAction.source = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.source);
 			expandedAction.target = game.getZone(ZONE_TYPE_IN_PLAY, null).byId(action.target);
+
+			if (action.additionalAttackers) {
+				expandedAction.additionalAttackers = action.additionalAttackers.map(id => game.getZone(ZONE_TYPE_IN_PLAY, null).byId(id));
+			}
+
 			if (!expandedAction.target) {
-				const opponentId = game.getOpponent(expandedAction.source.data.controller);
+				const controller = game.modifyByStaticAbilities(expandedAction.source, PROPERTY_CONTROLLER);
+				const opponentId = game.getOpponent(controller);
 				expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, opponentId).byId(action.target);
 			}
+
 			break;
 		}
 		case ACTION_PLAY: {

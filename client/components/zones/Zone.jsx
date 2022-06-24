@@ -1,11 +1,15 @@
-/* global window */
-import React from 'react';
-import {connect} from 'react-redux';
-import {compose} from 'recompose';
+import {useSelector} from 'react-redux';
 import Card from '../Card.jsx';
-import {withCardData, withZoneContent} from '../common';
+import {useCardData, useZoneContent} from '../common';
+import {getCurrentStep, isOurTurn} from '../../selectors';
 
-function Zone({ name, content, onCardClick, active }) {
+function Zone({ zoneId, activeStep, name, onCardClick }) {
+	const rawContent = useZoneContent(zoneId);
+	const content = useCardData(rawContent);
+	const currentStep = useSelector(getCurrentStep);
+	const ourTurn = useSelector(isOurTurn);
+	const active = currentStep === activeStep && ourTurn;
+
 	return (
 		<div className={`zone ${active ? 'zone-active' : ''}`} data-zone-name={name}>
 			{content.length ? content.map(cardData =>
@@ -23,17 +27,4 @@ function Zone({ name, content, onCardClick, active }) {
 	);
 }
 
-function mapStateToProps(state, {name, activeStep}) {
-	return {
-		name,
-		active: state.step === activeStep && state.activePlayer == window.playerId,
-	};
-}
-
-const enhance = compose(
-	withZoneContent,
-	connect(mapStateToProps),
-	withCardData,
-);
-
-export default enhance(Zone);
+export default Zone;

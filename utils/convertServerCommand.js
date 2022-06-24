@@ -7,6 +7,8 @@ import {
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
@@ -21,11 +23,13 @@ import {
 	EFFECT_TYPE_CREATURE_ATTACKS,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
+	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
-} from 'moonlands/src/const.js';
+} from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
 
@@ -49,7 +53,7 @@ const index = (obj, is, value) => {
 };
 
 const templateMessage = (message, metadata) => {
-	return message.replace(/\$\{(.+?)\}/g, (match, p1) => index(metadata, p1));
+	return message.replace(/\$\{(.+?)\}/g, (_match, p1) => index(metadata, p1));
 };
 
 const convertCard = cardInGame => ({
@@ -116,20 +120,37 @@ function convertServerCommand(initialAction, game, playerId) {
 
 					break;
 				}
+				case PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					action.amount = game.getMetaValue(action.amount, action.generatedBy);
+
+					break;
+				}
+				case PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					action.amount = game.getMetaValue(action.amount, action.generatedBy);
+
+					break;
+				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
+					const restrictions = action.restrictions || (action.restriction ? [
+						{
+							type: game.getMetaValue(action.restriction, action.generatedBy),
+							value: game.getMetaValue(action.restrictionValue, action.generatedBy),
+						},
+					] : null);
+
+					const zone = game.getMetaValue(action.zone, action.generatedBy);
 					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
 					const numberOfCards = game.getMetaValue(action.numberOfCards, action.generatedBy);
-					const zoneContent = game.getZone(action.zone, zoneOwner).cards;
-					const cardFilter = game.makeCardFilter(action.restrictions);
-
-					const cards = action.restrictions ? zoneContent.filter(cardFilter) : zoneContent;
+					const cardFilter = game.makeCardFilter(restrictions || []);
+					const zoneContent = game.getZone(zone, zoneOwner).cards;
+					const cards = restrictions ? zoneContent.filter(cardFilter) : zoneContent;
 
 					return {
 						type: ACTION_ENTER_PROMPT,
 						promptType: PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 						player: action.player,
-						zone: action.zone,
-						restrictions: action.restrictions,
+						zone,
+						restrictions,
 						cards: cards.map(convertCard),
 						zoneOwner,
 						numberOfCards,
@@ -193,6 +214,22 @@ function convertServerCommand(initialAction, game, playerId) {
 					return {
 						...action,
 						target: convertCard(action.target),
+					};
+				}
+				case EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					const energyOnCreatures = game.getMetaValue(action.energyOnCreatures, action.generatedBy) || {};
+					return {
+						...action,
+						source: convertCard(action.source),
+						energyOnCreatures,
+					};
+				}
+				case EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					const energyOnCreatures = game.getMetaValue(action.energyOnCreatures, action.generatedBy) || {};
+					return {
+						...action,
+						source: convertCard(action.source),
+						energyOnCreatures,
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {

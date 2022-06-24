@@ -1,0 +1,25 @@
+.smaller {
+    max-width: 250px;
+}
+
+.deckGrid {
+    width: 850px;
+}
+
+.deckGrid .ant-col-8, .deckGrid .ant-col-24 {
+    text-align: center;
+}
+
+.ant-col-24.cardList {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin: 0 25px;
+}
+
+.ant-col-24.cardList > div {
+    display: flex;
+    flex: 1 1 25%;
+    text-align: center;
+}

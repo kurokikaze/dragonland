@@ -27,10 +27,14 @@ const initApp = (mainCallback) => {
 		passport.use(new Strategy(
 			function(username, password, cb) {
 				getUserByUsername(username, function(err, user) {
+					console.log('Logging in');
+					console.dir(err);
 					if (err) { return cb(err); }
 					if (!user) { return cb(null, false); }
 					const hashedPassword = getPasswordHash(password);
-					if (user.password != hashedPassword) { return cb(null, false); }
+					console.log('hashedPassword', hashedPassword);
+					console.log('user.password', user.password);
+					if (user.password !== hashedPassword) { return cb(null, false); }
 					return cb(null, user);
 				});
 			}));

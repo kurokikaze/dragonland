@@ -29,17 +29,12 @@ a {
 }
 
 .startConfig {
-  width: 400px;
+  width: 350px;
 }
 
 .startButton {
-  width: 400px;
+  width: 350px;
   height: 80px;
-}
-
-.startButton {
-  width: 400px;
-  height: 120px;
   display: flex;
   justify-content: center;
   align-items: center;  
@@ -47,10 +42,26 @@ a {
 
 .startButton button[type=submit] {
   padding: 9px 17px;
+  width: 170px;
   font-family: Verdana, sans-serif;
   background-color: #D1A53E;
   color: #040403;
   border: 1px solid #E7DCCA;
   border-radius: 3px;
   font-weight: bold;
+}
+
+.startConfig fieldset {
+  display: flex;
+  justify-content: space-between;
+}
+
+.loginError {
+  display: flex;
+  justify-content: space-around;
+  height: 50px;
+  align-items: center;
+  color: red;
+  border: 1px solid red;
+  margin-top: 20px;
 }

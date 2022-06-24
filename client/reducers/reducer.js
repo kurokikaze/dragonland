@@ -7,6 +7,31 @@ import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
 	ACTION_POWER,
+	ACTION_TIME_NOTIFICATION,
+
+
+	TYPE_CREATURE,
+	TYPE_MAGI,
+	TYPE_RELIC,
+
+	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
+	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
+	EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
+	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
+	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
+	EFFECT_TYPE_START_OF_TURN,
+	EFFECT_TYPE_END_OF_TURN,
+	EFFECT_TYPE_MOVE_ENERGY,
+	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
+	EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY,
+	EFFECT_TYPE_CREATURE_ATTACKS,
+	EFFECT_TYPE_DRAW,
+	EFFECT_TYPE_MAGI_IS_DEFEATED,
+	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
+	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
@@ -16,12 +41,21 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_SINGLE_MAGI,
+	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 
 	LOG_ENTRY_POWER_ACTIVATION,
 	LOG_ENTRY_TARGETING,
 	LOG_ENTRY_NUMBER_CHOICE,
 	LOG_ENTRY_PLAY,
-} from 'moonlands/src/const.js';
+
+	LOG_ENTRY_DRAW,
+	LOG_ENTRY_CREATURE_DISCARDED_FROM_PLAY,
+	LOG_ENTRY_MAGI_ENERGY_LOSS,
+	LOG_ENTRY_MAGI_ENERGY_GAIN,
+	LOG_ENTRY_MAGI_DEFEATED,
+} from 'moonlands/dist/const';
+import {byName} from 'moonlands/dist/cards';
 
 import {
 	START_POWER_ANIMATION,
@@ -34,9 +68,14 @@ import {
 	END_SPELL_ANIMATION,
 	START_PROMPT_RESOLUTION_ANIMATION,
 	END_PROMPT_RESOLUTION_ANIMATION,
+	ADD_TO_PACK,
+	DISMISS_PACK,
+	PLUS_ENERGY_ON_CREATURE,
+	MINUS_ENERGY_ON_CREATURE,
 } from '../actions';
 
 import {
+	ACTION_TIMER_TICK,
 	MESSAGE_TYPE_POWER,
 	MESSAGE_TYPE_RELIC,
 	MESSAGE_TYPE_SPELL,
@@ -54,15 +93,15 @@ const defaultState = {
 		playerActiveMagi: [],
 		playerMagiPile: [],
 		playerDefeatedMagi: [],
-		playerInPlay: [],
+		inPlay: [],
 		opponentHand: [],
 		opponentDeck: [],
 		opponentDiscard: [],
 		opponentActiveMagi: [],
 		opponentMagiPile: [],
 		opponentDefeatedMagi: [],
-		opponentInPlay: [],
 	},
+	continuousEffects: [],
 	staticAbilities: [],
 	animation: null,
 	message: {
@@ -73,12 +112,64 @@ const defaultState = {
 		},
 	},
 	log: [],
+	turnTimer: false,
+	turnSecondsLeft: null,
 	gameEnded: false,
 	winner: null,
+	packs: [],
+	energyPrompt: {},
+};
+
+const clientZoneNames = {
+	[ZONE_TYPE_DECK]: 'Deck',
+	[ZONE_TYPE_HAND]: 'Hand',
+	[ZONE_TYPE_DISCARD]: 'Discard',
+	[ZONE_TYPE_ACTIVE_MAGI]: 'ActiveMagi',
+	[ZONE_TYPE_MAGI_PILE]: 'MagiPile',
+	[ZONE_TYPE_DEFEATED_MAGI]: 'DefeatedMagi',
+	[ZONE_TYPE_IN_PLAY]: 'InPlay',
+};
+
+const getZoneName = (serverZoneType, source) => {
+	if (serverZoneType === ZONE_TYPE_IN_PLAY) return 'inPlay';
+
+	if (!clientZoneNames[serverZoneType]) {
+		throw new Error(`Unknown zone: ${serverZoneType}`);
+	}
+
+	const zonePrefix = source.owner === window.playerId ? 'player' : 'opponent';
+	const zoneName = clientZoneNames[serverZoneType];
+	return `${zonePrefix}${zoneName}`;
+};
+
+const findInPlay = (state, id) => {
+	const cardInPlay = state.zones.inPlay.find(card => card.id === id);
+	if (cardInPlay) return cardInPlay;
+
+	const cardPlayerMagi = state.zones.playerActiveMagi.find(card => card.id === id);
+	if (cardPlayerMagi) return cardPlayerMagi;
+
+	const cardOpponentMagi = state.zones.opponentActiveMagi.find(card => card.id === id);
+	if (cardOpponentMagi) return cardOpponentMagi;
+
+	return null;
 };
 
 export default (state = defaultState, action) => {
 	switch (action.type) {
+		case ACTION_TIME_NOTIFICATION: {
+			return {
+				...state,
+				turnTimer: true,
+				turnSecondsLeft: 20,
+			};
+		}
+		case ACTION_TIMER_TICK: {
+			return {
+				...state,
+				turnSecondsLeft: Math.max(state.turnSecondsLeft - 1, 0),
+			};
+		}
 		case ACTION_PLAY: {
 
 			newLogEntry = {
@@ -103,6 +194,7 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				step: action.newStep,
+				packs: [],
 			};
 		}
 		/* Animations */
@@ -175,6 +267,20 @@ export default (state = defaultState, action) => {
 			};
 		}
 		/* End Animations */
+		case ADD_TO_PACK: {
+			return {
+				...state,
+				packs: state.packs.some(pack => pack.leader === action.leader) ? 
+					state.packs.map(pack => pack.leader === action.leader ? { ...pack, hunters: [ ...pack.hunters, pack.hunter ] } : pack) :
+					[ ...state.packs, {leader: action.leader, hunters: [ action.hunter ] } ],
+			};
+		}
+		case DISMISS_PACK: {
+			return {
+				...state,
+				packs: state.packs.filter(pack => pack.leader !== action.leader),
+			};
+		}
 		case ACTION_POWER: {
 			const sourceId = action.source.id;
 			const sourceName = action.power;
@@ -195,12 +301,7 @@ export default (state = defaultState, action) => {
 				...state,
 				zones: {
 					...state.zones,
-					playerInPlay: state.zones.playerInPlay.map(
-						card => card.id === sourceId
-							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
-							: card
-					),
-					opponentInPlay: state.zones.opponentInPlay.map(
+					inPlay: state.zones.inPlay.map(
 						card => card.id === sourceId
 							? ({...card, data: {...card.data, actionsUsed: [...card.data.actionsUsed, sourceName]}})
 							: card
@@ -221,6 +322,8 @@ export default (state = defaultState, action) => {
 		}
 		case ACTION_ENTER_PROMPT: {
 			var promptParams = action.promptParams;
+			var energyPrompt = state.energyPrompt;
+
 			switch (action.promptType) {
 				case PROMPT_TYPE_NUMBER: {
 					promptParams = {
@@ -253,7 +356,24 @@ export default (state = defaultState, action) => {
 					};
 					break;
 				}
+				case PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES: {
+					energyPrompt = {
+						freeEnergy: 0,
+						cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id, data }) => [id, data.energy])),
+					};
+					promptParams = promptParams || {
+						restriction: false,
+					};
+					break;
+				}
+				case PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES: {
+					energyPrompt = {
+						freeEnergy: action.amount,
+						cards: Object.fromEntries(state.zones.inPlay.filter(({ card, data }) => data.controller === window.playerId && byName(card).type === TYPE_CREATURE).map(({ id }) => [id, 0])),
+					};
+				}
 			}
+
 			return {
 				...state,
 				prompt: true,
@@ -263,6 +383,7 @@ export default (state = defaultState, action) => {
 				promptParams,
 				promptGeneratedBy: action.generatedBy,
 				promptAvailableCards: action.availableCards || [],
+				energyPrompt,
 			};
 		}
 		case START_PROMPT_RESOLUTION_ANIMATION: {
@@ -327,24 +448,13 @@ export default (state = defaultState, action) => {
 			};
 		}
 		case ACTION_ATTACK: {
-			const attackerId = action.source.id;
-
+			const attackerIds = [action.source.id, ...(action.additionalAttackers || []).map(({id}) => id)];
 			return {
 				...state,
 				zones: {
 					...state.zones,
-					playerInPlay: state.zones.playerInPlay.map(card =>
-						card.id === attackerId ? ({
-							...card,
-							data: {
-								...card.data,
-								attacked: card.data.attacked + 1,
-								hasAttacked: true,
-							},
-						}) : card,
-					),
-					opponentInPlay: state.zones.opponentInPlay.map(card =>
-						card.id === attackerId ? ({
+					inPlay: state.zones.inPlay.map(card =>
+						attackerIds.includes(card.id) ? ({
 							...card,
 							data: {
 								...card.data,
@@ -358,6 +468,30 @@ export default (state = defaultState, action) => {
 		}
 		case ACTION_EFFECT: {
 			return applyEffect(state, action);
+		}
+		case PLUS_ENERGY_ON_CREATURE: {
+			return {
+				...state,
+				energyPrompt: {
+					freeEnergy: state.energyPrompt.freeEnergy - 1,
+					cards: { 
+						...state.energyPrompt.cards,
+						[action.cardId]: state.energyPrompt.cards[action.cardId] + 1, 
+					},
+				},
+			};
+		}
+		case MINUS_ENERGY_ON_CREATURE: {
+			return {
+				...state,
+				energyPrompt: {
+					freeEnergy: state.energyPrompt.freeEnergy + 1,
+					cards: {
+						...state.energyPrompt.cards,
+						[action.cardId]: state.energyPrompt.cards[action.cardId] - 1, 
+					},
+				},
+			};
 		}
 		default: {
 			return state;

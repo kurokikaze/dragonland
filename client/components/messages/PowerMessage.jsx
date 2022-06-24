@@ -1,6 +1,5 @@
-import React from 'react';
 import MessageIcon from './MessageIcon.jsx';
-import Power from '../icons/Power.jsx';
+import Power from '../icons/Power.tsx';
 
 export default function PowerMessage ({card, power, display = false}) {
 	return ((card && display) ?
