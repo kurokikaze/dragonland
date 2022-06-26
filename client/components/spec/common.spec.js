@@ -38,7 +38,7 @@ describe('Common code from components', () => {
 					},
 				],
 				playerDefeatedMagi: [],
-				playerInPlay: [
+				inPlay: [
 					{
 						id: 8,
 					},

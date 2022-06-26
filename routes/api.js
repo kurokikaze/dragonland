@@ -1,5 +1,5 @@
 import express from 'express';
-import nanoid from 'nanoid';
+import {nanoid} from 'nanoid';
 import { open, write, close } from 'fs';
 import { join as joinPath } from 'path';
 import { State } from 'moonlands';
@@ -196,12 +196,14 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 
 		if (gameId && playerId) {
 			if (!ioLaunched) {
+        console.log('Launching IO')
 				const io = req.app.get('io');
 
 				console.log('Running games:');
 				console.dir(Object.keys(runningGames));
 
 				io.on('connection', function(socket) {
+          console.log('IO connection established')
 					const playerHash = socket.handshake.query.playerHash;
 
 					const gameId = keyHash[playerHash];

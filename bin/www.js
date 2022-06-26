@@ -6,8 +6,8 @@
 import initApp from '../app.js';
 import debug from 'debug';
 import http from 'http';
-import io from 'socket.io';
-
+// import io from 'socket.io';
+import { Server } from "socket.io";
 const serverDebug = debug('dragonland:server');
 
 /**
@@ -31,7 +31,10 @@ initApp(app => {
 	server.on('error', onError);
 	server.on('listening', onListening);
 
-	const ioServer = io.listen(server);
+	const ioServer = new Server(server, {
+    // options
+  });
+  
 	app.set('io', ioServer);
 });
 

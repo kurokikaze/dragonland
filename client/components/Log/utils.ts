@@ -12,10 +12,11 @@ import {
 	LOG_ENTRY_MAGI_ENERGY_LOSS,
 	LOG_ENTRY_CREATURE_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_ENERGY_GAIN,
-	LOG_ENTRY_MAGI_DEFEATED,	
-} from 'moonlands/src/const.js';
+	LOG_ENTRY_MAGI_DEFEATED,
+} from 'moonlands/src/const';
+import {LogEntryType} from 'moonlands/src/types';
 
-export const mapEntryToText = entry => {
+export const mapEntryToText = (entry: LogEntryType): string => {
 	switch (entry.type) {
 		case LOG_ENTRY_PLAY:
 			return `Player ${entry.player} plays ${entry.card}`;

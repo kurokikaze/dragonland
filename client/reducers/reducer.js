@@ -1,3 +1,4 @@
+/* global window */
 import {
 	ACTION_PLAY,
 	ACTION_EFFECT,
@@ -9,29 +10,7 @@ import {
 	ACTION_POWER,
 	ACTION_TIME_NOTIFICATION,
 
-
 	TYPE_CREATURE,
-	TYPE_MAGI,
-	TYPE_RELIC,
-
-	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
-	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
-	EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
-	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
-	EFFECT_TYPE_START_OF_TURN,
-	EFFECT_TYPE_END_OF_TURN,
-	EFFECT_TYPE_MOVE_ENERGY,
-	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
-	EFFECT_TYPE_DISCARD_CREATURE_FROM_PLAY,
-	EFFECT_TYPE_CREATURE_ATTACKS,
-	EFFECT_TYPE_DRAW,
-	EFFECT_TYPE_MAGI_IS_DEFEATED,
-	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
-	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
-	EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
@@ -48,12 +27,6 @@ import {
 	LOG_ENTRY_TARGETING,
 	LOG_ENTRY_NUMBER_CHOICE,
 	LOG_ENTRY_PLAY,
-
-	LOG_ENTRY_DRAW,
-	LOG_ENTRY_CREATURE_DISCARDED_FROM_PLAY,
-	LOG_ENTRY_MAGI_ENERGY_LOSS,
-	LOG_ENTRY_MAGI_ENERGY_GAIN,
-	LOG_ENTRY_MAGI_DEFEATED,
 } from 'moonlands/dist/const';
 import {byName} from 'moonlands/dist/cards';
 
@@ -80,10 +53,10 @@ import {
 	MESSAGE_TYPE_RELIC,
 	MESSAGE_TYPE_SPELL,
 	MESSAGE_TYPE_PROMPT_RESOLUTION,
-} from '../const.js';
+} from '../const';
 
-import {applyEffect} from './applyEffect.js';
-import {findInPlay} from './utils.js';
+import {applyEffect} from './applyEffect';
+import {findInPlay} from './utils';
 
 const defaultState = {
 	zones: {
@@ -118,41 +91,13 @@ const defaultState = {
 	winner: null,
 	packs: [],
 	energyPrompt: {},
-};
-
-const clientZoneNames = {
-	[ZONE_TYPE_DECK]: 'Deck',
-	[ZONE_TYPE_HAND]: 'Hand',
-	[ZONE_TYPE_DISCARD]: 'Discard',
-	[ZONE_TYPE_ACTIVE_MAGI]: 'ActiveMagi',
-	[ZONE_TYPE_MAGI_PILE]: 'MagiPile',
-	[ZONE_TYPE_DEFEATED_MAGI]: 'DefeatedMagi',
-	[ZONE_TYPE_IN_PLAY]: 'InPlay',
-};
-
-const getZoneName = (serverZoneType, source) => {
-	if (serverZoneType === ZONE_TYPE_IN_PLAY) return 'inPlay';
-
-	if (!clientZoneNames[serverZoneType]) {
-		throw new Error(`Unknown zone: ${serverZoneType}`);
-	}
-
-	const zonePrefix = source.owner === window.playerId ? 'player' : 'opponent';
-	const zoneName = clientZoneNames[serverZoneType];
-	return `${zonePrefix}${zoneName}`;
-};
-
-const findInPlay = (state, id) => {
-	const cardInPlay = state.zones.inPlay.find(card => card.id === id);
-	if (cardInPlay) return cardInPlay;
-
-	const cardPlayerMagi = state.zones.playerActiveMagi.find(card => card.id === id);
-	if (cardPlayerMagi) return cardPlayerMagi;
-
-	const cardOpponentMagi = state.zones.opponentActiveMagi.find(card => card.id === id);
-	if (cardOpponentMagi) return cardOpponentMagi;
-
-	return null;
+	prompt: false,
+	promptPlayer: null,
+	promptType: null,
+	promptMessage: null,
+	promptParams: {},
+	promptGeneratedBy: null,
+	promptAvailableCards: [],
 };
 
 export default (state = defaultState, action) => {

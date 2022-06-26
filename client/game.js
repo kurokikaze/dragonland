@@ -1,4 +1,4 @@
-/* global document, window, io */
+/* global document, window */
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
@@ -6,7 +6,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import { Observable } from 'rxjs';
 import thunk from 'redux-thunk';
-
+import io from 'socket.io-client';
 import App from './components/App.jsx';
 import rootReducer from './reducers';
 import rootEpic from './epics';
@@ -36,7 +36,11 @@ function startGame() {
 	);
 
 	const actionsObservable = Observable.create(observer => {
-		window.socket = io(`/?playerHash=${window.playerHash}`);
+		window.socket = io('/', {
+      query: {
+        playerHash: window.playerHash,
+      }
+    });
 		window.socket.on('action', function(action) {
 			console.dir(action);
 			observer.next(action);
