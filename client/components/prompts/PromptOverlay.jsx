@@ -1,3 +1,4 @@
+import {useEffect, useRef} from 'react';
 import {useSelector} from 'react-redux';
 
 import {
@@ -24,14 +25,23 @@ import {getPromptType, getPromptMessage} from '../../selectors/index.js';
 
 import './style.css';
 
-
 function PromptOverlay() {
 	const promptType = useSelector(getPromptType);
 	const promptMessage = useSelector(getPromptMessage);
 
+	const overlay = useRef();
+
+	useEffect(() => {
+		setTimeout(() => {
+			if (overlay.current) {
+				overlay.current.classList.add('prompt-animation');
+			}
+		}, 0);
+	}, [overlay]);
+
 	return (
-		<div className="promptOverlay">
-			{promptMessage && <h1 className='promptMessage'>{promptMessage}</h1>}
+		<div className="promptOverlay" ref={overlay}>
+			{promptMessage && <h1 className="promptMessage">{promptMessage}</h1>}
 			{promptType === PROMPT_TYPE_CHOOSE_CARDS && <PromptChooseCards />}
 			{promptType === PROMPT_TYPE_NUMBER && <PromptChooseNumber />}
 			{promptType === PROMPT_TYPE_MAY_ABILITY && <PromptMayEffect />}

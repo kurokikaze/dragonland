@@ -7,7 +7,7 @@ import initApp from '../app.js';
 import debug from 'debug';
 import http from 'http';
 // import io from 'socket.io';
-import { Server } from "socket.io";
+import { Server } from 'socket.io';
 const serverDebug = debug('dragonland:server');
 
 /**

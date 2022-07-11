@@ -196,24 +196,27 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 
 		if (gameId && playerId) {
 			if (!ioLaunched) {
-        console.log('Launching IO')
 				const io = req.app.get('io');
 
 				console.log('Running games:');
 				console.dir(Object.keys(runningGames));
 
 				io.on('connection', function(socket) {
-          console.log('IO connection established')
+          console.log('Connection event');
 					const playerHash = socket.handshake.query.playerHash;
 
 					const gameId = keyHash[playerHash];
 					const playerId = gamePlayers[playerHash];
 
-					console.log(`Sent game id ${gameId}, player id ${playerId}`);
+					console.log(`Sent game id ${gameId}, player id ${playerId} [playerhash ${playerHash}]`);
 					console.log('Running games:');
 					console.dir(Object.keys(runningGames));
 
 					if (gameId && playerId) {
+						socket.emit('gameData', {
+							playerId,
+							state: runningGames[gameId].serializeData(playerId),
+						});
 						// Converting game actions for sending
 						runningGames[gameId].actionStreamOne.on('action', action => {
 							var convertedAction = null;

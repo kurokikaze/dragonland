@@ -37,10 +37,10 @@ function startGame() {
 
 	const actionsObservable = Observable.create(observer => {
 		window.socket = io('/', {
-      query: {
-        playerHash: window.playerHash,
-      }
-    });
+			query: {
+				playerHash: window.playerHash,
+			}
+		});
 		window.socket.on('action', function(action) {
 			console.dir(action);
 			observer.next(action);
@@ -58,7 +58,7 @@ function startGame() {
 		window.socket.on('error', error => observer.error(error));
 	});
 
-	const delayedActions = addAnimations(actionsObservable);
+	const delayedActions = actionsObservable;// addAnimations(actionsObservable);
 
 	delayedActions.subscribe(transformedAction => store.dispatch(transformedAction));
 

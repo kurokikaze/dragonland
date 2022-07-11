@@ -74,6 +74,7 @@ export async function saveNewDeck(deck) {
 }
 
 export function getUserByUsername(username, callback) {
+  console.log('Getting user by username', username);
 	_db.collection(USERS_COLLECTION).findOne({login: username}, callback);
 }
 

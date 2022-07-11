@@ -5,6 +5,12 @@
     position: absolute;
     top: 0;
     left: 0;
+    transition: opacity ease-out 0.3s;
+    opacity: 0;
+}
+
+.promptOverlay.prompt-animation {
+  opacity: 1;
 }
 
 .promptMessage {

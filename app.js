@@ -27,8 +27,6 @@ const initApp = (mainCallback) => {
 		passport.use(new Strategy(
 			function(username, password, cb) {
 				getUserByUsername(username, function(err, user) {
-					console.log('Logging in');
-					console.dir(err);
 					if (err) { return cb(err); }
 					if (!user) { return cb(null, false); }
 					const hashedPassword = getPasswordHash(password);
@@ -40,6 +38,7 @@ const initApp = (mainCallback) => {
 			}));
 
 		passport.serializeUser(function(user, cb) {
+			console.log('Serializing user', user[USER_ID_FIELD]);
 			cb(null, user[USER_ID_FIELD]);
 		});
 
@@ -60,7 +59,7 @@ const initApp = (mainCallback) => {
 		app.use(express.urlencoded({ extended: false }));
 		app.use(cookieParser());
 		app.use(express.static(path.join(dirname__, 'public')));
-		app.use(session({ secret: config.expressSecret }));
+		app.use(session({ secret: config.expressSecret, saveUninitialized: true, resave: true }));
 		app.use(passport.initialize());
 		app.use(passport.session());
 		
@@ -77,7 +76,7 @@ const initApp = (mainCallback) => {
 		app.use(function(err, req, res) {
 			// set locals, only providing error in development
 			res.locals.message = err.message;
-			res.locals.error = req.app.get('env') === 'development' ? err : {};
+			res.locals.error = err;
 		
 			// render the error page
 			res.status(err.status || 500);
