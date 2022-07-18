@@ -21,6 +21,7 @@ import {
 	RESTRICTION_OPPONENT_CREATURE,
 	RESTRICTION_REGION,
 	RESTRICTION_CREATURE_TYPE,
+	RESTRICTION_ENERGY_EQUALS,
 
 	SELECTOR_OWN_CREATURES,
 	SELECTOR_OWN_MAGI,
@@ -38,7 +39,7 @@ import {
 	CALCULATION_HALVE_ROUND_UP,
 	CALCULATION_MIN,
 	CALCULATION_MAX,
-	
+
 	PROPERTY_ID,
 	PROPERTY_POWER_COST,
 	PROPERTY_TYPE,
@@ -62,7 +63,7 @@ import {
 	STATUS_BURROWED,
 } from 'moonlands/dist/const';
 
-import {getZoneContent} from '../selectors';
+import { getZoneContent } from '../selectors';
 
 export const cardMatchesSelector = (card, selector, selectorParameter = null, source) => {
 	switch (selector) {
@@ -147,15 +148,15 @@ export const transformCard = staticAbilityCards => cardData => {
 		const result = {
 			...cardData,
 			card,
-			modifiedData: {...card.data},
+			modifiedData: { ...card.data },
 		};
 
 		staticAbilityCards.forEach(staticAbilityCard => {
 			staticAbilityCard.card.data.staticAbilities.forEach(staticAbility => {
 				if (cardMatchesSelector(result, staticAbility.selector, staticAbility.selectorParameter, staticAbilityCard)) {
 					const modifierFunction = initialValue => {
-						const {operator, operandOne} = staticAbility.modifier;
-					
+						const { operator, operandOne } = staticAbility.modifier;
+
 						// For specifying value to substract in modifiers as positive ("CALCULATION_SUBSTRACT, 1")
 						if (operator === CALCULATION_SUBTRACT || operator === CALCULATION_SUBTRACT_TO_MINIMUM_OF_ONE) {
 							return performCalculation(operator, initialValue, operandOne);
@@ -164,10 +165,10 @@ export const transformCard = staticAbilityCards => cardData => {
 						}
 					};
 
-					switch(staticAbility.property) {
+					switch (staticAbility.property) {
 						case PROPERTY_POWER_COST: {
 							if ('powers' in result.modifiedData) {
-								result.modifiedData.powers = result.modifiedData.powers.map(power => ({...power, cost: modifierFunction(power.cost)}));
+								result.modifiedData.powers = result.modifiedData.powers.map(power => ({ ...power, cost: modifierFunction(power.cost) }));
 							}
 							break;
 						}
@@ -198,7 +199,7 @@ export const useCardData = (content) => {
 	return content.map(transformCard(staticAbilities));
 };
 
-export function mapCardDataFromProps(state, {id}) {
+export function mapCardDataFromProps(state, { id }) {
 	const filter = card => card.id === id;
 	const foundZone = Object.values(state.zones).find(zone => zone.find(filter));
 	return {
@@ -216,7 +217,7 @@ export const UNFILTERED_CREATURE_PROMPTS = [
 
 export const FILTERED_CREATURE_PROMPTS = [
 	PROMPT_TYPE_SINGLE_CREATURE,
-	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI, 
+	PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI,
 	PROMPT_TYPE_OWN_SINGLE_CREATURE,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
@@ -227,13 +228,15 @@ export const UNFILTERED_RELIC_PROMPTS = [
 ];
 
 const getRestrictionFilter = (restriction, value) => {
-	switch(restriction) {
+	switch (restriction) {
 		case RESTRICTION_TYPE:
 			return card => card.card.type === value;
 		case RESTRICTION_REGION:
 			return card => card.card.region === value;
 		case RESTRICTION_CREATURE_TYPE:
 			return card => (card.card.type === TYPE_CREATURE && card.card.name.split(' ').includes(value));
+		case RESTRICTION_ENERGY_EQUALS:
+			return card => (card.card.type === TYPE_CREATURE && card.data.energy === value);
 		case RESTRICTION_ENERGY_LESS_THAN:
 			return card => (card.card.type === TYPE_CREATURE && card.data.energy < value);
 		case RESTRICTION_ENERGY_LESS_THAN_STARTING:
@@ -260,7 +263,7 @@ export const getPromptFilter = (promptType, promptParams) => {
 		case PROMPT_TYPE_SINGLE_CREATURE_FILTERED:
 			if (promptParams) {
 				if (promptParams.restrictions && promptParams.restrictions.length) {
-					const checkers = promptParams.restrictions.map(({type, value}) => getRestrictionFilter(type, value));
+					const checkers = promptParams.restrictions.map(({ type, value }) => getRestrictionFilter(type, value));
 					return card =>
 						checkers.map(checker => checker(card)).every(a => a === true); // combine checkers
 				} else {
@@ -286,7 +289,7 @@ const propertyLayers = {
 };
 
 function getByProperty(target, property, subProperty = null) {
-	switch(property) {
+	switch (property) {
 		case PROPERTY_ID:
 			return target.id;
 		case PROPERTY_TYPE:
@@ -312,7 +315,7 @@ function getByProperty(target, property, subProperty = null) {
 		case PROPERTY_MAGI_STARTING_ENERGY:
 			return target.card.data.startingEnergy;
 		case PROPERTY_POWER_COST:
-			return target.card.data.powers.find(({name}) => name === subProperty).cost;
+			return target.card.data.powers.find(({ name }) => name === subProperty).cost;
 		case PROPERTY_STATUS_WAS_ATTACKED:
 			return target.data.wasAttacked || false;
 		case PROPERTY_CAN_BE_ATTACKED:
@@ -371,12 +374,12 @@ export const getCardDetails = state => {
 		activePlayerMagi: [...(state.zones.activePlayerMagi || [])].map(card => ({ ...card, card: byName(card.card), originalCard: byName(card.card) })),
 		opponentActiveMagi: [...(state.zones.opponentActiveMagi || [])].map(card => ({ ...card, card: byName(card.card), originalCard: byName(card.card) })),
 	};
-	
+
 	const continuousStaticAbilities = state.continuousEffects.map(effect => effect.staticAbilities).flat();
 	const zoneAbilities = [...allZonesCards.inPlay, ...allZonesCards.activePlayerMagi, ...allZonesCards.opponentActiveMagi].reduce(
 		(acc, cardInPlay) => cardInPlay.card.data.staticAbilities ? [
 			...acc,
-			...(cardInPlay.card.data.staticAbilities.map(a => ({...a, player: cardInPlay.data.controller})))
+			...(cardInPlay.card.data.staticAbilities.map(a => ({ ...a, player: cardInPlay.data.controller })))
 		] : acc,
 		[],
 	);
@@ -401,7 +404,7 @@ export const getCardDetails = state => {
 		for (let cardId in newState.inPlay) {
 			const currentCard = newState.inPlay[cardId];
 
-			if (cardMatchesSelector(currentCard, selector, selectorParameter, { data: { controller: staticAbility.player || null }})) {
+			if (cardMatchesSelector(currentCard, selector, selectorParameter, { data: { controller: staticAbility.player || null } })) {
 
 				if (!newState.inPlay[cardId].data.affectedBy) {
 					newState.inPlay[cardId].data.affectedBy = [];
@@ -421,7 +424,7 @@ export const getCardDetails = state => {
 					}
 					case PROPERTY_ATTACKS_PER_TURN: {
 						const initialValue = getByProperty(currentCard, PROPERTY_ATTACKS_PER_TURN);
-						const {operator, operandOne} = staticAbility.modifier;
+						const { operator, operandOne } = staticAbility.modifier;
 
 						const resultValue = (operator === CALCULATION_SUBTRACT || operator === CALCULATION_SUBTRACT_TO_MINIMUM_OF_ONE) ?
 							performCalculation(operator, initialValue, (typeof operandOne === 'number') ? operandOne : 0) :
@@ -479,7 +482,7 @@ export const getCardDetails = state => {
 							for (let powerId in currentCard.card.data.powers) {
 								const currentPower = currentCard.card.data.powers[powerId];
 								const initialValue = getByProperty(currentCard, PROPERTY_POWER_COST, currentPower.name);
-			
+
 								const resultValue = (operator === CALCULATION_SUBTRACT || operator === CALCULATION_SUBTRACT_TO_MINIMUM_OF_ONE) ?
 									performCalculation(operator, initialValue, (typeof operandOne === 'number') ? operandOne : 0) :
 									performCalculation(operator, (typeof operandOne === 'number') ? operandOne : 0, initialValue);

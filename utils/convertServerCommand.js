@@ -25,10 +25,12 @@ import {
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
 	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	EFFECT_TYPE_PLAY_CREATURE,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
+	EFFECT_TYPE_MOVE_CARDS_BETWEEN_ZONES,
 } from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
@@ -285,6 +287,18 @@ function convertServerCommand(initialAction, game, playerId) {
 					return {
 						...action,
 						source: convertCard(action.source),
+						target: convertCard(action.target),
+					};
+				}
+				case EFFECT_TYPE_PLAY_CREATURE: {
+					return {
+						...action,
+						card: convertCard(action.card),
+					};
+				}
+				case EFFECT_TYPE_MOVE_CARDS_BETWEEN_ZONES: {
+					return {
+						...action,
 						target: convertCard(action.target),
 					};
 				}

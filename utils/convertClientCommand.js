@@ -75,7 +75,6 @@ function convertClientCommands(action, game) {
 					const zone = action.zone === ZONE_TYPE_IN_PLAY ? game.getZone(ZONE_TYPE_IN_PLAY) : game.getZone(action.zone, action.zoneOwner);
 					const zoneContent = zone.cards;
 					expandedAction.cards = zoneContent.filter(card => action.cards.includes(card.id));
-					console.dir(expandedAction.cards[0]._card);
 					break;
 				}
 			}

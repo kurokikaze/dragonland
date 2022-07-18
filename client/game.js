@@ -58,7 +58,7 @@ function startGame() {
 		window.socket.on('error', error => observer.error(error));
 	});
 
-	const delayedActions = actionsObservable;// addAnimations(actionsObservable);
+	const delayedActions = addAnimations(actionsObservable);
 
 	delayedActions.subscribe(transformedAction => store.dispatch(transformedAction));
 
