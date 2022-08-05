@@ -253,7 +253,13 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 							// Only process active player actions or specifically requested prompt resolutions
 							if (runningGames[gameId].state.activePlayer === playerId ||
 								(runningGames[gameId].state.prompt && runningGames[gameId].state.promptPlayer === playerId)) {
-								const expandedAction = convertClientCommand({ ...action, player: playerId}, runningGames[gameId]);
+								let expandedAction = null
+								try {
+									expandedAction = convertClientCommand({ ...action, player: playerId}, runningGames[gameId]);
+								} catch(e) {
+									console.log('Error converting client command');
+									console.dir({ ...action, player: playerId});
+								}
 
 								try {
 									console.log('Expanded Action:');

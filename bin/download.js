@@ -17,6 +17,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const ALL_SETS_FIELD_NAME = 'plugins/magination2/sets/allsets.txt';
 const CORRECTIONS = {
 	'Fire Ball': 'Fire ball',
+  'Fireball': 'Fire ball',
 };
 
 function tsvToObjects(tsvData) {
