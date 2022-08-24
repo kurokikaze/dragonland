@@ -324,9 +324,13 @@ function convertServerCommand(initialAction, game, playerId) {
 					};
 				}
 				case EFFECT_TYPE_MOVE_CARDS_BETWEEN_ZONES: {
+					const targetCards = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+
 					return {
 						...action,
-						target: convertCard(action.target),
+						target: (targetCards instanceof Array) ? targetCards.map(convertCard) : convertCard(targetCards),
 					};
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {

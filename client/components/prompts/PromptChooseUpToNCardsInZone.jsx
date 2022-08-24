@@ -46,7 +46,7 @@ function PromptChooseUpToNCards() {
 
 	return (
 		<div className="promptWindow promptChooseCards">
-			<h1>Choose {numberOfCards} card(s)</h1>
+			<h1>Choose up to {numberOfCards} card(s)</h1>
 			{message && <h3>{message}</h3>}
 			<div className={cn('cardsRow', {'smallCards': cards.length > 4})}>
 				{cards.map(({card, id}) => (
@@ -61,7 +61,7 @@ function PromptChooseUpToNCards() {
 				))}
 			</div>
 			<div className="buttonHolder">
-				<button onClick={handleSend} disabled={numberOfCards !== selected.length}>OK</button>
+				<button onClick={handleSend} disabled={numberOfCards < selected.length}>OK</button>
 			</div>
 		</div>
 	);
