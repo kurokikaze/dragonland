@@ -14,6 +14,7 @@ body {
 .game {
     width: 900px;
     position: relative;
+    background-image: url("/images/defaultbackground.jpg");
 }
 
 #playerHand {

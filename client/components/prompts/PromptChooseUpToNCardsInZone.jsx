@@ -61,7 +61,7 @@ function PromptChooseUpToNCards() {
 				))}
 			</div>
 			<div className="buttonHolder">
-				<button onClick={handleSend} disabled={numberOfCards <= selected.length}>OK</button>
+				<button onClick={handleSend} disabled={numberOfCards !== selected.length}>OK</button>
 			</div>
 		</div>
 	);

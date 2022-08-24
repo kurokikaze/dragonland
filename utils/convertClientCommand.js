@@ -11,6 +11,7 @@ import {
 	PROMPT_TYPE_SINGLE_CREATURE_FILTERED,
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_RELIC,
+	PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_MAGI_WITHOUT_CREATURES,
 
@@ -69,6 +70,12 @@ function convertClientCommands(action, game) {
 					if (!expandedAction.target) {
 						expandedAction.target = game.getZone(ZONE_TYPE_ACTIVE_MAGI, game.players[1]).byId(action.target);
 					}
+					break;
+				}
+				case PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE: {
+					const zone = action.zone === ZONE_TYPE_IN_PLAY ? game.getZone(ZONE_TYPE_IN_PLAY) : game.getZone(action.zone, action.zoneOwner);
+					const zoneContent = zone.cards;
+					expandedAction.cards = zoneContent.filter(card => action.cards.includes(card.id));
 					break;
 				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {

@@ -99,7 +99,7 @@
     height: 293px;
     overflow: hidden;
     animation: fadeInDown .3s;
-    z-index: 2;
+    z-index: 400;
 }
 
 .cardView img {
