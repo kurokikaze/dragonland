@@ -76,7 +76,7 @@ function ZoneOpponentInPlay({
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					droppable={active && cardData.card.type === TYPE_CREATURE}
 					target={active && cardData.card.type === TYPE_CREATURE}
-					className={cn({'attackSource': animation && animation.source === cardData.id})}
+					className={cn({'attackSource': animation && animation.source === cardData.id, 'additionalAttacker': animation && animation.additionalAttacker === cardData.id})}
 					attacker={animation && animation.source === cardData.id}
 				/>,
 			) : null}

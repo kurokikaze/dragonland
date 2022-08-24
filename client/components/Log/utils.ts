@@ -41,7 +41,7 @@ export const mapEntryToText = (entry: LogEntryType): string => {
 		case LOG_ENTRY_MAGI_ENERGY_GAIN:
 			return `Magi ${entry.card} gains ${entry.amount} energy`;
 		case LOG_ENTRY_ATTACK:
-			return `${entry.source} attacks ${entry.target}`;
+			return `${entry.source} attacks ${entry.target}${entry.packHuntAttack ? ' (pack hunt attack)' :  ''}`;
 		case LOG_ENTRY_MAGI_DEFEATED:
 			return `Magi ${entry.card} is defeated`;
 		case LOG_ENTRY_NUMBER_CHOICE:

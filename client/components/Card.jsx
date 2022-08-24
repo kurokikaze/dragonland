@@ -85,6 +85,18 @@ function Card({
 			const newAttacker = attacker.cloneNode(true);
 			const parentNode = attacker.parentNode;
 
+			const additionalAttacker = document.querySelector('.additionalAttacker');
+			let newAdditionalAttacker = null;
+			if (additionalAttacker) {
+				const addAttackerBox = additionalAttacker.getBoundingClientRect();
+				const offsetX = targetBox.left - addAttackerBox.left;
+				const offsetY = targetBox.top - attackerBox.top;
+
+				additionalAttacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
+				additionalAttacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
+
+				newAdditionalAttacker = additionalAttacker.cloneNode(true);
+			}
 			if (parentNode && parentNode.classList) {
 				// if (parentNode.contains(attacker)) {
 				// 	parentNode.replaceChild(newAttacker, attacker);
@@ -96,9 +108,13 @@ function Card({
 					parentNode.closest('.zone').classList.remove('animated');
 					// @ts-ignore
 					newAttacker.classList.remove('attackSource');
+					if (newAdditionalAttacker) {
+						newAdditionalAttacker.classList.remove('additionalAttacker');
+					}
 				}, 600);
 			}
 		}
+		
 	}, [attacker]);
 
 	const ref = useRef(null);
@@ -144,7 +160,7 @@ function Card({
 			} else if (canPackHunt) {
 				onPackHunt(id, item.id);
 			} else {
-				console.dir('Problem, capn');
+				console.log('Problem, capn');
 			}
 		}
 	}), [card, data, id, guarded]);

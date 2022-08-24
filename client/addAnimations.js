@@ -59,7 +59,7 @@ const convertAction = action => {
 			] : [action];
 		case ACTION_ATTACK: {
 			return (action.source.owner !== window.playerId) ? [
-				startAttackAnimation(action.source.id, action.target.id, action.player), 
+				startAttackAnimation(action.source.id, action.target.id, action.additionalAttackers ? action.additionalAttackers[0].id : null,action.player), 
 				endAttackAnimation(action.source.id),
 				action,
 			] : [action];

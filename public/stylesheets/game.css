@@ -420,6 +420,14 @@ body {
     animation-name: attack;
 }
 
+.zone.animated .cardHolder.additionalAttacker {
+  box-shadow: 0 0 6px 6px rgb(131, 49, 131);
+  --targetOffsetX: 100px;
+  --targetOffsetY: -120px;
+  animation-duration: 0.6s;
+  animation-name: attack;
+}
+
 @keyframes attack {
     0% {
         transform: translateX(0px) translateY(0px);

@@ -23,7 +23,7 @@ export const showPowerName = (id, powerName) => ({type: SHOW_POWER_NAME, id, pow
 export const hidePowerName = (id, powerName) => ({type: HIDE_POWER_NAME, id, powerName});
 export const startPowerAnimation = (source, power, player) => ({type: START_POWER_ANIMATION, source, power, player});
 export const endPowerAnimation = (source) => ({type: END_POWER_ANIMATION, source, endAnimation: true});
-export const startAttackAnimation = (source, target, player) => ({type: START_ATTACK_ANIMATION, source, target, player});
+export const startAttackAnimation = (source, target, additionalAttacker, player) => ({type: START_ATTACK_ANIMATION, source, target, additionalAttacker, player});
 export const endAttackAnimation = (source) => ({type: END_ATTACK_ANIMATION, source, endAnimation: true});
 export const startRelicAnimation = (card) => ({type: START_RELIC_ANIMATION, card, endAnimation: true});
 export const endRelicAnimation = () => ({type: END_RELIC_ANIMATION, endAnimation: true});

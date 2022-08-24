@@ -81,6 +81,7 @@ export function applyEffect(state, action) {
 					player: action.player,
 					source: attackSource.card,
 					target: attackTarget.card,
+					packHuntAttack: action.packHuntAttack,
 				};
 
 				return {

@@ -167,6 +167,7 @@ export default (state = defaultState, action) => {
 					type: 'attack',
 					source: action.source,
 					target: action.target,
+					additionalAttacker: action.additionalAttacker,
 				},
 			};
 		}
