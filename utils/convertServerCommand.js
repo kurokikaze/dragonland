@@ -7,6 +7,7 @@ import {
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
+  PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 
@@ -131,6 +132,32 @@ function convertServerCommand(initialAction, game, playerId) {
 					action.amount = game.getMetaValue(action.amount, action.generatedBy);
 
 					break;
+				}
+				case PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE: {
+					const restrictions = action.restrictions || (action.restriction ? [
+						{
+							type: game.getMetaValue(action.restriction, action.generatedBy),
+							value: game.getMetaValue(action.restrictionValue, action.generatedBy),
+						},
+					] : null);
+
+					const zone = game.getMetaValue(action.zone, action.generatedBy);
+					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
+					const numberOfCards = game.getMetaValue(action.numberOfCards, action.generatedBy);
+					const cardFilter = game.makeCardFilter(restrictions || []);
+					const zoneContent = game.getZone(zone, zoneOwner).cards;
+					const cards = restrictions ? zoneContent.filter(cardFilter) : zoneContent;
+
+					return {
+						type: ACTION_ENTER_PROMPT,
+						promptType: PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE,
+						player: action.player,
+						zone,
+						restrictions,
+						cards: cards.map(convertCard),
+						zoneOwner,
+						numberOfCards,
+					};
 				}
 				case PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE: {
 					const restrictions = action.restrictions || (action.restriction ? [
