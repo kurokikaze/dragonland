@@ -420,9 +420,9 @@ function convertServerCommand(initialAction, game, playerId) {
 					};
 				}
 			}
-			break;
 		}
 	}
+
 	return action;
 }
 

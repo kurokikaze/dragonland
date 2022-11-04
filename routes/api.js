@@ -181,7 +181,7 @@ router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 router.get('/stats',
 	function(_req, res) {
 		res.render('stats', {
-			runningGames,
+			runningGames: Object.keys(runningGames),
 			gamesCounter,
 		});
 	}
