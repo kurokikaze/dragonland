@@ -1,9 +1,11 @@
 {
+  "preset": "ts-jest",
 	"testEnvironment": "jest-environment-jsdom-sixteen",
-	"transform": {
-	},
-	"transformIgnorePatterns": [
+  "transform": {
+    "^.+\\.[jt]s$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
 		"node_modules/(?!(moonlands|rxjs)/)"
 	],
-	"setupFilesAfterEnv": ["./testSetup/setupTests.js"]
+	"setupFilesAfterEnv": []
 }

@@ -1,8 +1,8 @@
 /* global expect, describe, it */
 
 import {State} from 'moonlands';
-import CardInGame from 'moonlands/dist/classes/CardInGame';
-import Zone from 'moonlands/dist/classes/Zone';
+import CardInGame from 'moonlands/src/classes/CardInGame.ts';
+import Zone from 'moonlands/src/classes/Zone.ts';
 
 import {
 	ACTION_PASS,
@@ -17,6 +17,7 @@ import {
 	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	EFFECT_TYPE_DISCARD_RESHUFFLED,
 
 	PROMPT_TYPE_ANY_CREATURE_EXCEPT_SOURCE,
 	PROMPT_TYPE_NUMBER,
@@ -803,5 +804,39 @@ describe('ACTION_EFFECT', () => {
 		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL, 'Effect type is correct');
 		expect(convertedAction.from).toEqual(convertedFrom, 'Payment source is converted correctly');
 		expect(convertedAction.amount).toEqual(6, 'Amount is passed correctly');
+	});
+
+	it('EFFECT_TYPE_DISCARD_RESHUFFLED', () => {
+		const ACTIVE_PLAYER = 42;
+		const NON_ACTIVE_PLAYER = 44;
+
+		const grega = new CardInGame(byName('Grega'), ACTIVE_PLAYER).addEnergy(6);
+		const weebo = new CardInGame(byName('Weebo'), ACTIVE_PLAYER).addEnergy(2);
+
+		const ayebaw = new CardInGame(byName('Ayebaw'), ACTIVE_PLAYER);
+		const pharan = new CardInGame(byName('Pharan'), ACTIVE_PLAYER);
+		const xyxElder = new CardInGame(byName('Xyx Elder'), ACTIVE_PLAYER);
+
+		const gameState = new State({
+			zones: createZones(ACTIVE_PLAYER, NON_ACTIVE_PLAYER, [weebo], [grega]),
+			step: STEP_DRAW,
+			activePlayer: ACTIVE_PLAYER,
+		});
+
+		const serverAction = {
+			type: ACTION_EFFECT,
+			effectType: EFFECT_TYPE_DISCARD_RESHUFFLED,
+			player: ACTIVE_PLAYER,
+			cards: [ayebaw.id, pharan.id, xyxElder.id],
+			generatedBy: grega.id,
+		};
+
+		const convertedAction = convert(serverAction, gameState, ACTIVE_PLAYER);
+
+		expect(convertedAction.type).toEqual(ACTION_EFFECT, 'Action type is correct');
+		expect(convertedAction.effectType).toEqual(EFFECT_TYPE_DISCARD_RESHUFFLED, 'Effect type is correct');
+		expect(convertedAction.player).toEqual(ACTIVE_PLAYER, 'Active player is passed correctly');
+		expect(convertedAction.cards).toEqual([ayebaw.id, pharan.id, xyxElder.id], 'List of card IDs is passed correctly');
+		expect(convertedAction.generatedBy).toEqual(grega.id, 'GeneratedBy is passed correctly');
 	});
 });

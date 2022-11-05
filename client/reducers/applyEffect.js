@@ -33,6 +33,7 @@ import {
 	LOG_ENTRY_MAGI_ENERGY_LOSS,
 	LOG_ENTRY_MAGI_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_DEFEATED,
+	EFFECT_TYPE_DISCARD_RESHUFFLED,
 } from 'moonlands/dist/const';
 
 import {byName} from 'moonlands/dist/cards';
@@ -387,7 +388,24 @@ export function applyEffect(state, action) {
 					},
 				],
 			};
-
+		}
+		case EFFECT_TYPE_DISCARD_RESHUFFLED: {
+			const newState = action.player === window.playerId ? {
+				...state,
+				zones: {
+					...state.zones,
+					playerDiscard: [],
+					playerDeck: action.cards.map(cardId => ({id: cardId, owner: action.player, card: null, data: null})),
+				},
+			} : {
+				...state,
+				zones: {
+					...state.zones,
+					opponentDiscard: [],
+					opponentDeck: action.cards.map(cardId => ({id: cardId, owner: action.player, card: null, data: null})),
+				},
+			};
+			return newState;
 		}
 	}
 	return state;

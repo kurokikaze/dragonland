@@ -18,6 +18,12 @@
     grid-row-gap: 30px;
 }
 
+@media screen and (max-width: 1600px) {
+  .allCards {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
 .allCardsContainer {
     margin-top: 50px;
 }

@@ -202,7 +202,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 				console.dir(Object.keys(runningGames));
 
 				io.on('connection', function(socket) {
-          console.log('Connection event');
+					console.log('Connection event');
 					const playerHash = socket.handshake.query.playerHash;
 
 					const gameId = keyHash[playerHash];
@@ -253,7 +253,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 							// Only process active player actions or specifically requested prompt resolutions
 							if (runningGames[gameId].state.activePlayer === playerId ||
 								(runningGames[gameId].state.prompt && runningGames[gameId].state.promptPlayer === playerId)) {
-								let expandedAction = null
+								let expandedAction = null;
 								try {
 									expandedAction = convertClientCommand({ ...action, player: playerId}, runningGames[gameId]);
 								} catch(e) {

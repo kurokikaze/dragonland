@@ -4,9 +4,14 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "strict": false,
+    "diagnostics": false,
+    "lib": ["es6"],
     "module": "commonjs",
+    "allowJs": true,
     "target": "es5",
     "jsx": "react-jsx"
     },
-  "include": ["./client/**/*", "./bin/*", "./utils/*", "node_modules/rxjs/src", "node_modules/@parcel"]
+  "include": ["./client/**/*", "./testSetup/*", "./bin/*", "./utils/*", "node_modules/rxjs/src", "node_modules/@parcel"]
 }
