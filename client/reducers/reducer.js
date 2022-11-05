@@ -184,7 +184,7 @@ export default (state = defaultState, action) => {
 					type: MESSAGE_TYPE_RELIC,
 					card: {
 						...action.card,
-						card: action.card._card.name,
+						card: action.card._card,
 					},
 				},
 			};
