@@ -87,8 +87,9 @@ router.post('/register',
 );
 
 router.get('/logout', function(req, res) {
-	req.logout();
-	res.redirect('/users/login');
+	req.logout(() => {
+		res.redirect('/users/login');
+	});
 });
 
 export default router;
