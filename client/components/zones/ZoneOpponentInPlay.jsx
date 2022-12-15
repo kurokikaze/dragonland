@@ -71,7 +71,7 @@ function ZoneOpponentInPlay({
 					id={cardData.id}
 					card={cardData.card}
 					data={cardData.data}
-					modifiedData={cardData.modifiedData}
+					modifiedData={cardData.card.data}
 					onClick={cardClickHandler}
 					isOnPrompt={isOnUnfilteredPrompt || (isOnFilteredPrompt && promptFilter(cardData))}
 					droppable={active && cardData.card.type === TYPE_CREATURE}
