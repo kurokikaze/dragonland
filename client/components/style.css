@@ -224,3 +224,11 @@
 .currentEnergy {
     font-family: Lato, "Helvetica Neue", Helvetica, Arial;
 }
+
+.promptRearrangeCards .movableCard {
+  margin: 0 10px;
+}
+
+.promptRearrangeCards .movableCard img {
+  max-width: 130px;
+}

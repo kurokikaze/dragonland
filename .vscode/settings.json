@@ -2,6 +2,7 @@
     "editor.useTabStops": false,
     "typescript.tsdk": "node_modules/typescript/lib",
     "cSpell.words": [
-      "moonlands"
+      "moonlands",
+      "Velociraptor"
     ]
 }

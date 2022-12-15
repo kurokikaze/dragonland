@@ -14,7 +14,7 @@ import {
 	STEP_ATTACK,
 	STEP_CREATURES,
 	STEP_PRS_SECOND,
-	STEP_DRAW
+	STEP_DRAW,
 } from '../const.js';
 import './style.css';
 

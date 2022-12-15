@@ -10,6 +10,7 @@ import {
 	PROMPT_TYPE_CHOOSE_UP_TO_N_CARDS_FROM_ZONE,
 	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_REARRANGE_CARDS_OF_ZONE,
 
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
@@ -28,6 +29,7 @@ import {
 	EFFECT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
 	EFFECT_TYPE_PLAY_CREATURE,
 	EFFECT_TYPE_DISCARD_RESHUFFLED,
+	EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
@@ -186,6 +188,23 @@ function convertServerCommand(initialAction, game, playerId) {
 						numberOfCards,
 					};
 				}
+				case PROMPT_TYPE_REARRANGE_CARDS_OF_ZONE: {
+					const zone = game.getMetaValue(action.promptParams.zone, action.generatedBy);
+					const zoneOwner = game.getMetaValue(action.promptParams.zoneOwner, action.generatedBy);
+					const numberOfCards = game.getMetaValue(action.promptParams.numberOfCards, action.generatedBy);
+					const zoneContent = game.getZone(zone, zoneOwner).cards;
+					const cards = zoneContent.slice(0, parseInt(numberOfCards, 10));
+
+					return {
+						type: ACTION_ENTER_PROMPT,
+						promptType: PROMPT_TYPE_REARRANGE_CARDS_OF_ZONE,
+						player: action.player,
+						zone,
+						cards: cards.map(convertCard),
+						zoneOwner,
+						numberOfCards,
+					};
+				}
 			}
 			break;
 		}
@@ -221,6 +240,20 @@ function convertServerCommand(initialAction, game, playerId) {
 						destinationZone: action.destinationZone,
 						convertedFor: playerId,
 						destOwner: destinationCardOwner,
+					};
+				}
+				case EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE: {
+					const cards = (typeof action.cards == 'string') ?
+						game.getMetaValue(action.cards, action.generatedBy) :
+						action.cards;
+
+					const zone = game.getMetaValue(action.zone, action.generatedBy);
+					const zoneOwner = game.getMetaValue(action.zoneOwner, action.generatedBy);
+					return {
+						...action,
+						cards,
+						zone,
+						zoneOwner,
 					};
 				}
 				case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {

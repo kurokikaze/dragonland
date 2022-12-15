@@ -23,6 +23,8 @@ import {
 	EFFECT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 	EFFECT_TYPE_END_OF_TURN,
 	EFFECT_TYPE_CREATE_CONTINUOUS_EFFECT,
+	EFFECT_TYPE_DISCARD_RESHUFFLED,
+	EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE,
 
 	LOG_ENTRY_CREATURE_ENERGY_LOSS,
 	LOG_ENTRY_CREATURE_ENERGY_GAIN,
@@ -33,7 +35,7 @@ import {
 	LOG_ENTRY_MAGI_ENERGY_LOSS,
 	LOG_ENTRY_MAGI_ENERGY_GAIN,
 	LOG_ENTRY_MAGI_DEFEATED,
-	EFFECT_TYPE_DISCARD_RESHUFFLED,
+	ZONE_TYPE_DECK,
 } from 'moonlands/dist/const';
 
 import {byName} from 'moonlands/dist/cards';
@@ -269,6 +271,57 @@ export function applyEffect(state, action) {
 				},
 				log: [...state.log, ...newLogEntries],
 			};                    
+		}
+		case EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE: {
+			if (action.zone === ZONE_TYPE_DECK) {
+				switch (action.zoneOwner) {
+					case state.activePlayer: {
+						const cardsToRearrange = state.zones.playerDeck.slice(0, action.cards.length);
+						const cardsRecord = {};
+						cardsToRearrange.forEach(card => {
+							cardsRecord[card.id] = card;
+						});
+						return {
+							...state,
+							zones: {
+								...state.zones,
+								playerDeck: state.zones.playerDeck.map((card, index) => {
+									if (index < action.cards.length) {
+										const idAtPosition = action.cards[index];
+										return cardsRecord[idAtPosition];
+									} else {
+										return card;
+									}
+								})
+							}
+						};
+					}
+					default: {
+						const cardsToRearrange = state.zones.opponentDeck.slice(0, action.cards.length);
+						const cardsRecord = {};
+						cardsToRearrange.forEach(card => {
+							cardsRecord[card.id] = card;
+						});
+						return {
+							...state,
+							zones: {
+								...state.zones,
+								opponentDeck: state.zones.opponentDeck.map((card, index) => {
+									if (index < action.cards.length) {
+										const idAtPosition = action.cards[index];
+										return cardsRecord[idAtPosition];
+									} else {
+										return card;
+									}
+								})
+							}
+						};
+					}
+				}
+			}
+			return {
+				...state,
+			};
 		}
 		case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
 			const magiFound = findInPlay(state, action.target.id);

@@ -23,6 +23,7 @@ import {
 	PROMPT_TYPE_SINGLE_MAGI,
 	PROMPT_TYPE_REARRANGE_ENERGY_ON_CREATURES,
 	PROMPT_TYPE_DISTRIBUTE_ENERGY_ON_CREATURES,
+	PROMPT_TYPE_REARRANGE_CARDS_OF_ZONE,
 
 	LOG_ENTRY_POWER_ACTIVATION,
 	LOG_ENTRY_TARGETING,
@@ -297,6 +298,15 @@ export default (state = defaultState, action) => {
 					promptParams = {
 						zone: action.zone,
 						restrictions: action.restrictions,
+						cards: action.cards,
+						zoneOwner: action.zoneOwner,
+						numberOfCards: action.numberOfCards,
+					};
+					break;
+				}
+				case PROMPT_TYPE_REARRANGE_CARDS_OF_ZONE: {
+					promptParams = {
+						zone: action.zone,
 						cards: action.cards,
 						zoneOwner: action.zoneOwner,
 						numberOfCards: action.numberOfCards,
