@@ -22,6 +22,7 @@ import PowerMessage from './messages/PowerMessage.jsx';
 import RelicMessage from './messages/RelicMessage.jsx';
 import SpellMessage from './messages/SpellMessage.jsx';
 import PromptResolutionMessage from './messages/PromptResolutionMessage.jsx';
+import ActionCardView from './ActionCardView.jsx';
 
 import StepBoard from './StepBoard.jsx';
 import EndgameOverlay from './EndgameOverlay.jsx';
@@ -141,6 +142,7 @@ function App() {
 					</div>
 					<ZoneHand zoneId='playerHand' name='Player hand' onCardClick={onPlay} />
 					<StepBoard />
+					<ActionCardView />
 					{ourTurn && (currentStep !== STEP_ENERGIZE) && (currentStep !== STEP_DRAW) && <button onClick={onPass}>Pass</button>}
 					{!ourTurn && <div>Opponent&apos;s turn</div>}
 					{discardShown && <div className='discardOverlay'>

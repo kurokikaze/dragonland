@@ -1,5 +1,5 @@
 /* global window */
-import {connect} from 'react-redux';
+import {useSelector} from 'react-redux';
 import cn from 'classnames';
 
 import StepIcon from './StepIcon.jsx';
@@ -21,7 +21,10 @@ import './style.css';
 const OUR_TURN_ACTIVE = '#32bb32';
 const NOT_OUR_TURN_ACTIVE = '#F8E71C';
 
-function StepBoard({currentStep, ourTurn}) {
+function StepBoard() {
+	const currentStep = useSelector(state => state.step);
+	const ourTurn = useSelector(state => state.activePlayer == window.playerId);
+
 	const activeColor = ourTurn ? OUR_TURN_ACTIVE : NOT_OUR_TURN_ACTIVE;
 
 	return (
@@ -36,15 +39,4 @@ function StepBoard({currentStep, ourTurn}) {
 	);
 }
 
-function mapStateToProps(state) {
-	return {
-		currentStep: state.step,
-		ourTurn: state.activePlayer == window.playerId,
-	};
-}
-
-const enhance = connect(mapStateToProps);
-
-export {StepBoard as Base};
-
-export default enhance(StepBoard);
+export default StepBoard;

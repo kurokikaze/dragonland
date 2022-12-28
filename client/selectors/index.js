@@ -111,3 +111,11 @@ export const getCardsCountInOpponentDeck = (state) => state.zones.opponentDeck.l
 export const getAnimation = state => state.animation;
 export const getIsOnMagiPrompt = state => state.prompt &&
 	(state.promptType === PROMPT_TYPE_SINGLE_CREATURE_OR_MAGI || state.promptType === PROMPT_TYPE_SINGLE_MAGI);
+export const getPowerSource = id => state => {
+	if (!id) return null;
+
+	const myCards = state.zones.inPlay;
+	const myCard = myCards ? myCards.find(card => card.id === id) : null;
+
+	return myCard;
+};
