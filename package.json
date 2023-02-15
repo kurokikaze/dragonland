@@ -38,6 +38,7 @@
     "express": "~4.16.1",
     "express-session": "^1.17.1",
     "g": "^2.0.1",
+    "gsap": "^3.11.4",
     "hookrouter": "^1.2.5",
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^0.20.0",

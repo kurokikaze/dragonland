@@ -1,7 +1,8 @@
 /* global window, document */
-import {useEffect, useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import cn from 'classnames';
+import {gsap} from 'gsap';
 import {
 	TYPE_CREATURE,
 	TYPE_RELIC,
@@ -70,49 +71,34 @@ function Card({
 	onPackHunt,
 	useLocket = false,
 }) {
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const attacker = document.querySelector('.attackSource');
 		const target = document.querySelector('.attackTarget');
 		if (attacker && target) {
+
 			const targetBox = target.getBoundingClientRect();
 			const attackerBox = attacker.getBoundingClientRect();
 			const offsetX = targetBox.left - attackerBox.left;
 			const offsetY = targetBox.top - attackerBox.top;
 
-			attacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
-			attacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
+			const tl = gsap.timeline({});
+			tl.to(attacker, {x: offsetX, y: offsetY, duration: 0.3});
+			tl.to(attacker, {x: 0, y: 0, duration: 0.4});
 
-			const newAttacker = attacker.cloneNode(true);
-			const parentNode = attacker.parentNode;
-
+			tl.play();
 			const additionalAttacker = document.querySelector('.additionalAttacker');
-			let newAdditionalAttacker = null;
 			if (additionalAttacker) {
 				const addAttackerBox = additionalAttacker.getBoundingClientRect();
-				const offsetX = targetBox.left - addAttackerBox.left;
-				const offsetY = targetBox.top - attackerBox.top;
-
-				additionalAttacker.style.setProperty('--targetOffsetX', `${offsetX}px`);
-				additionalAttacker.style.setProperty('--targetOffsetY', `${offsetY}px`);
-
-				newAdditionalAttacker = additionalAttacker.cloneNode(true);
+				const addOffsetX = targetBox.left - addAttackerBox.left;
+				const addOffsetY = targetBox.top - addAttackerBox.top;
+				const tl2 = gsap.timeline({});
+				tl2.to(additionalAttacker, {x: addOffsetX, y: addOffsetY, duration: 0.3});
+				tl2.to(additionalAttacker, {x: 0, y: 0, duration: 0.4});
+	
+				tl2.play();
+				return () => {tl.clear();tl2.clear();};
 			}
-			if (parentNode && parentNode.classList) {
-				// if (parentNode.contains(attacker)) {
-				// 	parentNode.replaceChild(newAttacker, attacker);
-				// }
-				// @ts-ignore
-				parentNode.closest('.zone').classList.add('animated');
-				setTimeout(() => {
-					// @ts-ignore
-					parentNode.closest('.zone').classList.remove('animated');
-					// @ts-ignore
-					newAttacker.classList.remove('attackSource');
-					if (newAdditionalAttacker) {
-						newAdditionalAttacker.classList.remove('additionalAttacker');
-					}
-				}, 600);
-			}
+			return () => tl.clear();
 		}
 		
 	}, [attacker]);
