@@ -81,7 +81,8 @@ export const hideIfNecessary = (card, targetZone, isOpponent) => {
 	}
 };
 
-function convertServerCommand(initialAction, game, playerId) {
+function convertServerCommand(initialAction, game, playerId, overrideHiding = false) {
+
 	var action = clone(initialAction);
 	switch(action.type) {
 		case ACTION_PASS: {
@@ -229,13 +230,13 @@ function convertServerCommand(initialAction, game, playerId) {
 						sourceCard: hideIfNecessary(
 							convertCard(action.sourceCard),
 							action.sourceZone,
-							sourceCardOwner !== playerId
+							overrideHiding ? false : sourceCardOwner !== playerId
 						),
 						sourceZone: action.sourceZone,
 						destinationCard: hideIfNecessary(
 							convertCard(action.destinationCard),
 							action.destinationZone,
-							destinationCardOwner !== playerId
+							overrideHiding ? false : destinationCardOwner !== playerId
 						),
 						destinationZone: action.destinationZone,
 						convertedFor: playerId,

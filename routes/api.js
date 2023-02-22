@@ -1,6 +1,6 @@
 import express from 'express';
 import {nanoid} from 'nanoid';
-import { open, write, close } from 'fs';
+import { open, write, close, readdir, readFile } from 'fs';
 import { join as joinPath } from 'path';
 import { State } from 'moonlands';
 import { byName } from 'moonlands/dist/cards';
@@ -14,6 +14,7 @@ import config from '../config.js';
 import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
+	ACTION_POWER,
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_MAGI_PILE,
@@ -22,6 +23,7 @@ import {
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_DISCARD,
 	ACTION_PLAY,
+	ACTION_ATTACK,
 } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
@@ -142,6 +144,39 @@ router.get(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 		} else {
 			res.sendStatus(404);
 		}
+	});
+
+router.get(
+	'/logs',
+	ensure.ensureLoggedIn('/users/login'),
+	async (_, res) => {
+		readdir('./logs', (err, files) => {
+			if (!err) {
+				res.json(files.filter(file => file.endsWith('.log')).map(file => file.slice(0, -4)));
+			} else {
+				res.json(err);
+			}
+		});
+	});
+
+router.get(
+	/^\/log\/([a-zA-Z0-9_-]+)\/?$/,
+	ensure.ensureLoggedIn('/users/login'),
+	async (req, res) => {
+		const logId = req.params[0];
+		readFile(`./logs/${logId}.log`, 'utf8', (err, data) => {
+			if (err) {
+				res.json(err);
+			} else {
+				const rawString = data.toString();
+				const [initialStateRaw, actionLogRaw] = rawString.split('###');
+				// console.log(actionLogRaw.trimEnd().slice(0, -1));
+				res.json({
+					state: JSON.parse(initialStateRaw),
+					actions: JSON.parse(`[${actionLogRaw.trimEnd().slice(0, -1)}]`),
+				});
+			}
+		});
 	});
 
 router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
@@ -366,13 +401,25 @@ router.post('/accept',
 				deckTwo.cards,
 			);
 
+			runningGames[gameId].setup();
+			runningGames[gameId].enableDebug();
+
 			open(joinPath(config.logDirectory, `${gameId}.log`), 'w', (err, file) => {
 				if (!err) {
-					runningGames[gameId].logStream.on('action', action => {
-						write(file, JSON.stringify(action, null, 2) + ',\n', () => null);
-					});
-					runningGames[gameId].logStream.on('close', () => {
-						close(file, () => null);
+					const initialState = runningGames[gameId].serializeData(1, false);
+					write(file, JSON.stringify(initialState, null, 2) + '\n###\n', () => {
+						runningGames[gameId].logStream.on('action', action => {
+							const isClientAction = (
+								action.type === ACTION_RESOLVE_PROMPT ||
+								action.type === ACTION_POWER ||
+								action.type === ACTION_ATTACK ||
+								action.type === ACTION_PLAY);
+							const convertedAction = isClientAction ? convertClientCommand(action, runningGames[gameId]) : convertServerCommand(action, runningGames[gameId], 1, true);
+							write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
+						});
+						runningGames[gameId].logStream.on('close', () => {
+							close(file, () => null);
+						});	
 					});
 				} else {
 					console.log('===================');
@@ -380,9 +427,6 @@ router.post('/accept',
 					console.log('===================');
 				}
 			});
-
-			runningGames[gameId].setup();
-			runningGames[gameId].enableDebug();
 
 			participants[challenge.userId] = playerOneHash;
 			participants[req.user.gameId] = playerTwoHash;
