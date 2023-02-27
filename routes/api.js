@@ -1,4 +1,5 @@
 import express from 'express';
+import { EventEmitter } from 'events';
 import {nanoid} from 'nanoid';
 import { open, write, close, readdir, readFile } from 'fs';
 import { join as joinPath } from 'path';
@@ -14,7 +15,6 @@ import config from '../config.js';
 import {
 	ACTION_RESOLVE_PROMPT,
 	ACTION_PLAYER_WINS,
-	ACTION_POWER,
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_MAGI_PILE,
@@ -23,7 +23,6 @@ import {
 	ZONE_TYPE_DEFEATED_MAGI,
 	ZONE_TYPE_DISCARD,
 	ACTION_PLAY,
-	ACTION_ATTACK,
 } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
@@ -33,6 +32,8 @@ var router = express.Router();
 var gamesCounter = 0;
 
 const runningGames = {};
+// EventEmitters corresponding to games
+const eventEmitters = {};
 // Player ID (Mongo) to player Id (game)
 const gamePlayers = {};
 // Player hash to game hash 
@@ -75,6 +76,9 @@ function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 
 	// gameState.enableTurnTimer(100);
 	runningGames[gameId] = gameState;
+	const gameEventEmitter = new EventEmitter();
+	gameState.setOnAction(action => gameEventEmitter.emit('action', action));
+	eventEmitters[gameId] = gameEventEmitter;
 	gamesCounter++;
 
 	return [gameId, playerOneHash, playerTwoHash];
@@ -253,7 +257,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 							state: runningGames[gameId].serializeData(playerId),
 						});
 						// Converting game actions for sending
-						runningGames[gameId].actionStreamOne.on('action', action => {
+						eventEmitters[gameId].on('action', action => {
 							var convertedAction = null;
 							try {
 								convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
@@ -277,6 +281,8 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 										runningGames[gameId].userHashes.forEach(userHash => {delete participants[userHash];});
 									}
 									delete runningGames[gameId];
+									eventEmitters[gameId].close();
+									delete eventEmitters[gameId];
 									delete keyHash[playerHash];
 									delete gamePlayers[playerHash];
 								}, 1000);
@@ -297,8 +303,6 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 								}
 
 								try {
-									console.log('Expanded Action:');
-									console.dir(expandedAction);
 									runningGames[gameId].update(expandedAction);
 								} catch(e) {
 									console.log('Engine error!');
@@ -402,13 +406,13 @@ router.post('/accept',
 			);
 
 			runningGames[gameId].setup();
-			runningGames[gameId].enableDebug();
+			// runningGames[gameId].enableDebug();
 
 			open(joinPath(config.logDirectory, `${gameId}.log`), 'w', (err, file) => {
 				if (!err) {
 					const initialState = runningGames[gameId].serializeData(1, false);
 					write(file, JSON.stringify(initialState, null, 2) + '\n###\n', () => {
-						runningGames[gameId].logStream.on('action', action => {
+						eventEmitters[gameId].on('action', action => {
 							// const isClientAction = (
 							// 	action.type === ACTION_RESOLVE_PROMPT ||
 							// 	action.type === ACTION_POWER ||
@@ -417,7 +421,7 @@ router.post('/accept',
 							const convertedAction = /* isClientAction ? convertClientCommand(action, runningGames[gameId]) : */ convertServerCommand(action, runningGames[gameId], 1, true);
 							write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
 						});
-						runningGames[gameId].logStream.on('close', () => {
+						eventEmitters[gameId].on('close', () => {
 							close(file, () => null);
 						});	
 					});
