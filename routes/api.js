@@ -409,12 +409,12 @@ router.post('/accept',
 					const initialState = runningGames[gameId].serializeData(1, false);
 					write(file, JSON.stringify(initialState, null, 2) + '\n###\n', () => {
 						runningGames[gameId].logStream.on('action', action => {
-							const isClientAction = (
-								action.type === ACTION_RESOLVE_PROMPT ||
-								action.type === ACTION_POWER ||
-								action.type === ACTION_ATTACK ||
-								action.type === ACTION_PLAY);
-							const convertedAction = isClientAction ? convertClientCommand(action, runningGames[gameId]) : convertServerCommand(action, runningGames[gameId], 1, true);
+							// const isClientAction = (
+							// 	action.type === ACTION_RESOLVE_PROMPT ||
+							// 	action.type === ACTION_POWER ||
+							// 	action.type === ACTION_ATTACK ||
+							// 	action.type === ACTION_PLAY);
+							const convertedAction = /* isClientAction ? convertClientCommand(action, runningGames[gameId]) : */ convertServerCommand(action, runningGames[gameId], 1, true);
 							write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
 						});
 						runningGames[gameId].logStream.on('close', () => {

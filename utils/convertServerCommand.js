@@ -30,6 +30,7 @@ import {
 	EFFECT_TYPE_PLAY_CREATURE,
 	EFFECT_TYPE_DISCARD_RESHUFFLED,
 	EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE,
+	EFFECT_TYPE_MOVE_CARD_BETWEEN_ZONES,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
@@ -366,6 +367,16 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 					return {
 						...action,
 						target: (targetCards instanceof Array) ? targetCards.map(convertCard) : convertCard(targetCards),
+					};
+				}
+				case EFFECT_TYPE_MOVE_CARD_BETWEEN_ZONES: {
+					const targetCard = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+
+					return {
+						...action,
+						target: convertCard(targetCard),
 					};
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {
