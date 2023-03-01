@@ -281,7 +281,11 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 										runningGames[gameId].userHashes.forEach(userHash => {delete participants[userHash];});
 									}
 									delete runningGames[gameId];
-									eventEmitters[gameId].close();
+									if (eventEmitters[gameId]) {
+										eventEmitters[gameId].removeAllListeners();
+									} else {
+										console.log(`No eventEmitter found for the game ${gameId}`);
+									}
 									delete eventEmitters[gameId];
 									delete keyHash[playerHash];
 									delete gamePlayers[playerHash];
@@ -308,12 +312,13 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 									console.log('Engine error!');
 									console.log('On action:');
 									console.dir(expandedAction);
-									console.log('');
-									console.dir(runningGames[gameId].state);
+									// console.log('');
+									// console.dir(runningGames[gameId].state);
 									console.log('');
 									console.log(e.name);
 									console.log(e.message);
 									console.log(e.stack);
+                  process.exit(1);
 								}
 							}
 						});
@@ -406,7 +411,7 @@ router.post('/accept',
 			);
 
 			runningGames[gameId].setup();
-			// runningGames[gameId].enableDebug();
+			runningGames[gameId].enableDebug();
 
 			open(joinPath(config.logDirectory, `${gameId}.log`), 'w', (err, file) => {
 				if (!err) {

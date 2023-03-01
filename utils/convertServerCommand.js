@@ -70,6 +70,10 @@ const convertCard = cardInGame => ({
 	data: cardInGame.data,
 });
 
+const convertCardMinimal = cardInGame => ({
+	id: cardInGame.id,
+});
+
 export const hideIfNecessary = (card, targetZone, isOpponent) => {
 	if (hiddenZonesHash[targetZone] && isOpponent) {
 		return {
@@ -423,7 +427,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
                     
-					const target = (targetCard.length) ? targetCard.map(convertCard) : convertCard(targetCard);
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCard) : convertCard(targetCard);
 
 					return {
 						...action,
@@ -435,8 +439,12 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 					const targetCard = (typeof action.target == 'string') ?
 						game.getMetaValue(action.target, action.generatedBy) :
 						action.target;
-                    
-					const target = (targetCard.length) ? targetCard.map(convertCard) : convertCard(targetCard);
+
+					if (!('_card' in targetCard) || !targetCard._card) {
+						throw new Error('Card action without the card!');
+					}
+
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCard) : convertCard(targetCard);
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
@@ -461,7 +469,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						target: convertCard(target),
+						target: convertCardMinimal(target),
 						amount,
 					};
 				}
