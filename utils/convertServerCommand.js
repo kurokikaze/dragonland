@@ -440,7 +440,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 						game.getMetaValue(action.target, action.generatedBy) :
 						action.target;
 
-					if (!('_card' in targetCard) || !targetCard._card) {
+					if (!(targetCard instanceof Array) && (!('_card' in targetCard) || !targetCard._card)) {
 						throw new Error('Card action without the card!');
 					}
 

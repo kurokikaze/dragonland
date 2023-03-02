@@ -26,6 +26,7 @@ import {
 } from 'moonlands/dist/const.js';
 import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
+import { RegistryService } from '../utils/RegistryService.js';
 
 var router = express.Router();
 
@@ -34,25 +35,22 @@ var gamesCounter = 0;
 const runningGames = {};
 // EventEmitters corresponding to games
 const eventEmitters = {};
-// Player ID (Mongo) to player Id (game)
-const gamePlayers = {};
-// Player hash to game hash 
-const keyHash = {};
 // Player id (Mongo) to player hash
 const participants = {};
 
 const STEP_PRS_FIRST = 1;
+
+const registry = new RegistryService();
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
 	const gameId = nanoid();
 	const playerOneHash = nanoid();
 	const playerTwoHash = nanoid();
 
-	keyHash[playerOneHash] = gameId;
-	keyHash[playerTwoHash] = gameId;
+	registry.registerGameHashes(gameId, [playerOneHash, playerTwoHash]);
 
-	gamePlayers[playerOneHash] = 1;
-	gamePlayers[playerTwoHash] = 2;
+	registry.registerGamePlayer(playerOneHash, 1);
+	registry.registerGamePlayer(playerTwoHash, 2);
 	
 	const zones = [];
 
@@ -230,8 +228,8 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 	function(req, res) {
 		const playerHash = req.params[0];
 
-		const gameId = keyHash[playerHash];
-		const playerId = gamePlayers[playerHash];
+		const gameId = registry.getGameIdByPlayerHash(playerHash);
+		const playerId = registry.getPlayerIdByPlayerHash(playerHash);
 
 		if (gameId && playerId) {
 			if (!ioLaunched) {
@@ -244,8 +242,8 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 					console.log('Connection event');
 					const playerHash = socket.handshake.query.playerHash;
 
-					const gameId = keyHash[playerHash];
-					const playerId = gamePlayers[playerHash];
+					const gameId = registry.getGameIdByPlayerHash(playerHash);
+					const playerId = registry.getPlayerIdByPlayerHash(playerHash);
 
 					console.log(`Sent game id ${gameId}, player id ${playerId} [playerhash ${playerHash}]`);
 					console.log('Running games:');
@@ -287,8 +285,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 										console.log(`No eventEmitter found for the game ${gameId}`);
 									}
 									delete eventEmitters[gameId];
-									delete keyHash[playerHash];
-									delete gamePlayers[playerHash];
+									registry.unregisterPlayerHash(playerHash);
 								}, 1000);
 							}
 						});

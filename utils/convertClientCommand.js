@@ -98,7 +98,7 @@ function convertClientCommands(action, game) {
 			}
 
 			if (!expandedAction.source || !expandedAction.source.card) {
-				console.log('Card not found in expanded action')
+				console.log('Card not found in expanded action');
 				console.log(`Type of card object: ${typeof expandedAction.source}`);
 			}
 
