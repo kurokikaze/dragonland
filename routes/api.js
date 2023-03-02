@@ -308,6 +308,11 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 
 								try {
 									runningGames[gameId].update(expandedAction);
+									eventEmitters[gameId].emit('action', {
+										type: 'display/priority',
+										player: runningGames[gameId].state.prompt ? runningGames[gameId].state.promptPlayer : runningGames[gameId].state.activePlayer,
+										prompt: runningGames[gameId].state.prompt,
+									});
 								} catch(e) {
 									console.log('Engine error!');
 									console.log('On action:');
@@ -318,7 +323,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 									console.log(e.name);
 									console.log(e.message);
 									console.log(e.stack);
-                  process.exit(1);
+									process.exit(1);
 								}
 							}
 						});
