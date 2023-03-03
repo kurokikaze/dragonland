@@ -5,6 +5,12 @@ export class RegistryService {
 	// Player hash to player id in the game
 	gamePlayers = {};
 
+	// User ids to game hashes (used to check if the player participates in a game)
+	participants = {}
+
+	// Running games by ids
+	runningGames = {};
+
 	constructor() {}
 	registerGameHashes(gameId, playerHashes) {
 		for (let playerHash of playerHashes) {
@@ -27,5 +33,25 @@ export class RegistryService {
 	unregisterPlayerHash(playerHash) {
 		delete this.keyHash[playerHash];
 		delete this.gamePlayers[playerHash];
+	}
+
+	registerParticipant(userId, playerHash) {
+		this.participants[userId] = playerHash;
+	}
+
+	getParticipant(userId) {
+		return this.participants[userId];
+	}
+
+	unregisterParticipant(userId) {
+		delete this.participants[userId];
+	}
+
+	registerGame(game, gameId) {
+		this.runningGames[gameId] = game;
+	}
+
+	getGame(gameId) {
+		return this.runningGames[gameId];
 	}
 }

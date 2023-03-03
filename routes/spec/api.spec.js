@@ -33,8 +33,8 @@ describe.skip('challenges', () => {
 	
 			const cookie = await login(server, 'tester', 'tester');	
 
-			console.log('COOKIE');
-			console.dir(cookie);
+			// console.log('COOKIE');
+			// console.dir(cookie);
 
 			server
 				.set('Cookie', cookie)

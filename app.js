@@ -2,7 +2,7 @@ import createError from 'http-errors';
 import express from 'express';
 import session from 'express-session'; 
 import cookieParser from 'cookie-parser';
-import logger from 'morgan';
+// import logger from 'morgan';
 import path from 'path';
 import passport from 'passport';
 import Strategy from 'passport-local';
@@ -54,7 +54,7 @@ const initApp = (mainCallback) => {
 		app.set('views', path.join(dirname__, 'views'));
 		app.set('view engine', 'pug');
 		
-		app.use(logger('combined'));
+		// app.use(logger('combined'));
 		app.use(express.json());
 		app.use(express.urlencoded({ extended: false }));
 		app.use(cookieParser());

@@ -1,6 +1,4 @@
 import express from 'express';
-import { EventEmitter } from 'events';
-import {nanoid} from 'nanoid';
 import { open, write, close, readdir, readFile } from 'fs';
 import { join as joinPath } from 'path';
 import { State } from 'moonlands';
@@ -14,7 +12,6 @@ import { getChallenges, addChallenge, removeByName } from '../utils/challenge.js
 import config from '../config.js';
 import {
 	ACTION_RESOLVE_PROMPT,
-	ACTION_PLAYER_WINS,
 	ZONE_TYPE_ACTIVE_MAGI,
 	ZONE_TYPE_HAND,
 	ZONE_TYPE_MAGI_PILE,
@@ -24,114 +21,25 @@ import {
 	ZONE_TYPE_DISCARD,
 	ACTION_PLAY,
 } from 'moonlands/dist/const.js';
-import convertClientCommand from '../utils/convertClientCommand.js';
 import convertServerCommand from '../utils/convertServerCommand.js';
 import { RegistryService } from '../utils/RegistryService.js';
+import { GameContainerFactory } from '../utils/GameContainerFactory.js';
 
 var router = express.Router();
 
 var gamesCounter = 0;
 
-const runningGames = {};
-// EventEmitters corresponding to games
-const eventEmitters = {};
-// Player id (Mongo) to player hash
-const participants = {};
-
 const STEP_PRS_FIRST = 1;
 
 const registry = new RegistryService();
+const gameFactory = new GameContainerFactory(registry); 
 
 function createGame(playerOne, playerTwo, deckOne, deckTwo) {
-	const gameId = nanoid();
-	const playerOneHash = nanoid();
-	const playerTwoHash = nanoid();
-
-	registry.registerGameHashes(gameId, [playerOneHash, playerTwoHash]);
-
-	registry.registerGamePlayer(playerOneHash, 1);
-	registry.registerGamePlayer(playerTwoHash, 2);
-	
-	const zones = [];
-
-	const gameState = new State({
-		zones,
-		step: null,
-		activePlayer: playerOne,
-	});
-
-	gameState.setPlayers(playerOne, playerTwo);
-
-	gameState.setDeck(
-		playerOne,
-		deckOne,
-	);
-
-	gameState.setDeck(
-		playerTwo,
-		deckTwo,
-	);
-
-	// gameState.enableTurnTimer(100);
-	runningGames[gameId] = gameState;
-	const gameEventEmitter = new EventEmitter();
-	gameState.setOnAction(action => gameEventEmitter.emit('action', action));
-	eventEmitters[gameId] = gameEventEmitter;
+	const game = gameFactory.createGameContainer(playerOne, playerTwo, deckOne, deckTwo);
 	gamesCounter++;
 
-	return [gameId, playerOneHash, playerTwoHash];
+	return game;
 }
-
-router.post('/start',
-	ensure.ensureLoggedIn('/users/login'),
-	async function(req, res) {
-		const playerOne = parseInt(req.body.playerOne || '1', 10);
-		const playerTwo = parseInt(req.body.playerTwo || '2', 10);
-
-		const chosenDeckOne = req.body.chosenDeckOne;
-		const chosenDeckTwo = req.body.chosenDeckTwo;
-
-		try {
-			const deckOneObject = await getDeckById(chosenDeckOne);
-			const deckTwoObject = await getDeckById(chosenDeckTwo);
-
-			const deckOne = deckOneObject.cards;
-			const deckTwo = deckTwoObject.cards;
-
-			if (deckOne && deckOne.length > 0 && deckTwo && deckTwo.length > 0) {
-				const [
-					gameId,
-					playerOneHash,
-					playerTwoHash
-				] = createGame(
-					playerOne,
-					playerTwo,
-					deckOne,
-					deckTwo,
-				);
-			
-				runningGames[gameId].setup();
-				runningGames[gameId].enableDebug();
-			
-				res.render('started', {
-					gameId,
-					playerOneHash,
-					playerTwoHash,
-				});
-			} else {
-				res.render('game-error', { 
-					message: 'Deck retrieval error',
-					subtext: 'Wrong deck format',
-				});
-			}
-		} catch(e) {
-			res.render('game-error', { 
-				message: 'Database error',
-				subtext: 'Failed to connect to MongoDB',
-			});
-		}
-	}
-);
 
 var ioLaunched = false;
 
@@ -218,7 +126,7 @@ router.post(/^\/deck\/([a-zA-Z0-9_-]+)\/?$/,
 router.get('/stats',
 	function(_req, res) {
 		res.render('stats', {
-			runningGames: Object.keys(runningGames),
+			runningGames: [],
 			gamesCounter,
 		});
 	}
@@ -228,15 +136,17 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 	function(req, res) {
 		const playerHash = req.params[0];
 
+		console.log('');
+		console.log(`Getting the player id from hash ${playerHash}`);
+		console.dir(registry.gamePlayers);
+
 		const gameId = registry.getGameIdByPlayerHash(playerHash);
 		const playerId = registry.getPlayerIdByPlayerHash(playerHash);
 
 		if (gameId && playerId) {
+			const container = registry.getGame(gameId);
 			if (!ioLaunched) {
 				const io = req.app.get('io');
-
-				console.log('Running games:');
-				console.dir(Object.keys(runningGames));
 
 				io.on('connection', function(socket) {
 					console.log('Connection event');
@@ -244,90 +154,11 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 
 					const gameId = registry.getGameIdByPlayerHash(playerHash);
 					const playerId = registry.getPlayerIdByPlayerHash(playerHash);
-
-					console.log(`Sent game id ${gameId}, player id ${playerId} [playerhash ${playerHash}]`);
-					console.log('Running games:');
-					console.dir(Object.keys(runningGames));
-
 					if (gameId && playerId) {
-						socket.emit('gameData', {
-							playerId,
-							state: runningGames[gameId].serializeData(playerId),
-						});
-						// Converting game actions for sending
-						eventEmitters[gameId].on('action', action => {
-							var convertedAction = null;
-							try {
-								convertedAction = convertServerCommand(action, runningGames[gameId], playerId);
-							} catch (error) {
-								console.dir(error);
-								console.log('Error converting server command:');
-								console.dir(action);
-								console.log('Because of:');
-								console.dir(action.sourceCard);
-							}
-							socket.emit('action', convertedAction);
+						const socketContainer = registry.getGame(gameId);
+						console.log(`Sent game id ${gameId}, player id ${playerId} [playerhash ${playerHash}]`);
 
-							// if convertedAction signals game end, shut the session down
-							// and free the players
-							if (convertedAction.type === ACTION_PLAYER_WINS) {
-								setTimeout(() => {
-									socket.removeAllListeners();
-									socket.disconnect();
-
-									if (runningGames[gameId] && runningGames[gameId].userHashes) {
-										runningGames[gameId].userHashes.forEach(userHash => {delete participants[userHash];});
-									}
-									delete runningGames[gameId];
-									if (eventEmitters[gameId]) {
-										eventEmitters[gameId].removeAllListeners();
-									} else {
-										console.log(`No eventEmitter found for the game ${gameId}`);
-									}
-									delete eventEmitters[gameId];
-									registry.unregisterPlayerHash(playerHash);
-								}, 1000);
-							}
-						});
-
-						// Converting client actions for game engine
-						socket.on('clientAction', action => {
-							// Only process active player actions or specifically requested prompt resolutions
-							if (runningGames[gameId].state.activePlayer === playerId ||
-								(runningGames[gameId].state.prompt && runningGames[gameId].state.promptPlayer === playerId)) {
-								let expandedAction = null;
-								try {
-									expandedAction = convertClientCommand({ ...action, player: playerId}, runningGames[gameId]);
-								} catch(e) {
-									console.log('Error converting client command');
-									console.dir({ ...action, player: playerId});
-								}
-
-								try {
-									runningGames[gameId].update(expandedAction);
-									eventEmitters[gameId].emit('action', {
-										type: 'display/priority',
-										player: runningGames[gameId].state.prompt ? runningGames[gameId].state.promptPlayer : runningGames[gameId].state.activePlayer,
-										prompt: runningGames[gameId].state.prompt,
-									});
-								} catch(e) {
-									console.log('Engine error!');
-									console.log('On action:');
-									console.dir(expandedAction);
-									// console.log('');
-									// console.dir(runningGames[gameId].state);
-									console.log('');
-									console.log(e.name);
-									console.log(e.message);
-									console.log(e.stack);
-									process.exit(1);
-								}
-							}
-						});
-
-						socket.on('disconnect', function(){
-							console.log('user disconnected');
-						});
+						socketContainer.attachPlayerSocket(socket, playerId);
 					}
 				});
 
@@ -338,7 +169,7 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 				gameId,
 				playerId,
 				playerHash,
-				initialState: runningGames[gameId].serializeData(playerId),
+				initialState: container.gameState.serializeData(playerId),
 			});
 		} else {
 			res.render('game-error', {
@@ -352,8 +183,9 @@ router.get(/^\/game\/([a-zA-Z0-9_-]+)\/?$/,
 router.get('/challenges', 
 	ensure.ensureLoggedIn('/users/login'),
 	(req, res) => {
-		if (participants[req.user.gameId]) {
-			res.json({hash: participants[req.user.gameId]});
+		const participantHash = registry.getParticipant(req.user.gameId);
+		if (participantHash) {
+			res.json({hash: participantHash});
 		} else {
 			res.json(getChallenges());
 		}
@@ -363,6 +195,7 @@ router.get('/challenges',
 router.post('/challenges',
 	ensure.ensureLoggedIn('/users/login'),
 	async (req, res) => {
+		console.log('Creating the challenge.');
 		const challenges = getChallenges();
 		if (!challenges.some(challenge => challenge.user === req.user.name)) {
 			const deck = await getDeckById(req.body.deckId);
@@ -401,34 +234,30 @@ router.post('/accept',
 			const deckOne = await getDeckById(challenge.deckId);
 			const deckTwo = await getDeckById(req.body.deckId);
 
-			const [
-				gameId,
-				playerOneHash,
-				playerTwoHash
-			] = createGame(
-				1,
-				2,
+			// Player One is the one who created the game,
+			// player two is the one who accepted it
+			console.log(`Accepting the challenge. Creating game with players ${challenge.userId} and ${req.user.gameId}`);
+			const gameContainer = createGame(
+				challenge.userId,
+				req.user.gameId,
 				deckOne.cards,
 				deckTwo.cards,
 			);
 
-			runningGames[gameId].setup();
-			runningGames[gameId].enableDebug();
+			gameContainer.gameState.setup();
+			// gameContainer.gameState.enableDebug();
+
+			const gameId = gameContainer.gameId;
 
 			open(joinPath(config.logDirectory, `${gameId}.log`), 'w', (err, file) => {
 				if (!err) {
-					const initialState = runningGames[gameId].serializeData(1, false);
+					const initialState = gameContainer.gameState.serializeData(1, false);
 					write(file, JSON.stringify(initialState, null, 2) + '\n###\n', () => {
-						eventEmitters[gameId].on('action', action => {
-							// const isClientAction = (
-							// 	action.type === ACTION_RESOLVE_PROMPT ||
-							// 	action.type === ACTION_POWER ||
-							// 	action.type === ACTION_ATTACK ||
-							// 	action.type === ACTION_PLAY);
-							const convertedAction = /* isClientAction ? convertClientCommand(action, runningGames[gameId]) : */ convertServerCommand(action, runningGames[gameId], 1, true);
+						gameContainer.events.on('action', action => {
+							const convertedAction = convertServerCommand(action, gameContainer.gameState, 1, true);
 							write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
 						});
-						eventEmitters[gameId].on('close', () => {
+						gameContainer.events.on('close', () => {
 							close(file, () => null);
 						});	
 					});
@@ -439,16 +268,11 @@ router.post('/accept',
 				}
 			});
 
-			participants[challenge.userId] = playerOneHash;
-			participants[req.user.gameId] = playerTwoHash;
-
-			runningGames[gameId].userHashes = [challenge.userId, req.user.gameId];
-
 			removeByName(challenge.user);
 			removeByName(req.user.name);
 
 			res.json({
-				hash: playerTwoHash,
+				hash: gameContainer.playerHashes[req.user.gameId],
 			});
 		} else {
 			res.json(getChallenges());
