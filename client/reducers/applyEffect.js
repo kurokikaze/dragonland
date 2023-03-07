@@ -1,17 +1,12 @@
 /* global window */
 import { nanoid } from 'nanoid';
 import {
-	TYPE_CREATURE,
-	TYPE_MAGI,
-	TYPE_RELIC,
-
 	EFFECT_TYPE_ADD_ENERGY_TO_MAGI,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL,
-	EFFECT_TYPE_PAYING_ENERGY_FOR_POWER,
+	EFFECT_TYPE_REMOVE_ENERGY_FROM_CREATURE,
+	EFFECT_TYPE_REMOVE_ENERGY_FROM_MAGI,
 	EFFECT_TYPE_START_OF_TURN,
 	EFFECT_TYPE_MOVE_ENERGY,
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
@@ -149,97 +144,26 @@ export function applyEffect(state, action) {
 				turnTimer: false, 
 			};
 		}
-		case EFFECT_TYPE_PAYING_ENERGY_FOR_POWER: {
-			const targetBaseCard = byName(action.target.card);
-			switch (targetBaseCard.type) {
-				case TYPE_CREATURE: {
-					// creature pays for the ability
-					return state;
-				}
-				case TYPE_MAGI: {
-					const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
-						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-					const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
-						.map(card => card.id == action.target.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-          
-					return {
-						...state,
-						zones: {
-							...state.zones,
-							playerActiveMagi,
-							opponentActiveMagi,
-						},
-					};
-				}
-				case TYPE_RELIC: {
-					// magi pays for the ability
-					if (action.target.owner == window.playerId) {
-						const playerActiveMagi = state.zones.playerActiveMagi
-							.map(card => ({
-								...card,
-								data: {
-									...card.data,
-									energy: card.data.energy - action.amount,
-								},
-							}));
-						return {
-							...state,
-							zones: {
-								...state.zones,
-								playerActiveMagi,
-							},
-						};
-					} else {
-						const opponentActiveMagi = state.zones.opponentActiveMagi
-							.map(card => ({
-								...card,
-								data: {
-									...card.data,
-									energy: card.data.energy - action.amount,
-								},
-							}));
-						return {
-							...state,
-							zones: {
-								...state.zones,
-								opponentActiveMagi,
-							},
-						};
-					}
-				}
+
+		case EFFECT_TYPE_REMOVE_ENERGY_FROM_CREATURE: {
+			const idToFind = action.target.id;
+
+			const creature = findInPlay(state, idToFind);
+			if (!creature) {
+				return state;
 			}
-			// No idea what that was
-			return state; 
-		}
-		case EFFECT_TYPE_PAYING_ENERGY_FOR_SPELL: {
-			const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
-				.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-			const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
-				.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
+			const newLogEntry = {type: LOG_ENTRY_CREATURE_ENERGY_LOSS, card: creature.card, amount: action.amount};
+
+			const inPlay = [...state.zones.inPlay].map(card => card.id === idToFind ? {...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}} : card);
 
 			return {
 				...state,
 				zones: {
 					...state.zones,
-					playerActiveMagi,
-					opponentActiveMagi,
+					inPlay,
 				},
-			};
-		}
-		case EFFECT_TYPE_PAYING_ENERGY_FOR_CREATURE: {
-			const playerActiveMagi = [...(state.zones.playerActiveMagi || [])]
-				.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-			const opponentActiveMagi = [...(state.zones.opponentActiveMagi || [])]
-				.map(card => card.id == action.from.id ? {...card, data: {...card.data, energy: card.data.energy - action.amount}} : card);
-
-			return {
-				...state,
-				zones: {
-					...state.zones,
-					playerActiveMagi,
-					opponentActiveMagi,
-				},
-			};
+				log: [...state.log, newLogEntry],
+			};    
 		}
 		case EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE: {
 			const inPlay = [...state.zones.inPlay].map(
@@ -343,6 +267,35 @@ export function applyEffect(state, action) {
 				},
 				log: [...state.log, newLogEntry],
 			};
+		}
+		case EFFECT_TYPE_REMOVE_ENERGY_FROM_MAGI: {
+			const magiFound = findInPlay(state, action.target.id);
+			const newLogEntry = {
+				type: LOG_ENTRY_MAGI_ENERGY_LOSS,
+				card: magiFound.card,
+				amount: action.amount,
+			};
+
+			if (state.zones.playerActiveMagi.length && state.zones.playerActiveMagi[0].id === action.target.id) {
+				return {
+					...state,
+					zones: {
+						...state.zones,
+						playerActiveMagi: state.zones.playerActiveMagi.map(card => ({...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}})),
+					},
+					log: [...state.log, newLogEntry],
+				};
+			} else if (state.zones.opponentActiveMagi.length && state.zones.opponentActiveMagi[0].id === action.target.id) {
+				return {
+					...state,
+					zones: {
+						...state.zones,
+						opponentActiveMagi: state.zones.opponentActiveMagi.map(card => ({...card, data: {...card.data, energy: Math.max(card.data.energy - action.amount, 0)}})),
+					},
+					log: [...state.log, newLogEntry],
+				};
+			}
+			return state;
 		}
 		case EFFECT_TYPE_MOVE_ENERGY: {
 			const playerActiveMagi = [...state.zones.playerActiveMagi]

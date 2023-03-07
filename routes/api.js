@@ -254,8 +254,15 @@ router.post('/accept',
 					const initialState = gameContainer.gameState.serializeData(1, false);
 					write(file, JSON.stringify(initialState, null, 2) + '\n###\n', () => {
 						gameContainer.events.on('action', action => {
-							const convertedAction = convertServerCommand(action, gameContainer.gameState, 1, true);
-							write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
+							if (action.type !== 'display/priority') {
+								try {
+									const convertedAction = convertServerCommand(action, gameContainer.gameState, 1, true);
+									write(file, JSON.stringify(convertedAction, null, 2) + ',\n', () => null);
+								} catch(e) {
+									console.log(`Error on serializing the action for the log: ${action.type}`);
+									console.dir(action);
+								}
+							}
 						});
 						gameContainer.events.on('close', () => {
 							close(file, () => null);

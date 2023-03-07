@@ -31,6 +31,7 @@ export class GameContainer {
 
 	clear() {
 		if (this.events) {
+			this.events.emit('close');
 			this.events.removeAllListeners();
 		} else {
 			console.log(`No eventEmitter found for the game ${this.gameId}`);

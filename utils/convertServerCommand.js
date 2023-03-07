@@ -4,6 +4,7 @@ import {
 	ACTION_ENTER_PROMPT,
 	ACTION_EFFECT,
 	ACTION_POWER,
+	ACTION_ATTACK,
 
 	PROMPT_TYPE_NUMBER,
 	PROMPT_TYPE_CHOOSE_N_CARDS_FROM_ZONE,
@@ -22,6 +23,7 @@ import {
 	EFFECT_TYPE_CARD_MOVED_BETWEEN_ZONES,
 	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE,
 	EFFECT_TYPE_ADD_ENERGY_TO_CREATURE,
+	EFFECT_TYPE_ATTACK,
 	EFFECT_TYPE_CREATURE_ATTACKS,
 	EFFECT_TYPE_MAGI_IS_DEFEATED,
 	EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE,
@@ -31,11 +33,22 @@ import {
 	EFFECT_TYPE_DISCARD_RESHUFFLED,
 	EFFECT_TYPE_REARRANGE_CARDS_OF_ZONE,
 	EFFECT_TYPE_MOVE_CARD_BETWEEN_ZONES,
+	EFFECT_TYPE_MOVE_CARDS_BETWEEN_ZONES,
+	EFFECT_TYPE_DAMAGE_STEP,
+	EFFECT_TYPE_DEAL_DAMAGE,
+	EFFECT_TYPE_DEFENDER_DEALS_DAMAGE,
 
 	ZONE_TYPE_DECK,
 	ZONE_TYPE_MAGI_PILE,
 	ZONE_TYPE_HAND,
-	EFFECT_TYPE_MOVE_CARDS_BETWEEN_ZONES,
+	EFFECT_TYPE_ATTACKER_DEALS_DAMAGE,
+	EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE_OR_MAGI,
+	EFFECT_TYPE_BEFORE_DAMAGE,
+	EFFECT_TYPE_CREATURE_DEFEATS_CREATURE,
+	EFFECT_TYPE_CREATURE_IS_DEFEATED,
+	EFFECT_TYPE_RETURN_CREATURE_RETURNING_ENERGY,
+	EFFECT_TYPE_REMOVE_ENERGY_FROM_CREATURE,
+	EFFECT_TYPE_REMOVE_ENERGY_FROM_MAGI,
 } from 'moonlands/dist/const.js';
 
 import {clone} from './index.js';
@@ -113,6 +126,19 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 					card: convertCard(cardPlayed),
 				}
 			};
+		}
+		case ACTION_ATTACK: {
+			const convertedAction = {
+				type: action.type,
+				source: action.source.id,
+				target: action.target.id,
+				player: action.player,
+			};
+
+			if (action.additionalAttackers) {
+				convertedAction.additionalAttackers = action.additionalAttackers.map(card => card.id);
+			}
+			return convertedAction;
 		}
 		case ACTION_ENTER_PROMPT: {
 			const actionSource = game.getMetaValue(action.source, action.generatedBy);
@@ -275,7 +301,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						target: convertCard(target),
+						target: convertCardMinimal(target),
 						amount,
 					};
 				}
@@ -309,7 +335,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						from: convertCard(from),
+						from: convertCardMinimal(from),
 					};
 				}
 				case EFFECT_TYPE_FORBID_ATTACK_TO_CREATURE: {
@@ -330,7 +356,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						from: convertCard(from),
+						from: convertCardMinimal(from),
 					};
 				}
 				case EFFECT_TYPE_DISCARD_ENERGY_FROM_MAGI: {
@@ -350,11 +376,23 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 						amount,
 					};
 				}
+				case EFFECT_TYPE_ATTACK: {
+					return {
+						...action,
+						source: action.source.id,
+						target: action.target.id,
+						additionalAttackers: action.additionalAttackers.map(card => card.id),
+						generatedBy: action.generatedBy,
+						player: action.player,
+					};
+				}
 				case EFFECT_TYPE_CREATURE_ATTACKS: {
 					return {
 						...action,
-						source: convertCard(action.source),
-						target: convertCard(action.target),
+						source: convertCardMinimal(action.source),
+						target: convertCardMinimal(action.target),
+						sourceAtStart: convertCardMinimal(action.sourceAtStart),
+						targetAtStart: convertCardMinimal(action.targetAtStart),
 					};
 				}
 				case EFFECT_TYPE_PLAY_CREATURE: {
@@ -370,7 +408,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						target: (targetCards instanceof Array) ? targetCards.map(convertCard) : convertCard(targetCards),
+						target: (targetCards instanceof Array) ? targetCards.map(convertCardMinimal) : convertCardMinimal(targetCards),
 					};
 				}
 				case EFFECT_TYPE_MOVE_CARD_BETWEEN_ZONES: {
@@ -380,7 +418,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 
 					return {
 						...action,
-						target: convertCard(targetCard),
+						target: convertCardMinimal(targetCard),
 					};
 				}
 				case EFFECT_TYPE_MOVE_ENERGY: {
@@ -427,11 +465,48 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
 						action.amount;
                     
-					const target = (targetCard instanceof Array) ? targetCard.map(convertCard) : convertCard(targetCard);
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCardMinimal) : convertCardMinimal(targetCard);
 
 					return {
 						...action,
 						target,
+						source: action.source ? convertCardMinimal(action.source) : action.source,
+						amount,
+					};
+				}
+				case EFFECT_TYPE_REMOVE_ENERGY_FROM_CREATURE: {
+					const targetCard = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+
+					const amount = (typeof action.amount == 'string') ?
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
+						action.amount;
+                    
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCardMinimal) : convertCardMinimal(targetCard);
+
+					return {
+						...action,
+						target,
+						source: action.source ? convertCardMinimal(action.source) : action.source,
+						amount,
+					};
+				}
+				case EFFECT_TYPE_REMOVE_ENERGY_FROM_MAGI: {
+					const targetCard = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+
+					const amount = (typeof action.amount == 'string') ?
+						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
+						action.amount;
+                    
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCardMinimal) : convertCardMinimal(targetCard);
+
+					return {
+						...action,
+						target,
+						source: action.source ? convertCardMinimal(action.source) : action.source,
 						amount,
 					};
 				}
@@ -444,7 +519,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 						throw new Error('Card action without the card!');
 					}
 
-					const target = (targetCard instanceof Array) ? targetCard.map(convertCard) : convertCard(targetCard);
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCardMinimal) : convertCardMinimal(targetCard);
 
 					const amount = (typeof action.amount == 'string') ?
 						parseInt(game.getMetaValue(action.amount, action.generatedBy), 10) :
@@ -453,6 +528,7 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 					return {
 						...action,
 						target,
+						source: action.source ? convertCardMinimal(action.source) : false,
 						amount,
 					};
 				}
@@ -477,6 +553,106 @@ function convertServerCommand(initialAction, game, playerId, overrideHiding = fa
 					return {
 						...action,
 					};
+				}
+				// Log size optimization
+				case EFFECT_TYPE_DEAL_DAMAGE: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						amount: action.amount,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_DAMAGE_STEP: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						packHuntAttack: action.packHuntAttack,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_ATTACKER_DEALS_DAMAGE: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						amount: action.amount,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_DEFENDER_DEALS_DAMAGE: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						amount: action.amount,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_DISCARD_ENERGY_FROM_CREATURE_OR_MAGI: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						attack: action.attack,
+						spell: action.spell,
+						relic: action.relic,
+						amount: action.amount,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_BEFORE_DAMAGE: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_CREATURE_DEFEATS_CREATURE: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						source: action.source.id,
+						target: action.target.id,
+						attack: action.attack,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_CREATURE_IS_DEFEATED: {
+					return {
+						type: action.type,
+						effectType: action.effectType,
+						target: action.target.id,
+						generatedBy: action.generatedBy,
+					};
+				}
+				case EFFECT_TYPE_RETURN_CREATURE_RETURNING_ENERGY: {
+					const targetCard = (typeof action.target == 'string') ?
+						game.getMetaValue(action.target, action.generatedBy) :
+						action.target;
+                    
+					const target = (targetCard instanceof Array) ? targetCard.map(convertCardMinimal) : convertCardMinimal(targetCard);
+
+					const convertedAction = {
+						type: action.type,
+						effectType: action.effectType,
+						target,
+						power: action.power,
+						generatedBy: action.generatedBy,
+					};
+					if (action.source) {
+						convertedAction.source = convertCardMinimal(action.source);
+					}
+					return convertedAction;
 				}
 			}
 		}
